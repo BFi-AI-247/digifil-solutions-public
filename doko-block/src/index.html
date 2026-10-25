@@ -1,0 +1,505 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#1f4d3a">
+<meta name="robots" content="noindex,nofollow">
+<title>Doko-Block</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icon-180.png">
+<style>
+/*BASIS_CSS*/
+nav.unten{position:fixed;left:0;right:0;bottom:0;background:var(--karte);border-top:1px solid var(--linie);display:flex;padding-bottom:env(safe-area-inset-bottom);z-index:20}
+nav.unten button{flex:1;background:none;color:var(--leise);border-radius:0;flex-direction:column;gap:2px;font-size:.74rem;font-weight:600;padding:8px 2px 9px;min-height:58px}
+nav.unten button svg{width:23px;height:23px}
+nav.unten button[aria-current=true]{color:var(--filz)}
+.kopf .punkt{width:18px;height:18px;min-height:0;padding:0;border-radius:50%;border:2px solid rgba(255,255,255,.85);vertical-align:-4px;margin-left:4px}
+.muster{display:grid;grid-template-columns:repeat(6,1fr);gap:10px;margin:12px 0}
+.muster button{aspect-ratio:1;min-height:0;padding:0;border-radius:50%;border:3px solid transparent}
+.muster button[aria-pressed=true]{border-color:var(--tinte)}
+.seite{display:none}.seite.an{display:block}
+.termin{display:flex;gap:12px;align-items:center}
+.termin .tag{background:var(--filz-hell);color:var(--filz);border-radius:12px;padding:6px 10px;text-align:center;font-weight:700;line-height:1.1;min-width:58px}
+.termin .tag small{display:block;font-size:.72rem;font-weight:600}
+.foto-wahl{border:2px dashed var(--linie);border-radius:var(--r);padding:22px 14px;text-align:center;cursor:pointer;display:block;margin:0}
+.foto-wahl input{display:none}
+.foto-wahl strong{display:block;font-size:1.05rem;color:var(--filz);margin-bottom:4px}
+.vorschau{max-width:100%;max-height:260px;border-radius:10px;display:block;margin:10px auto 0;cursor:zoom-in}
+.wahl{display:inline-flex;background:var(--papier);border:1px solid var(--linie);border-radius:11px;padding:3px}
+.wahl button{background:none;color:var(--leise);min-height:36px;padding:6px 12px;border-radius:8px}
+.wahl button[aria-pressed=true]{background:var(--karte);color:var(--filz);box-shadow:var(--schatten)}
+.platz-gitter{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.platz-gitter div{text-align:center}
+.platz-gitter b{display:block;font-size:.9rem;margin-bottom:4px}
+.platz-gitter select{text-align:center;padding:8px 4px}
+.platz-gitter input{text-align:center;padding:8px 4px}
+.spiele input{min-height:34px;padding:4px;text-align:center;width:58px;border-radius:7px}
+.spiele select{min-height:34px;padding:4px;width:76px;border-radius:7px;font-size:.85rem}
+.spiele td{padding:3px 3px}
+.abend{display:flex;gap:10px;align-items:center;padding:11px 2px;border-bottom:1px solid var(--linie);cursor:pointer}
+.abend:last-child{border-bottom:0}
+.abend .nr{color:var(--leise);font-size:.8rem;width:34px;text-align:right;font-variant-numeric:tabular-nums}
+.abend .wann{width:88px;font-variant-numeric:tabular-nums;font-size:.92rem}
+.abend .wann small{display:block;color:var(--leise);font-size:.76rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:88px}
+.abend .chips{flex:1;display:flex;flex-wrap:wrap;gap:4px}
+.abend .foto{font-size:.9rem}
+/* Handy: oben Nr · Datum · Ort, darunter alle vier Namen in einer Zeile */
+@media (max-width:560px){
+  .abend{display:grid;grid-template-columns:auto auto 1fr auto;column-gap:8px;row-gap:7px;align-items:baseline;padding:10px 0}
+  .abend .nr{width:auto;grid-column:1;grid-row:1}
+  .abend .wann{display:contents}
+  .abend .wann small{grid-column:3;grid-row:1;max-width:none;font-size:.82rem}
+  .abend .foto{grid-column:4;grid-row:1}
+  .abend .chips{grid-column:1/-1;grid-row:2;flex-wrap:nowrap;gap:5px}
+  .abend .chips .chip{flex:1 1 0;min-width:0;justify-content:center;padding:3px 4px;font-size:.8rem;overflow:hidden;text-overflow:ellipsis}
+}
+.jahr-kopf{display:flex;justify-content:space-between;align-items:baseline;margin:18px 2px 6px}
+.jahr-kopf h3{margin:0}
+.balken{height:8px;border-radius:4px;background:var(--linie);overflow:hidden;display:flex}
+.balken i{display:block;height:100%}
+.verteilung{display:flex;gap:2px;height:8px;border-radius:4px;overflow:hidden;min-width:64px}
+.verteilung i{display:block}
+.chat{display:flex;flex-direction:column;gap:10px;margin-bottom:12px}
+.blase{max-width:88%;padding:10px 13px;border-radius:16px;white-space:pre-wrap;word-wrap:break-word}
+.blase.ich{align-self:flex-end;background:var(--filz);color:#fff;border-bottom-right-radius:5px}
+@media (prefers-color-scheme:dark){.blase.ich{color:#0f1a14}}
+.blase.ki{align-self:flex-start;background:var(--karte);border:1px solid var(--linie);border-bottom-left-radius:5px}
+.vorschlag{border:1px solid var(--gold);background:var(--gold-hell);border-radius:12px;padding:10px 12px;margin-top:8px;white-space:normal}
+.vorschlag .zeile{margin-top:8px}
+.kenn{display:flex;justify-content:space-between;gap:10px;padding:6px 0;border-bottom:1px solid var(--linie)}
+.kenn:last-child{border-bottom:0}
+.gross-foto{max-width:100%;border-radius:10px}
+</style>
+</head>
+<body>
+<header class="kopf">
+  <span class="pips" aria-hidden="true">♣♠</span>
+  <h1><span id="runde">Doko-Block</span><small><span id="hallo">&nbsp;</span> <button id="meine-farbe" class="punkt verdeckt" aria-label="Meine Farbe ändern" title="Meine Farbe ändern"></button></small></h1>
+  <a href="verlauf.html">Verlauf</a>
+</header>
+<main>
+
+<section class="seite an" id="s-erfassen">
+  <div id="naechster"></div>
+  <div class="karte" id="k-foto">
+    <h2>Abend erfassen</h2>
+    <label class="foto-wahl" id="foto-wahl">
+      <input type="file" accept="image/*" id="foto">
+      <strong>📷 Foto vom Block</strong>
+      <span class="leise">Antippen zum Fotografieren oder ein Bild auswählen</span>
+    </label>
+    <img id="foto-vorschau" class="vorschau verdeckt" alt="Ausgewähltes Foto">
+    <div class="zeile" style="margin-top:12px">
+      <span class="leise">Auslesen mit</span>
+      <div class="wahl" id="anbieter-wahl">
+        <button type="button" data-a="claude" aria-pressed="true">Claude</button>
+        <button type="button" data-a="mistral" aria-pressed="false">Mistral</button>
+      </div>
+    </div>
+    <div class="zeile" style="margin-top:12px">
+      <button id="auslesen" class="dehnen" disabled>Zettel auslesen</button>
+    </div>
+    <div id="auslese-status"></div>
+    <p class="leise" style="margin:12px 0 0">Ohne Foto? <a href="#" id="hand">Nur die Plätze eintragen</a></p>
+  </div>
+  <div id="entwurf"></div>
+  <div class="karte">
+    <div class="zeile"><h2 class="dehnen" style="margin:0">Geplante Termine</h2><button class="zweit klein" id="termin-neu">+ Termin</button></div>
+    <div id="termine" style="margin-top:8px"></div>
+  </div>
+</section>
+
+<section class="seite" id="s-abende">
+  <div class="karte" style="padding:10px 14px">
+    <input type="search" id="suche" placeholder="Suchen: Datum, Ort, Jahr …" aria-label="Abende durchsuchen">
+  </div>
+  <div id="abende"></div>
+</section>
+
+<section class="seite" id="s-statistik">
+  <div class="karte">
+    <div class="zeile"><h2 class="dehnen" style="margin:0">Statistik</h2><select id="stat-jahr" style="width:auto"></select></div>
+    <div id="stat" style="margin-top:10px"></div>
+  </div>
+  <div class="karte"><h3>Jahr für Jahr</h3><div id="jahre" class="rollen"></div></div>
+  <div class="karte" id="stat-details"></div>
+</section>
+
+<section class="seite" id="s-fragen">
+  <div class="karte">
+    <div class="zeile"><h2 class="dehnen" style="margin:0">Fragen &amp; Ändern</h2>
+      <div class="wahl" id="ki-wahl"><button type="button" data-a="claude" aria-pressed="true">Claude</button><button type="button" data-a="mistral" aria-pressed="false">Mistral</button></div>
+    </div>
+    <p class="leise" style="margin:8px 0 12px">Frag zur Statistik oder bitte um eine Korrektur, z.&nbsp;B. „Am 9.10. war Ben Erster, nicht Anna“. Geändert wird erst, wenn ihr den Vorschlag übernehmt – alles steht im Verlauf.</p>
+    <div class="chat" id="chat"></div>
+    <textarea id="ki-text" placeholder="Nachricht an die KI …" style="min-height:70px"></textarea>
+    <div class="zeile" style="margin-top:8px"><button id="ki-senden" class="dehnen">Senden</button></div>
+  </div>
+  <div class="karte">
+    <h3>Rückmeldung zur App</h3>
+    <p class="leise" style="margin:0 0 8px">Wunsch oder Fehler? Landet als Aufgabe im Projekt. Den Stand seht ihr im Verlauf.</p>
+    <div class="wahl" id="fb-art"><button type="button" data-a="wunsch" aria-pressed="true">Wunsch</button><button type="button" data-a="fehler" aria-pressed="false">Fehler</button></div>
+    <textarea id="fb-text" placeholder="Was soll die App können – oder was klappt nicht?" style="margin-top:10px"></textarea>
+    <div class="zeile" style="margin-top:8px"><button id="fb-senden" class="zweit dehnen">Rückmeldung senden</button></div>
+  </div>
+</section>
+
+</main>
+
+<nav class="unten" aria-label="Bereiche">
+  <button data-s="erfassen" aria-current="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></svg>Erfassen</button>
+  <button data-s="abende"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M8 6h12M8 12h12M8 18h12M4 6h.01M4 12h.01M4 18h.01"/></svg>Abende</button>
+  <button data-s="statistik"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M5 20V10M12 20V4M19 20v-7"/></svg>Statistik</button>
+  <button data-s="fragen"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a8 8 0 0 1-11.6 7.1L4 20l1-4.6A8 8 0 1 1 21 12z"/></svg>Fragen</button>
+</nav>
+
+<dialog id="dlg"><div class="innen" id="dlg-inhalt"></div></dialog>
+
+<script>
+/*BASIS_JS*/
+(() => {
+const { api, esc, datum, wochentag, euro, zahl, heute, toast, chips } = DK;
+const $ = s => document.querySelector(s);
+let D = null;              // Daten vom Server
+let fotoBlob = null;       // verkleinertes Foto
+let ENTWURF = null;
+const chatVerlauf = [];
+const merke = (k, v) => { try { v === undefined ? (v = localStorage.getItem(k)) : localStorage.setItem(k, v); } catch (e) {} return v; };
+
+// ---------- Navigation ----------
+function zeige(s) {
+  document.querySelectorAll('.seite').forEach(el => el.classList.toggle('an', el.id === 's-' + s));
+  document.querySelectorAll('nav.unten button').forEach(b => b.setAttribute('aria-current', b.dataset.s === s));
+  merke('doko-seite', s); window.scrollTo(0, 0);
+}
+document.querySelectorAll('nav.unten button').forEach(b => b.onclick = () => zeige(b.dataset.s));
+function wahl(id, cb) {
+  const el = $(id);
+  el.querySelectorAll('button').forEach(b => b.onclick = () => { el.querySelectorAll('button').forEach(x => x.setAttribute('aria-pressed', x === b)); cb && cb(b.dataset.a); });
+  return () => el.querySelector('[aria-pressed=true]').dataset.a;
+}
+function setzeWahl(id, wert) { $(id).querySelectorAll('button').forEach(x => x.setAttribute('aria-pressed', x.dataset.a === wert)); }
+const anbieter = wahl('#anbieter-wahl', a => merke('doko-anbieter', a));
+const kiAnbieter = wahl('#ki-wahl', a => merke('doko-ki', a));
+const fbArt = wahl('#fb-art');
+setzeWahl('#anbieter-wahl', merke('doko-anbieter') || 'claude');
+setzeWahl('#ki-wahl', merke('doko-ki') || 'claude');
+
+// ---------- Daten ----------
+const aktiv = () => D.abende.filter(a => !a.geloescht);
+function nummern() { const m = {}; aktiv().forEach((a, i) => m[a.id] = i + 1); return m; }
+async function laden() {
+  D = await api('daten');
+  const erstes = aktiv().map(a => a.datum).sort()[0];
+  $('#hallo').textContent = 'Hallo ' + D.ich + ' · ' + aktiv().length + ' Abende' + (erstes ? ' seit ' + erstes.slice(0, 4) : '');
+  if (D.runde) { $('#runde').textContent = D.runde; document.title = D.runde; }
+  DK.farben(D.farben);
+  const p = $('#meine-farbe'); p.dataset.farbe = D.ich; p.classList.remove('verdeckt');
+  zeigeTermine(); zeigeAbende(); zeigeStatistik();
+}
+
+// ---------- Erfassen ----------
+function zeigeTermine() {
+  const h = heute();
+  const kommend = D.termine.filter(t => t.datum >= h);
+  const n = kommend[0];
+  $('#naechster').innerHTML = n ? `<div class="karte termin"><div class="tag">${datum(n.datum).slice(0, 5)}<small>${wochentag(n.datum)}</small></div>
+    <div class="dehnen"><b>${n.datum === h ? 'Heute' : 'Nächster Abend'}</b><div class="leise">${esc(n.ort || 'Doko')}</div></div></div>` : '';
+  $('#termine').innerHTML = D.termine.length ? D.termine.map(t => `<div class="kenn"><span><b>${wochentag(t.datum)} ${datum(t.datum)}</b> <span class="leise">${esc(t.ort)}</span>${t.datum < h ? ' <span class="chip" style="background:var(--gold-hell);color:var(--gold)">noch nicht erfasst</span>' : ''}</span>
+    <button class="zweit klein" data-weg="${t.datum}" aria-label="Termin entfernen">✕</button></div>`).join('') : '<p class="leise">Keine Termine eingetragen.</p>';
+  $('#termine').querySelectorAll('[data-weg]').forEach(b => b.onclick = async () => {
+    if (!confirm('Termin am ' + datum(b.dataset.weg) + ' entfernen?')) return;
+    await api('termin', { datum: b.dataset.weg, weg: true }); toast('Termin entfernt'); laden();
+  });
+}
+$('#termin-neu').onclick = () => {
+  dialog(`<h2>Termin eintragen</h2><label>Datum</label><input type="date" id="t-datum" value="${heute()}">
+    <label>Ort / Bemerkung</label><input id="t-ort" placeholder="z. B. bei Ben">
+    <div class="zeile" style="margin-top:14px"><button class="zweit" data-zu>Abbrechen</button><button class="dehnen" id="t-ok">Eintragen</button></div>`);
+  $('#t-ok').onclick = async () => {
+    try { await api('termin', { datum: $('#t-datum').value, ort: $('#t-ort').value }); schliessen(); toast('Termin eingetragen'); laden(); }
+    catch (e) { toast(e.message); }
+  };
+};
+
+async function verkleinern(datei) {
+  let bild;
+  try { bild = await createImageBitmap(datei, { imageOrientation: 'from-image' }); }
+  catch (e) { bild = await new Promise((ok, nein) => { const i = new Image(); i.onload = () => ok(i); i.onerror = () => nein(new Error('Das Bild lässt sich nicht öffnen. Bitte als JPEG fotografieren.')); i.src = URL.createObjectURL(datei); }); }
+  const max = 2200, f = Math.min(1, max / Math.max(bild.width, bild.height));
+  const c = document.createElement('canvas'); c.width = Math.round(bild.width * f); c.height = Math.round(bild.height * f);
+  c.getContext('2d').drawImage(bild, 0, 0, c.width, c.height);
+  return await new Promise(ok => c.toBlob(ok, 'image/jpeg', 0.86));
+}
+$('#foto').onchange = async e => {
+  const f = e.target.files[0]; if (!f) return;
+  $('#auslese-status').innerHTML = '';
+  try {
+    fotoBlob = await verkleinern(f);
+    const v = $('#foto-vorschau'); v.src = URL.createObjectURL(fotoBlob); v.classList.remove('verdeckt');
+    v.onclick = () => dialog(`<img class="gross-foto" src="${v.src}" alt="Foto"><div class="zeile" style="margin-top:10px"><button class="dehnen zweit" data-zu>Schließen</button></div>`);
+    $('#foto-wahl strong').textContent = '📷 Anderes Foto wählen';
+    $('#auslesen').disabled = false;
+  } catch (err) { $('#auslese-status').innerHTML = `<div class="fehler">${esc(err.message)}</div>`; }
+};
+$('#auslesen').onclick = async () => {
+  if (!fotoBlob) return;
+  const b = $('#auslesen'); b.disabled = true;
+  const wer = anbieter() === 'mistral' ? 'Mistral' : 'Claude';
+  b.innerHTML = `<span class="drehen"></span> ${wer} liest den Zettel …`;
+  $('#auslese-status').innerHTML = '<p class="leise">Das dauert meist 15–60 Sekunden.</p>';
+  const fd = new FormData(); fd.append('foto', fotoBlob, 'zettel.jpg'); fd.append('anbieter', anbieter());
+  try {
+    const r = await api('auslesen', fd);
+    $('#auslese-status').innerHTML = '';
+    zeigeEntwurf(r.entwurf);
+  } catch (e) {
+    $('#auslese-status').innerHTML = `<div class="fehler">${esc(e.message)}</div>`;
+  } finally { b.disabled = false; b.textContent = 'Zettel auslesen'; }
+};
+$('#hand').onclick = e => { e.preventDefault(); zeigeEntwurf({ datum: null, plaetze: {}, spiele: [], hinweise: [], hand: true }); };
+
+function terminOrt(d) { const t = D.termine.find(t => t.datum === d); return t ? t.ort : ''; }
+function zeigeEntwurf(e) {
+  ENTWURF = e;
+  const S = D.spieler;
+  const d = e.datum && /^\d{4}-\d{2}-\d{2}$/.test(e.datum) ? e.datum : heute();
+  const ort = terminOrt(d) || terminOrt(heute());
+  const auswahl = s => `<select data-platz="${esc(s)}">${[1, 2, 3, 4].map(p => `<option ${e.plaetze[s] === p ? 'selected' : ''}>${p}</option>`).join('')}</select>`;
+  const spiele = e.spiele || [];
+  $('#entwurf').innerHTML = `<div class="karte">
+    <h2>${e.hand ? 'Abend von Hand eintragen' : 'Bitte prüfen'}</h2>
+    ${e.hand ? '' : `<p class="leise" style="margin-top:-6px">Ausgelesen mit ${esc(e.modell)}. Der Zettel gilt – korrigiert nur, wo die KI sich verlesen hat.</p>`}
+    ${(e.hinweise || []).map(h => `<div class="hinweis">${esc(h)}</div>`).join('')}
+    <div class="gitter2"><div><label>Datum</label><input type="date" id="e-datum" value="${d}"></div>
+      <div><label>Ort / Bemerkung</label><input id="e-ort" value="${esc(ort)}" placeholder="z. B. bei Anna"></div></div>
+    <label>Plätze</label>
+    <div class="platz-gitter">${S.map(s => `<div><b>${esc(s)}</b>${auswahl(s)}</div>`).join('')}</div>
+    ${e.hand ? '' : `<label>Endstand laut Zettel</label>
+    <div class="platz-gitter">${S.map(s => `<div><input inputmode="numeric" data-end="${esc(s)}" value="${e.endstand?.[s] ?? ''}" aria-label="Endstand ${esc(s)}"></div>`).join('')}</div>`}
+    <p class="leise" id="e-kasse" style="margin:10px 0 0"></p>
+    ${spiele.length ? `<details style="margin-top:12px"><summary><b>${spiele.length} Spiele</b> <span class="leise">(${e.format === 'laufend' ? 'laufende Summe' : 'Punkte je Spiel'}) – antippen zum Prüfen</span></summary>
+      <div class="rollen" style="margin-top:8px"><table class="spiele"><thead><tr><th>#</th>${S.map(s => `<th>${esc(s.slice(0, 3))}</th>`).join('')}<th>Solo</th></tr></thead><tbody>
+      ${spiele.map((z, i) => `<tr><td class="leise">${i + 1}</td>${S.map(s => `<td><input inputmode="numeric" data-sp="${i}" data-s="${esc(s)}" value="${z.werte[s] ?? ''}"></td>`).join('')}
+        <td><select data-solo="${i}"><option value="">–</option>${S.map(s => `<option ${z.solo === s ? 'selected' : ''}>${esc(s)}</option>`).join('')}</select></td></tr>`).join('')}
+      </tbody></table></div></details>` : ''}
+    <label>Notiz</label><input id="e-notiz" value="${esc(e.notiz || '')}" placeholder="optional">
+    <div class="zeile" style="margin-top:14px"><button class="zweit" id="e-weg">Verwerfen</button><button class="dehnen" id="e-ok">Abend speichern</button></div>
+  </div>`;
+  const kasse = () => {
+    const pl = leseePlaetze(); const ok = [...Object.values(pl)].sort().join() === '1,2,3,4';
+    $('#e-kasse').innerHTML = ok ? 'In die Kasse: ' + S.map(s => `${esc(s)} ${euro(pl[s] * D.euro_pro_platz)}`).join(' · ')
+      : '<span style="color:var(--rot)">Jeder Platz 1–4 muss genau einmal vorkommen.</span>';
+    $('#e-ok').disabled = !ok;
+  };
+  const anzahl = Object.keys(e.plaetze || {}).length;
+  if (anzahl < 4) S.forEach((s, i) => $(`[data-platz="${s}"]`).value = i + 1);
+  $('#entwurf').querySelectorAll('[data-platz]').forEach(el => el.onchange = kasse);
+  $('#e-datum').onchange = () => { const o = terminOrt($('#e-datum').value); if (o && !$('#e-ort').value) $('#e-ort').value = o; };
+  kasse();
+  $('#e-weg').onclick = () => { if (confirm('Entwurf verwerfen?')) { $('#entwurf').innerHTML = ''; ENTWURF = null; } };
+  $('#e-ok').onclick = speichern;
+  $('#entwurf').scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+function leseePlaetze() { const pl = {}; D.spieler.forEach(s => pl[s] = +document.querySelector(`[data-platz="${s}"]`).value); return pl; }
+async function speichern() {
+  const e = ENTWURF, S = D.spieler;
+  const abend = { datum: $('#e-datum').value, ort: $('#e-ort').value, plaetze: leseePlaetze(), notiz: $('#e-notiz').value };
+  if (!e.hand) {
+    abend.endstand = {}; S.forEach(s => { const v = document.querySelector(`[data-end="${s}"]`).value.trim(); abend.endstand[s] = v === '' ? null : +v; });
+    abend.format = e.format; abend.foto = e.foto; abend.anbieter = e.anbieter; abend.modell = e.modell;
+    abend.sieger = e.sieger; abend.stechen = e.stechen;
+    abend.spiele = (e.spiele || []).map((z, i) => {
+      const w = {}; S.forEach(s => { const v = document.querySelector(`[data-sp="${i}"][data-s="${s}"]`).value.trim(); w[s] = v === '' ? null : +v; });
+      return { werte: w, solo: document.querySelector(`[data-solo="${i}"]`).value || null, notiz: z.notiz };
+    });
+  }
+  if (aktiv().some(a => a.datum === abend.datum) && !confirm('Für den ' + datum(abend.datum) + ' gibt es schon einen Abend. Trotzdem einen weiteren speichern?')) return;
+  const b = $('#e-ok'); b.disabled = true;
+  try {
+    await api('speichern', { abend });
+    toast('Abend gespeichert 🎉');
+    $('#entwurf').innerHTML = ''; ENTWURF = null; fotoBlob = null;
+    $('#foto').value = ''; $('#foto-vorschau').classList.add('verdeckt'); $('#auslesen').disabled = true;
+    $('#foto-wahl strong').textContent = '📷 Foto vom Block';
+    await laden(); zeige('abende');
+  } catch (err) { toast(err.message); b.disabled = false; }
+}
+
+// ---------- Abende ----------
+function zeigeAbende() {
+  const q = $('#suche').value.trim().toLowerCase();
+  const nr = nummern();
+  let liste = aktiv().slice().reverse();
+  if (q) liste = liste.filter(a => (datum(a.datum) + ' ' + a.datum + ' ' + (a.ort || '') + ' ' + (a.notiz || '')).toLowerCase().includes(q));
+  if (!liste.length) { $('#abende').innerHTML = '<div class="karte leer">Nichts gefunden.</div>'; return; }
+  const jahre = {};
+  liste.forEach(a => (jahre[a.datum.slice(0, 4)] ||= []).push(a));
+  $('#abende').innerHTML = Object.keys(jahre).sort().reverse().map(j => `
+    <div class="jahr-kopf"><h3>${j}</h3><span class="leise">${jahre[j].length} Abende</span></div>
+    <div class="karte" style="padding:2px 12px">${jahre[j].map(a => `<div class="abend" data-id="${a.id}">
+      <span class="nr">${nr[a.id]}</span>
+      <span class="wann">${datum(a.datum)}<small>${esc(a.ort || '')}</small></span>
+      <span class="chips">${chips(a.plaetze, D.spieler)}</span>${a.foto ? '<span class="foto" title="mit Foto">📷</span>' : ''}</div>`).join('')}</div>`).join('');
+  $('#abende').querySelectorAll('.abend').forEach(el => el.onclick = () => zeigeAbend(el.dataset.id));
+}
+$('#suche').oninput = zeigeAbende;
+
+function zeigeAbend(id) {
+  const a = D.abende.find(x => x.id === id), S = D.spieler, nr = nummern()[id];
+  const sp = a.spiele || [];
+  dialog(`<div class="zeile"><h2 class="dehnen" style="margin:0">Abend ${nr} · ${wochentag(a.datum)} ${datum(a.datum)}</h2><button class="zweit klein" data-zu aria-label="Schließen">✕</button></div>
+    <p class="leise" style="margin:4px 0 12px">${esc(a.ort || '')}</p>
+    ${S.slice().sort((x, y) => a.plaetze[x] - a.plaetze[y]).map(s => `<div class="kenn"><span><span class="chip" data-p="${esc(s)}">${a.plaetze[s]}. ${esc(s)}</span></span>
+      <span class="leise">${a.endstand && a.endstand[s] != null ? a.endstand[s] + ' Pkt · ' : ''}${euro(a.plaetze[s] * D.euro_pro_platz)}</span></div>`).join('')}
+    ${a.stechen ? '<p class="leise">Mit Stechen entschieden.</p>' : ''}
+    ${a.notiz ? `<p>${esc(a.notiz)}</p>` : ''}
+    ${sp.length ? `<details style="margin-top:10px"><summary><b>${sp.length} Spiele</b></summary><div class="rollen"><table><thead><tr><th>#</th>${S.map(s => `<th class="z">${esc(s.slice(0, 3))}</th>`).join('')}<th></th></tr></thead><tbody>
+      ${sp.map(z => `<tr><td class="leise">${z.nr}</td>${S.map(s => `<td class="z">${z.werte[s] ?? '–'}</td>`).join('')}<td class="leise">${z.solo ? 'Solo ' + esc(z.solo) : ''} ${esc(z.notiz || '')}</td></tr>`).join('')}</tbody></table></div></details>` : ''}
+    <div id="d-foto"></div>
+    <p class="leise" style="font-size:.8rem;margin-top:12px">${a.quelle === 'excel' ? 'Aus der alten Excel-Liste übernommen.' : `Erfasst von ${esc(a.erfasst?.von)} am ${DK.zeit(a.erfasst?.am)}${a.modell ? ' · ausgelesen mit ' + esc(a.modell) : ''}.`}
+      ${a.geaendert ? ` Zuletzt geändert von ${esc(a.geaendert.von)} am ${DK.zeit(a.geaendert.am)}.` : ''}</p>
+    <div class="zeile" style="margin-top:12px"><button class="warn" id="d-weg">Löschen</button><button class="zweit dehnen" id="d-aendern">Ändern</button></div>`);
+  if (a.foto) DK.fotoUrl(a.foto).then(u => $('#d-foto').innerHTML = `<img class="gross-foto" style="margin-top:12px" src="${u}" alt="Foto vom Block">`).catch(() => {});
+  $('#d-weg').onclick = async () => {
+    const grund = prompt('Abend vom ' + datum(a.datum) + ' in den Papierkorb legen?\nGrund (optional):', '');
+    if (grund === null) return;
+    try { await api('loeschen', { id, grund }); schliessen(); toast('In den Papierkorb gelegt – wiederherstellbar im Verlauf'); laden(); } catch (e) { toast(e.message); }
+  };
+  $('#d-aendern').onclick = () => aendern(a);
+}
+function aendern(a) {
+  const S = D.spieler;
+  dialog(`<h2>Abend ändern</h2>
+    <div class="gitter2"><div><label>Datum</label><input type="date" id="a-datum" value="${a.datum}"></div><div><label>Ort / Bemerkung</label><input id="a-ort" value="${esc(a.ort || '')}"></div></div>
+    <label>Plätze</label><div class="platz-gitter">${S.map(s => `<div><b>${esc(s)}</b><select data-ap="${esc(s)}">${[1, 2, 3, 4].map(p => `<option ${a.plaetze[s] === p ? 'selected' : ''}>${p}</option>`).join('')}</select></div>`).join('')}</div>
+    <label>Notiz</label><input id="a-notiz" value="${esc(a.notiz || '')}">
+    <div class="zeile" style="margin-top:14px"><button class="zweit" data-zu>Abbrechen</button><button class="dehnen" id="a-ok">Speichern</button></div>`);
+  $('#a-ok').onclick = async () => {
+    const pl = {}; S.forEach(s => pl[s] = +document.querySelector(`[data-ap="${s}"]`).value);
+    try { await api('aendern', { id: a.id, abend: { datum: $('#a-datum').value, ort: $('#a-ort').value, plaetze: pl, notiz: $('#a-notiz').value } }); schliessen(); toast('Geändert'); laden(); }
+    catch (e) { toast(e.message); }
+  };
+}
+
+// ---------- Statistik ----------
+function auswerten(abende) {
+  const S = D.spieler, r = {};
+  S.forEach(s => r[s] = { abende: 0, summe: 0, verteilung: [0, 0, 0, 0], euro: 0 });
+  abende.forEach(a => S.forEach(s => { const p = a.plaetze[s]; if (!p) return; r[s].abende++; r[s].summe += p; r[s].verteilung[p - 1]++; r[s].euro += p * D.euro_pro_platz; }));
+  S.forEach(s => r[s].schnitt = r[s].abende ? r[s].summe / r[s].abende : 0);
+  return r;
+}
+function zeigeStatistik() {
+  const jahre = [...new Set(aktiv().map(a => a.datum.slice(0, 4)))].sort().reverse();
+  const sel = $('#stat-jahr'), alt = sel.value || 'alle';
+  sel.innerHTML = `<option value="alle">Seit 2015</option>` + jahre.map(j => `<option>${j}</option>`).join('');
+  sel.value = [...sel.options].some(o => o.value === alt) ? alt : 'alle';
+  const auswahl = sel.value === 'alle' ? aktiv() : aktiv().filter(a => a.datum.startsWith(sel.value));
+  const r = auswerten(auswahl), S = D.spieler;
+  const farben = ['var(--p1)', 'var(--p2)', 'var(--p3)', 'var(--p4)'];
+  $('#stat').innerHTML = `<p class="leise" style="margin:0 0 8px">${auswahl.length} Abende · ${euro(auswahl.length * 10 * D.euro_pro_platz)} in die Kasse · kleiner Schnitt = besser</p>
+    <div class="rollen"><table><thead><tr><th>Spieler</th><th class="z">Ø Platz</th><th class="z">Siege</th><th>Plätze</th><th class="z">Kasse</th></tr></thead><tbody>
+    ${S.map((s, i) => `<tr><td><b>${esc(s)}</b></td><td class="z">${zahl(r[s].schnitt)}</td><td class="z">${r[s].verteilung[0]}</td>
+      <td><div class="verteilung" title="${r[s].verteilung.join(' / ')}">${r[s].verteilung.map((v, k) => `<i style="flex:${v};background:${farben[k]}"></i>`).join('')}</div><span class="leise" style="font-size:.75rem">${r[s].verteilung.join(' · ')}</span></td>
+      <td class="z">${euro(r[s].euro)}</td></tr>`).join('')}</tbody></table></div>`;
+  // Jahr für Jahr
+  const alle = [...new Set(aktiv().map(a => a.datum.slice(0, 4)))].sort().reverse();
+  $('#jahre').innerHTML = `<table><thead><tr><th>Jahr</th><th class="z">Abende</th>${D.spieler.map(s => `<th class="z">${esc(s)}</th>`).join('')}</tr></thead><tbody>
+    ${alle.map(j => { const ab = aktiv().filter(a => a.datum.startsWith(j)), q = auswerten(ab); const best = Math.min(...D.spieler.map(s => q[s].schnitt));
+      return `<tr><td><b>${j}</b></td><td class="z">${ab.length}</td>${D.spieler.map(s => `<td class="z" style="${q[s].schnitt === best ? 'font-weight:700;color:var(--filz)' : ''}">${zahl(q[s].schnitt)}</td>`).join('')}</tr>`; }).join('')}
+    </tbody></table><p class="leise" style="font-size:.8rem;margin:8px 0 0">Ø Platz je Jahr, fett = Jahresbester.</p>`;
+  // Details aus Zetteln
+  const mitSpielen = auswahl.filter(a => (a.spiele || []).length);
+  const det = $('#stat-details');
+  if (!mitSpielen.length) { det.innerHTML = '<h3>Details aus den Zetteln</h3><p class="leise" style="margin:0">Sobald Abende per Foto erfasst sind, erscheinen hier Punkte und Soli.</p>'; return; }
+  const z = {}; D.spieler.forEach(s => z[s] = { punkte: 0, soli: 0, soliGewonnen: 0, spiele: 0, plus: 0 });
+  mitSpielen.forEach(a => {
+    let vorher = {}; D.spieler.forEach(s => vorher[s] = 0);
+    a.spiele.forEach(sp => D.spieler.forEach(s => {
+      const w = sp.werte[s]; if (w == null) return;
+      const wert = a.format === 'laufend' ? w - vorher[s] : w; vorher[s] = a.format === 'laufend' ? w : vorher[s];
+      z[s].spiele++; if (wert > 0) z[s].plus++;
+      if (sp.solo === s) { z[s].soli++; if (wert > 0) z[s].soliGewonnen++; }
+    }));
+    D.spieler.forEach(s => { if (a.endstand && a.endstand[s] != null) z[s].punkte += a.endstand[s]; });
+  });
+  det.innerHTML = `<h3>Details aus den Zetteln</h3><p class="leise" style="margin:0 0 8px">${mitSpielen.length === 1 ? 'Ein Abend' : mitSpielen.length + ' Abende'} mit einzelnen Spielen</p>
+    <div class="rollen"><table><thead><tr><th>Spieler</th><th class="z">Punkte</th><th class="z">Spiele im Plus</th><th class="z">Soli (gewonnen)</th></tr></thead><tbody>
+    ${D.spieler.map(s => `<tr><td><b>${esc(s)}</b></td><td class="z">${z[s].punkte}</td><td class="z">${z[s].spiele ? Math.round(100 * z[s].plus / z[s].spiele) : 0} %</td><td class="z">${z[s].soli} (${z[s].soliGewonnen})</td></tr>`).join('')}</tbody></table></div>`;
+}
+$('#stat-jahr').onchange = zeigeStatistik;
+
+// ---------- KI ----------
+function zeigeChat() {
+  $('#chat').innerHTML = chatVerlauf.map((m, i) => `<div class="blase ${m.rolle}">${esc(m.text)}${(m.vorschlaege || []).map((v, k) => `<div class="vorschlag">
+      <b>Vorschlag:</b> ${esc(v.beschreibung || v.typ)}
+      <div class="zeile">${v.erledigt ? `<span class="leise">✓ ${esc(v.erledigt)}</span>` : `<button class="klein" data-v="${i}:${k}">Übernehmen</button><button class="klein zweit" data-n="${i}:${k}">Nein</button>`}</div></div>`).join('')}</div>`).join('')
+    || '<p class="leise" style="margin:0">Zum Beispiel: „Wer hat 2024 am meisten bezahlt?“ oder „Trag den 6.11. bei David als Termin ein.“</p>';
+  $('#chat').querySelectorAll('[data-v]').forEach(b => b.onclick = () => uebernehmen(...b.dataset.v.split(':').map(Number)));
+  $('#chat').querySelectorAll('[data-n]').forEach(b => b.onclick = () => { const [i, k] = b.dataset.n.split(':').map(Number); chatVerlauf[i].vorschlaege[k].erledigt = 'abgelehnt'; zeigeChat(); });
+}
+async function uebernehmen(i, k) {
+  const v = chatVerlauf[i].vorschlaege[k];
+  try {
+    if (v.typ === 'abend_aendern') await api('aendern', { id: v.id, abend: v.felder || {}, ueber_ki: true });
+    else if (v.typ === 'abend_loeschen') await api('loeschen', { id: v.id, grund: v.grund || '', ueber_ki: true });
+    else if (v.typ === 'termin_neu') await api('termin', { datum: v.datum, ort: v.ort || '', ueber_ki: true });
+    else if (v.typ === 'termin_loeschen') await api('termin', { datum: v.datum, weg: true, ueber_ki: true });
+    else if (v.typ === 'feedback') { const r = await api('feedback', { text: v.text, art: v.art }); v.erledigt = 'als Rückmeldung Nr. ' + r.nr + ' abgelegt'; zeigeChat(); return; }
+    v.erledigt = 'übernommen'; zeigeChat(); toast('Übernommen'); laden();
+  } catch (e) { toast(e.message); }
+}
+$('#ki-senden').onclick = async () => {
+  const t = $('#ki-text').value.trim(); if (!t) return;
+  const b = $('#ki-senden'); b.disabled = true; b.innerHTML = '<span class="drehen"></span> denkt nach …';
+  const verlauf = chatVerlauf.slice(-6).map(m => ({ rolle: m.rolle, text: m.text }));
+  chatVerlauf.push({ rolle: 'ich', text: t }); $('#ki-text').value = ''; zeigeChat();
+  try {
+    const r = await api('ki', { text: t, verlauf, anbieter: kiAnbieter() });
+    chatVerlauf.push({ rolle: 'ki', text: r.antwort || '(keine Antwort)', vorschlaege: r.vorschlaege || [] });
+  } catch (e) { chatVerlauf.push({ rolle: 'ki', text: 'Fehler: ' + e.message }); }
+  b.disabled = false; b.textContent = 'Senden'; zeigeChat();
+};
+$('#fb-senden').onclick = async () => {
+  const t = $('#fb-text').value.trim(); if (t.length < 3) { toast('Bitte ein paar Worte schreiben'); return; }
+  const b = $('#fb-senden'); b.disabled = true;
+  try { const r = await api('feedback', { text: t, art: fbArt() }); $('#fb-text').value = ''; toast('Danke! Rückmeldung Nr. ' + r.nr + ' ist angekommen'); }
+  catch (e) { toast(e.message); }
+  b.disabled = false;
+};
+
+// ---------- Eigene Farbe ----------
+const MUSTER = ['#e8c22e', '#f08a24', '#d94c3d', '#d6457f', '#7b4fb3', '#4a4fb8', '#2f6fc4', '#1f9bb5', '#2f8a4e', '#7fa33a', '#8a6a4a', '#4b5560'];
+$('#meine-farbe').onclick = () => {
+  let wahl = (D.farben[D.ich] || '#888888').toLowerCase();
+  dialog(`<h2>Meine Farbe</h2><p class="leise" style="margin:4px 0 0">So erscheinst du (${esc(D.ich)}) bei allen in der Liste.</p>
+    <div class="muster">${MUSTER.map(c => `<button style="background:${c}" data-c="${c}" aria-label="Farbe ${c}" aria-pressed="${c === wahl}"></button>`).join('')}</div>
+    <label>Oder eigene Farbe</label><input type="color" id="f-eigen" value="${wahl}" style="padding:4px;height:48px">
+    <p style="margin:14px 0 4px">Vorschau: <span class="chip" id="f-vorschau">1. ${esc(D.ich)}</span></p>
+    <div class="zeile" style="margin-top:14px"><button class="zweit" data-zu>Abbrechen</button><button class="dehnen" id="f-ok">Speichern</button></div>`);
+  const zeig = c => { wahl = c; const v = $('#f-vorschau'); v.style.background = c; v.style.color = DK.hell(c) ? '#1d1a10' : '#fff';
+    document.querySelectorAll('.muster button').forEach(b => b.setAttribute('aria-pressed', b.dataset.c === c)); $('#f-eigen').value = c; };
+  zeig(wahl);
+  document.querySelectorAll('.muster button').forEach(b => b.onclick = () => zeig(b.dataset.c));
+  $('#f-eigen').oninput = e => zeig(e.target.value.toLowerCase());
+  $('#f-ok').onclick = async () => {
+    try { await api('farbe', { farbe: wahl }); schliessen(); toast('Farbe gespeichert'); laden(); } catch (e) { toast(e.message); }
+  };
+};
+
+// ---------- Dialog ----------
+function dialog(html) { $('#dlg-inhalt').innerHTML = html; $('#dlg-inhalt').querySelectorAll('[data-zu]').forEach(b => b.onclick = schliessen); $('#dlg').showModal(); }
+function schliessen() { $('#dlg').close(); }
+$('#dlg').addEventListener('click', e => { if (e.target.id === 'dlg') schliessen(); });
+
+// ---------- Start ----------
+if (!DK.hatSchluessel()) { DK.sperre('Bitte öffne deinen persönlichen Link (mit dem Schlüssel), den du für eure Runde bekommen hast.'); document.querySelector('nav.unten').remove(); return; }
+zeigeChat();
+laden().then(() => { const s = merke('doko-seite'); if (s && document.getElementById('s-' + s)) zeige(s); })
+  .catch(e => { if (e.status === 401) { DK.sperre(e.message); document.querySelector('nav.unten').remove(); } else toast(e.message, 5000); });
+})();
+</script>
+</body>
+</html>

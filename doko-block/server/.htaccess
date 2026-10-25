@@ -1,0 +1,16 @@
+# Doko-Block
+DirectoryIndex index.html
+Options -Indexes
+AddType application/manifest+json .webmanifest
+<IfModule mod_headers.c>
+  <FilesMatch "\.(html)$">
+    Header set Cache-Control "no-cache"
+  </FilesMatch>
+  Header set X-Content-Type-Options "nosniff"
+  Header set Referrer-Policy "no-referrer"
+</IfModule>
+<IfModule mod_php.c>
+  php_value upload_max_filesize 10M
+  php_value post_max_size 12M
+  php_value max_execution_time 180
+</IfModule>

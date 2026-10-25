@@ -1,0 +1,1 @@
+{"antwort": "Laut Liste war am 09.10.2026 Anna Erster. Soll ich das ändern?", "vorschlaege": [{"typ": "abend_aendern", "id": "x204", "felder": {"plaetze": {"Anna": 2, "Ben": 1, "Clara": 4, "David": 3}}, "beschreibung": "Abend 09.10.2026: Ben 1., Anna 2."}, {"typ": "termin_neu", "datum": "2027-01-08", "ort": "bei Clara", "beschreibung": "Termin 08.01.2027 bei Clara"}]}

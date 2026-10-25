@@ -1,0 +1,12 @@
+# Blattwerk
+DirectoryIndex index.php
+Options -Indexes
+<Files "lib.php">
+  Require all denied
+</Files>
+<IfModule mod_headers.c>
+  Header set X-Robots-Tag "noindex, nofollow"
+  <FilesMatch "\.(woff2|css)$">
+    Header set Cache-Control "public, max-age=2592000"
+  </FilesMatch>
+</IfModule>

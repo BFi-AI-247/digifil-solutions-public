@@ -1,0 +1,7 @@
+dist/
+out/
+server/zugaenge.json
+server/einstellungen.json
+data/
+*.xlsx
+__pycache__/

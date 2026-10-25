@@ -1,0 +1,65 @@
+# Beispiel: Blattwerk per SFTP auf einen eigenen PHP-Webspace laden.
+# Nutzung: nach .github/workflows/blattwerk-deploy.yml kopieren und die Secrets eintragen.
+#   main      → live:     <WEB>/<PFAD>/ (index.php, lib.php, feedback.php, .htaccess, fonts/) und <PRIVAT>/blattwerk/app.html
+#   prototyp  → Vorschau: <WEB>/<PFAD>/vorschau/index.php und <PRIVAT>/blattwerk/app-vorschau.html
+# Der Ordner <PRIVAT> muss neben <WEB> liegen (lib.php sucht ../../privat/blattwerk), also z. B. /web und /privat.
+# Secrets: SFTP_HOST, SFTP_USER, SFTP_PASSWORD, SFTP_KNOWN_HOSTS (empfohlen),
+#          BW_PASSWORT (Anmeldung), BW_GITHUB_TOKEN (optional, Rückmelde-Knopf → Issues)
+# Variablen (Settings → Variables): BW_PFAD (z. B. /blattwerk/), BW_REPO (owner/repo), BW_BETREIBER (z. B. „Max“)
+
+name: Deploy Blattwerk
+
+on:
+  push:
+    branches: [main, prototyp]
+    paths: ["blattwerk/**"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: blattwerk
+    env:
+      H: ${{ secrets.SFTP_HOST }}
+      U: ${{ secrets.SFTP_USER }}
+      LFTP_PASSWORD: ${{ secrets.SFTP_PASSWORD }}
+      K: ${{ secrets.SFTP_KNOWN_HOSTS }}
+      BW_PASSWORT: ${{ secrets.BW_PASSWORT }}
+      BW_GITHUB_TOKEN: ${{ secrets.BW_GITHUB_TOKEN }}
+      BW_PFAD: ${{ vars.BW_PFAD || '/blattwerk/' }}
+      BW_REPO: ${{ vars.BW_REPO }}
+      BW_BETREIBER: ${{ vars.BW_BETREIBER }}
+      ZIEL: ${{ github.ref_name == 'main' && 'live' || 'vorschau' }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.12" }
+      - name: Bauen und testen
+        run: |
+          python -m pip install --quiet playwright && python -m playwright install --with-deps chromium
+          python tools/fetch_fonts.py
+          python tools/build.py
+          python tests/smoke.py dist/index.html
+      - name: Hochladen
+        run: |
+          mkdir -p out && python tools/make_zugang.py out/zugang.php
+          sudo apt-get update -qq && sudo apt-get install -y -qq lftp
+          mkdir -p ~/.ssh && { [ -n "$K" ] && printf '%s\n' "$K" || ssh-keyscan -T 15 "$H" 2>/dev/null; } > ~/.ssh/known_hosts
+          D="/web${BW_PFAD%/}"
+          FONTS=""; [ -d dist/fonts ] && FONTS="mirror --reverse --no-perms dist/fonts/ $D/fonts/;"
+          if [ "$ZIEL" = "live" ]; then
+            CMDS="mkdir -p -f $D; put server/lib.php -o $D/lib.php; put server/index.php -o $D/index.php;
+                  put server/feedback.php -o $D/feedback.php; put server/.htaccess -o $D/.htaccess;
+                  $FONTS put dist/index.html -o /privat/blattwerk/app.html;"
+          else
+            CMDS="mkdir -p -f $D/vorschau; put server/vorschau-index.php -o $D/vorschau/index.php;
+                  put dist/vorschau.html -o /privat/blattwerk/app-vorschau.html;"
+          fi
+          lftp -c "set sftp:connect-program 'ssh -a -x -o StrictHostKeyChecking=yes -o UserKnownHostsFile=$HOME/.ssh/known_hosts';
+            open --env-password -u \"$U\" sftp://$H; mkdir -p -f /privat/blattwerk; $CMDS
+            put out/zugang.php -o /privat/blattwerk/zugang.php"

@@ -1,0 +1,10 @@
+{
+  "runde": "Doko-Runde",
+  "spieler": ["Anna", "Ben", "Clara", "David"],
+  "farben": {"Anna": "#e8c22e", "Ben": "#2f8a4e", "Clara": "#7b4fb3", "David": "#2f6fc4"},
+  "euro_pro_platz": 2.5,
+  "spiele": 20,
+  "repo": "",
+  "label": "doko",
+  "betreiber": "dem Betreiber"
+}

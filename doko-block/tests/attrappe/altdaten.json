@@ -1,0 +1,2676 @@
+{
+ "spieler": [
+  "Anna",
+  "Ben",
+  "Clara",
+  "David"
+ ],
+ "abende": [
+  {
+   "datum": "2015-01-26",
+   "ort": "bei Ben",
+   "plaetze": {
+    "Anna": 4,
+    "Ben": 2,
+    "Clara": 1,
+    "David": 3
+   },
+   "quelle": "beispiel",
+   "nr": 1,
+   "id": "x001"
+  },
+  {
+   "datum": "2015-01-31",
+   "ort": "",
+   "plaetze": {
+    "Anna": 1,
+    "Ben": 3,
+    "Clara": 4,
+    "David": 2
+   },
+   "quelle": "beispiel",
+   "nr": 2,
+   "id": "x002"
+  },
+  {
+   "datum": "2015-02-08",
+   "ort": "",
+   "plaetze": {
+    "Anna": 4,
+    "Ben": 3,
+    "Clara": 2,
+    "David": 1
+   },
+   "quelle": "beispiel",
+   "nr": 3,
+   "id": "x003"
+  },
+  {
+   "datum": "2015-02-19",
+   "ort": "bei Anna",
+   "plaetze": {
+    "Anna": 3,
+    "Ben": 1,
+    "Clara": 4,
+    "David": 2
+   },
+   "quelle": "beispiel",
+   "nr": 4,
+   "id": "x004"
+  },
+  {
+   "datum": "2015-03-20",
+   "ort": "bei David",
+   "plaetze": {
+    "Anna": 1,
+    "Ben": 2,
+    "Clara": 4,
+    "David": 3
+   },
+   "quelle": "beispiel",
+   "nr": 5,
+   "id": "x005"
+  },
+  {
+   "datum": "2015-06-16",
+   "ort": "bei Ben",
+   "plaetze": {
+    "Anna": 2,
+    "Ben": 4,
+    "Clara": 3,
+    "David": 1
+   },
+   "quelle": "beispiel",
+   "nr": 6,
+   "id": "x006"
+  },
+  {
+   "datum": "2015-07-08",
+   "ort": "bei Clara",
+   "plaetze": {
+    "Anna": 3,
+    "Ben": 1,
+    "Clara": 4,
+    "David": 2
+   },
+   "quelle": "beispiel",
+   "nr": 7,
+   "id": "x007"
+  },
+  {
+   "datum": "2015-07-23",
+   "ort": "",
+   "plaetze": {
+    "Anna": 4,
+    "Ben": 2,
+    "Clara": 3,
+    "David": 1
+   },
+   "quelle": "beispiel",
+   "nr": 8,
+   "id": "x008"
+  },
+  {
+   "datum": "2015-09-18",
+   "ort": "bei Ben",
+   "plaetze": {
+    "Anna": 3,
+    "Ben": 2,
+    "Clara": 4,
+    "David": 1
+   },
+   "quelle": "beispiel",
+   "nr": 9,
+   "id": "x009"
+  },
+  {
+   "datum": "2015-10-03",
+   "ort": "",
+   "plaetze": {
+    "Anna": 3,
+    "Ben": 4,
+    "Clara": 1,
+    "David": 2
+   },
+   "quelle": "beispiel",
+   "nr": 10,
+   "id": "x010"
+  },
+  {
+   "datum": "2015-10-27",
+   "ort": "",
+   "plaetze": {
+    "Anna": 2,
+    "Ben": 3,
+    "Clara": 1,
+    "David": 4
+   },
+   "quelle": "beispiel",
+   "nr": 11,
+   "id": "x011"
+  },
+  {
+   "datum": "2015-12-01",
+   "ort": "",
+   "plaetze": {
+    "Anna": 2,
+    "Ben": 3,
+    "Clara": 1,
+    "David": 4
+   },
+   "quelle": "beispiel",
+   "nr": 12,
+   "id": "x012"
+  },
+  {
+   "datum": "2016-01-21",
+   "ort": "",
+   "plaetze": {
+    "Anna": 2,
+    "Ben": 3,
+    "Clara": 4,
+    "David": 1
+   },
+   "quelle": "beispiel",
+   "nr": 13,
+   "id": "x013"
+  },
+  {
+   "datum": "2016-02-01",
+   "ort": "",
+   "plaetze": {
+    "Anna": 2,
+    "Ben": 4,
+    "Clara": 1,
+    "David": 3
+   },
+   "quelle": "beispiel",
+   "nr": 14,
+   "id": "x014"
+  },
+  {
+   "datum": "2016-02-06",
+   "ort": "bei David",
+   "plaetze": {
+    "Anna": 2,
+    "Ben": 1,
+    "Clara": 3,
+    "David": 4
+   },
+   "quelle": "beispiel",
+   "nr": 15,
+   "id": "x015"
+  },
+  {
+   "datum": "2016-02-15",
+   "ort": "",
+   "plaetze": {
+    "Anna": 2,
+    "Ben": 1,
+    "Clara": 4,
+    "David": 3
+   },
+   "quelle": "beispiel",
+   "nr": 16,
+   "id": "x016"
+  },
+  {
+   "datum": "2016-02-17",
+   "ort": "bei David",
+   "plaetze": {
+    "Anna": 2,
+    "Ben": 4,
+    "Clara": 1,
+    "David": 3
+   },
+   "quelle": "beispiel",
+   "nr": 17,
+   "id": "x017"
+  },
+  {
+   "datum": "2016-03-05",
+   "ort": "",
+   "plaetze": {
+    "Anna": 3,
+    "Ben": 2,
+    "Clara": 4,
+    "David": 1
+   },
+   "quelle": "beispiel",
+   "nr": 18,
+   "id": "x018"
+  },
+  {
+   "datum": "2016-04-20",
+   "ort": "",
+   "plaetze": {
+    "Anna": 4,
+    "Ben": 1,
+    "Clara": 3,
+    "David": 2
+   },
+   "quelle": "beispiel",
+   "nr": 19,
+   "id": "x019"
+  },
+  {
+   "datum": "2016-04-25",
+   "ort": "bei Ben",
+   "plaetze": {
+    "Anna": 4,
+    "Ben": 2,
+    "Clara": 1,
+    "David": 3
+   },
+   "quelle": "beispiel",
+   "nr": 20,
+   "id": "x020"
+  },
+  {
+   "datum": "2016-05-04",
+   "ort": "bei Ben",
+   "plaetze": {
+    "Anna": 1,
+    "Ben": 2,
+    "Clara": 3,
+    "David": 4
+   },
+   "quelle": "beispiel",
+   "nr": 21,
+   "id": "x021"
+  },
+  {
+   "datum": "2016-08-03",
+   "ort": "bei Anna",
+   "plaetze": {
+    "Anna": 3,
+    "Ben": 4,
+    "Clara": 2,
+    "David": 1
+   },
+   "quelle": "beispiel",
+   "nr": 22,
+   "id": "x022"
+  },
+  {
+   "datum": "2016-08-06",
+   "ort": "",
+   "plaetze": {
+    "Anna": 2,
+    "Ben": 4,
+    "Clara": 1,
+    "David": 3
+   },
+   "quelle": "beispiel",
+   "nr": 23,
+   "id": "x023"
+  },
+  {
+   "datum": "2016-08-11",
+   "ort": "bei Ben",
+   "plaetze": {
+    "Anna": 3,
+    "Ben": 2,
+    "Clara": 4,
+    "David": 1
+   },
+   "quelle": "beispiel",
+   "nr": 24,
+   "id": "x024"
+  },
+  {
+   "datum": "2016-10-10",
+   "ort": "",
+   "plaetze": {
+    "Anna": 1,
+    "Ben": 3,
+    "Clara": 4,
+    "David": 2
+   },
+   "quelle": "beispiel",
+   "nr": 25,
+   "id": "x025"
+  },
+  {
+   "datum": "2016-10-17",
+   "ort": "bei Ben",
+   "plaetze": {
+    "Anna": 1,
+    "Ben": 3,
+    "Clara": 4,
+    "David": 2
+   },
+   "quelle": "beispiel",
+   "nr": 26,
+   "id": "x026"
+  },
+  {
+   "datum": "2017-01-25",
+   "ort": "",
+   "plaetze": {
+    "Anna": 2,
+    "Ben": 4,
+    "Clara": 3,
+    "David": 1
+   },
+   "quelle": "beispiel",
+   "nr": 27,
+   "id": "x027"
+  },
+  {
+   "datum": "2017-01-27",
+   "ort": "",
+   "plaetze": {
+    "Anna": 4,
+    "Ben": 1,
+    "Clara": 2,
+    "David": 3
+   },
+   "quelle": "beispiel",
+   "nr": 28,
+   "id": "x028"
+  },
+  {
+   "datum": "2017-02-02",
+   "ort": "bei Clara",
+   "plaetze": {
+    "Anna": 4,
+    "Ben": 1,
+    "Clara": 3,
+    "David": 2
+   },
+   "quelle": "beispiel",
+   "nr": 29,
+   "id": "x029"
+  },
+  {
+   "datum": "2017-03-03",
+   "ort": "",
+   "plaetze": {
+    "Anna": 3,
+    "Ben": 1,
+    "Clara": 2,
+    "David": 4
+   },
+   "quelle": "beispiel",
+   "nr": 30,
+   "id": "x030"
+  },
+  {
+   "datum": "2017-03-11",
+   "ort": "bei David",
+   "plaetze": {
+    "Anna": 3,
+    "Ben": 1,
+    "Clara": 4,
+    "David": 2
+   },
+   "quelle": "beispiel",
+   "nr": 31,
+   "id": "x031"
+  },
+  {
+   "datum": "2017-03-16",
+   "ort": "bei Clara",
+   "plaetze": {
+    "Anna": 4,
+    "Ben": 2,
+    "Clara": 1,
+    "David": 3
+   },
+   "quelle": "beispiel",
+   "nr": 32,
+   "id": "x032"
+  },
+  {
+   "datum": "2017-04-04",
+   "ort": "bei David",
+   "plaetze": {
+    "Anna": 1,
+    "Ben": 4,
+    "Clara": 3,
+    "David": 2
+   },
+   "quelle": "beispiel",
+   "nr": 33,
+   "id": "x033"
+  },
+  {
+   "datum": "2017-04-25",
+   "ort": "bei Clara",
+   "plaetze": {
+    "Anna": 2,
+    "Ben": 1,
+    "Clara": 3,
+    "David": 4
+   },
+   "quelle": "beispiel",
+   "nr": 34,
+   "id": "x034"
+  },
+  {
+   "datum": "2017-05-30",
+   "ort": "",
+   "plaetze": {
+    "Anna": 2,
+    "Ben": 4,
+    "Clara": 1,
+    "David": 3
+   },
+   "quelle": "beispiel",
+   "nr": 35,
+   "id": "x035"
+  },
+  {
+   "datum": "2017-06-08",
+   "ort": "bei Anna",
+   "plaetze": {
+    "Anna": 1,
+    "Ben": 3,
+    "Clara": 2,
+    "David": 4
+   },
+   "quelle": "beispiel",
+   "nr": 36,
+   "id": "x036"
+  },
+  {
+   "datum": "2017-07-24",
+   "ort": "bei Ben",
+   "plaetze": {
+    "Anna": 2,
+    "Ben": 4,
+    "Clara": 1,
+    "David": 3
+   },
+   "quelle": "beispiel",
+   "nr": 37,
+   "id": "x037"
+  },
+  {
+   "datum": "2017-08-04",
+   "ort": "",
+   "plaetze": {
+    "Anna": 3,
+    "Ben": 1,
+    "Clara": 4,
+    "David": 2
+   },
+   "quelle": "beispiel",
+   "nr": 38,
+   "id": "x038"
+  },
+  {
+   "datum": "2017-10-05",
+   "ort": "bei Ben",
+   "plaetze": {
+    "Anna": 3,
+    "Ben": 2,
+    "Clara": 4,
+    "David": 1
+   },
+   "quelle": "beispiel",
+   "nr": 39,
+   "id": "x039"
+  },
+  {
+   "datum": "2017-10-14",
+   "ort": "bei Ben",
+   "plaetze": {
+    "Anna": 4,
+    "Ben": 3,
+    "Clara": 2,
+    "David": 1
+   },
+   "quelle": "beispiel",
+   "nr": 40,
+   "id": "x040"
+  },
+  {
+   "datum": "2017-10-15",
+   "ort": "",
+   "plaetze": {
+    "Anna": 3,
+    "Ben": 4,
+    "Clara": 1,
+    "David": 2
+   },
+   "quelle": "beispiel",
+   "nr": 41,
+   "id": "x041"
+  },
+  {
+   "datum": "2017-10-21",
+   "ort": "",
+   "plaetze": {
+    "Anna": 3,
+    "Ben": 2,
+    "Clara": 1,
+    "David": 4
+   },
+   "quelle": "beispiel",
+   "nr": 42,
+   "id": "x042"
+  },
+  {
+   "datum": "2017-10-24",
+   "ort": "",
+   "plaetze": {
+    "Anna": 3,
+    "Ben": 2,
+    "Clara": 4,
+    "David": 1
+   },
+   "quelle": "beispiel",
+   "nr": 43,
+   "id": "x043"
+  },
+  {
+   "datum": "2017-10-27",
+   "ort": "bei Clara",
+   "plaetze": {
+    "Anna": 4,
+    "Ben": 3,
+    "Clara": 2,
+    "David": 1
+   },
+   "quelle": "beispiel",
+   "nr": 44,
+   "id": "x044"
+  },
+  {
+   "datum": "2017-10-28",
+   "ort": "",
+   "plaetze": {
+    "Anna": 4,
+    "Ben": 1,
+    "Clara": 2,
+    "David": 3
+   },
+   "quelle": "beispiel",
+   "nr": 45,
+   "id": "x045"
+  },
+  {
+   "datum": "2017-11-19",
+   "ort": "",
+   "plaetze": {
+    "Anna": 2,
+    "Ben": 3,
+    "Clara": 4,
+    "David": 1
+   },
+   "quelle": "beispiel",
+   "nr": 46,
+   "id": "x046"
+  },
+  {
+   "datum": "2017-11-20",
+   "ort": "",
+   "plaetze": {
+    "Anna": 1,
+    "Ben": 4,
+    "Clara": 2,
+    "David": 3
+   },
+   "quelle": "beispiel",
+   "nr": 47,
+   "id": "x047"
+  },
+  {
+   "datum": "2017-12-17",
+   "ort": "",
+   "plaetze": {
+    "Anna": 1,
+    "Ben": 2,
+    "Clara": 3,
+    "David": 4
+   },
+   "quelle": "beispiel",
+   "nr": 48,
+   "id": "x048"
+  },
+  {
+   "datum": "2018-02-01",
+   "ort": "",
+   "plaetze": {
+    "Anna": 4,
+    "Ben": 1,
+    "Clara": 3,
+    "David": 2
+   },
+   "quelle": "beispiel",
+   "nr": 49,
+   "id": "x049"
+  },
+  {
+   "datum": "2018-02-03",
+   "ort": "",
+   "plaetze": {
+    "Anna": 3,
+    "Ben": 1,
+    "Clara": 4,
+    "David": 2
+   },
+   "quelle": "beispiel",
+   "nr": 50,
+   "id": "x050"
+  },
+  {
+   "datum": "2018-02-20",
+   "ort": "",
+   "plaetze": {
+    "Anna": 3,
+    "Ben": 4,
+    "Clara": 1,
+    "David": 2
+   },
+   "quelle": "beispiel",
+   "nr": 51,
+   "id": "x051"
+  },
+  {
+   "datum": "2018-02-23",
+   "ort": "bei Clara",
+   "plaetze": {
+    "Anna": 4,
+    "Ben": 3,
+    "Clara": 2,
+    "David": 1
+   },
+   "quelle": "beispiel",
+   "nr": 52,
+   "id": "x052"
+  },
+  {
+   "datum": "2018-04-08",
+   "ort": "",
+   "plaetze": {
+    "Anna": 3,
+    "Ben": 4,
+    "Clara": 2,
+    "David": 1
+   },
+   "quelle": "beispiel",
+   "nr": 53,
+   "id": "x053"
+  },
+  {
+   "datum": "2018-04-17",
+   "ort": "",
+   "plaetze": {
+    "Anna": 3,
+    "Ben": 1,
+    "Clara": 4,
+    "David": 2
+   },
+   "quelle": "beispiel",
+   "nr": 54,
+   "id": "x054"
+  },
+  {
+   "datum": "2018-06-11",
+   "ort": "",
+   "plaetze": {
+    "Anna": 2,
+    "Ben": 1,
+    "Clara": 4,
+    "David": 3
+   },
+   "quelle": "beispiel",
+   "nr": 55,
+   "id": "x055"
+  },
+  {
+   "datum": "2018-07-11",
+   "ort": "",
+   "plaetze": {
+    "Anna": 1,
+    "Ben": 4,
+    "Clara": 2,
+    "David": 3
+   },
+   "quelle": "beispiel",
+   "nr": 56,
+   "id": "x056"
+  },
+  {
+   "datum": "2018-08-08",
+   "ort": "bei Ben",
+   "plaetze": {
+    "Anna": 4,
+    "Ben": 1,
+    "Clara": 2,
+    "David": 3
+   },
+   "quelle": "beispiel",
+   "nr": 57,
+   "id": "x057"
+  },
+  {
+   "datum": "2018-09-13",
+   "ort": "bei Anna",
+   "plaetze": {
+    "Anna": 3,
+    "Ben": 2,
+    "Clara": 1,
+    "David": 4
+   },
+   "quelle": "beispiel",
+   "nr": 58,
+   "id": "x058"
+  },
+  {
+   "datum": "2018-10-01",
+   "ort": "bei David",
+   "plaetze": {
+    "Anna": 1,
+    "Ben": 2,
+    "Clara": 3,
+    "David": 4
+   },
+   "quelle": "beispiel",
+   "nr": 59,
+   "id": "x059"
+  },
+  {
+   "datum": "2018-10-09",
+   "ort": "",
+   "plaetze": {
+    "Anna": 2,
+    "Ben": 1,
+    "Clara": 4,
+    "David": 3
+   },
+   "quelle": "beispiel",
+   "nr": 60,
+   "id": "x060"
+  },
+  {
+   "datum": "2018-10-17",
+   "ort": "",
+   "plaetze": {
+    "Anna": 2,
+    "Ben": 4,
+    "Clara": 3,
+    "David": 1
+   },
+   "quelle": "beispiel",
+   "nr": 61,
+   "id": "x061"
+  },
+  {
+   "datum": "2018-10-21",
+   "ort": "bei Anna",
+   "plaetze": {
+    "Anna": 4,
+    "Ben": 1,
+    "Clara": 2,
+    "David": 3
+   },
+   "quelle": "beispiel",
+   "nr": 62,
+   "id": "x062"
+  },
+  {
+   "datum": "2018-10-26",
+   "ort": "",
+   "plaetze": {
+    "Anna": 2,
+    "Ben": 3,
+    "Clara": 4,
+    "David": 1
+   },
+   "quelle": "beispiel",
+   "nr": 63,
+   "id": "x063"
+  },
+  {
+   "datum": "2018-11-14",
+   "ort": "bei Ben",
+   "plaetze": {
+    "Anna": 1,
+    "Ben": 2,
+    "Clara": 3,
+    "David": 4
+   },
+   "quelle": "beispiel",
+   "nr": 64,
+   "id": "x064"
+  },
+  {
+   "datum": "2018-11-25",
+   "ort": "",
+   "plaetze": {
+    "Anna": 3,
+    "Ben": 2,
+    "Clara": 4,
+    "David": 1
+   },
+   "quelle": "beispiel",
+   "nr": 65,
+   "id": "x065"
+  },
+  {
+   "datum": "2018-12-16",
+   "ort": "",
+   "plaetze": {
+    "Anna": 2,
+    "Ben": 3,
+    "Clara": 4,
+    "David": 1
+   },
+   "quelle": "beispiel",
+   "nr": 66,
+   "id": "x066"
+  },
+  {
+   "datum": "2019-02-08",
+   "ort": "",
+   "plaetze": {
+    "Anna": 1,
+    "Ben": 2,
+    "Clara": 4,
+    "David": 3
+   },
+   "quelle": "beispiel",
+   "nr": 67,
+   "id": "x067"
+  },
+  {
+   "datum": "2019-02-12",
+   "ort": "",
+   "plaetze": {
+    "Anna": 3,
+    "Ben": 2,
+    "Clara": 4,
+    "David": 1
+   },
+   "quelle": "beispiel",
+   "nr": 68,
+   "id": "x068"
+  },
+  {
+   "datum": "2019-03-03",
+   "ort": "",
+   "plaetze": {
+    "Anna": 2,
+    "Ben": 3,
+    "Clara": 4,
+    "David": 1
+   },
+   "quelle": "beispiel",
+   "nr": 69,
+   "id": "x069"
+  },
+  {
+   "datum": "2019-03-27",
+   "ort": "",
+   "plaetze": {
+    "Anna": 3,
+    "Ben": 4,
+    "Clara": 2,
+    "David": 1
+   },
+   "quelle": "beispiel",
+   "nr": 70,
+   "id": "x070"
+  },
+  {
+   "datum": "2019-04-04",
+   "ort": "",
+   "plaetze": {
+    "Anna": 4,
+    "Ben": 2,
+    "Clara": 1,
+    "David": 3
+   },
+   "quelle": "beispiel",
+   "nr": 71,
+   "id": "x071"
+  },
+  {
+   "datum": "2019-05-06",
+   "ort": "",
+   "plaetze": {
+    "Anna": 4,
+    "Ben": 3,
+    "Clara": 2,
+    "David": 1
+   },
+   "quelle": "beispiel",
+   "nr": 72,
+   "id": "x072"
+  },
+  {
+   "datum": "2019-05-09",
+   "ort": "bei Clara",
+   "plaetze": {
+    "Anna": 1,
+    "Ben": 4,
+    "Clara": 3,
+    "David": 2
+   },
+   "quelle": "beispiel",
+   "nr": 73,
+   "id": "x073"
+  },
+  {
+   "datum": "2019-05-29",
+   "ort": "",
+   "plaetze": {
+    "Anna": 3,
+    "Ben": 2,
+    "Clara": 1,
+    "David": 4
+   },
+   "quelle": "beispiel",
+   "nr": 74,
+   "id": "x074"
+  },
+  {
+   "datum": "2019-06-04",
+   "ort": "bei Anna",
+   "plaetze": {
+    "Anna": 2,
+    "Ben": 1,
+    "Clara": 3,
+    "David": 4
+   },
+   "quelle": "beispiel",
+   "nr": 75,
+   "id": "x075"
+  },
+  {
+   "datum": "2019-06-26",
+   "ort": "",
+   "plaetze": {
+    "Anna": 3,
+    "Ben": 4,
+    "Clara": 2,
+    "David": 1
+   },
+   "quelle": "beispiel",
+   "nr": 76,
+   "id": "x076"
+  },
+  {
+   "datum": "2019-07-06",
+   "ort": "bei David",
+   "plaetze": {
+    "Anna": 3,
+    "Ben": 2,
+    "Clara": 4,
+    "David": 1
+   },
+   "quelle": "beispiel",
+   "nr": 77,
+   "id": "x077"
+  },
+  {
+   "datum": "2019-08-04",
+   "ort": "",
+   "plaetze": {
+    "Anna": 4,
+    "Ben": 1,
+    "Clara": 3,
+    "David": 2
+   },
+   "quelle": "beispiel",
+   "nr": 78,
+   "id": "x078"
+  },
+  {
+   "datum": "2019-08-19",
+   "ort": "bei Anna",
+   "plaetze": {
+    "Anna": 3,
+    "Ben": 2,
+    "Clara": 4,
+    "David": 1
+   },
+   "quelle": "beispiel",
+   "nr": 79,
+   "id": "x079"
+  },
+  {
+   "datum": "2019-08-22",
+   "ort": "",
+   "plaetze": {
+    "Anna": 4,
+    "Ben": 1,
+    "Clara": 3,
+    "David": 2
+   },
+   "quelle": "beispiel",
+   "nr": 80,
+   "id": "x080"
+  },
+  {
+   "datum": "2019-08-28",
+   "ort": "",
+   "plaetze": {
+    "Anna": 4,
+    "Ben": 3,
+    "Clara": 1,
+    "David": 2
+   },
+   "quelle": "beispiel",
+   "nr": 81,
+   "id": "x081"
+  },
+  {
+   "datum": "2019-09-12",
+   "ort": "",
+   "plaetze": {
+    "Anna": 1,
+    "Ben": 3,
+    "Clara": 2,
+    "David": 4
+   },
+   "quelle": "beispiel",
+   "nr": 82,
+   "id": "x082"
+  },
+  {
+   "datum": "2019-09-21",
+   "ort": "bei Anna",
+   "plaetze": {
+    "Anna": 3,
+    "Ben": 1,
+    "Clara": 4,
+    "David": 2
+   },
+   "quelle": "beispiel",
+   "nr": 83,
+   "id": "x083"
+  },
+  {
+   "datum": "2019-09-27",
+   "ort": "bei Clara",
+   "plaetze": {
+    "Anna": 1,
+    "Ben": 4,
+    "Clara": 2,
+    "David": 3
+   },
+   "quelle": "beispiel",
+   "nr": 84,
+   "id": "x084"
+  },
+  {
+   "datum": "2019-10-23",
+   "ort": "",
+   "plaetze": {
+    "Anna": 3,
+    "Ben": 4,
+    "Clara": 1,
+    "David": 2
+   },
+   "quelle": "beispiel",
+   "nr": 85,
+   "id": "x085"
+  },
+  {
+   "datum": "2019-10-28",
+   "ort": "bei Ben",
+   "plaetze": {
+    "Anna": 2,
+    "Ben": 1,
+    "Clara": 4,
+    "David": 3
+   },
+   "quelle": "beispiel",
+   "nr": 86,
+   "id": "x086"
+  },
+  {
+   "datum": "2019-11-09",
+   "ort": "",
+   "plaetze": {
+    "Anna": 1,
+    "Ben": 3,
+    "Clara": 2,
+    "David": 4
+   },
+   "quelle": "beispiel",
+   "nr": 87,
+   "id": "x087"
+  },
+  {
+   "datum": "2019-12-25",
+   "ort": "",
+   "plaetze": {
+    "Anna": 3,
+    "Ben": 1,
+    "Clara": 2,
+    "David": 4
+   },
+   "quelle": "beispiel",
+   "nr": 88,
+   "id": "x088"
+  },
+  {
+   "datum": "2020-01-22",
+   "ort": "",
+   "plaetze": {
+    "Anna": 3,
+    "Ben": 2,
+    "Clara": 1,
+    "David": 4
+   },
+   "quelle": "beispiel",
+   "nr": 89,
+   "id": "x089"
+  },
+  {
+   "datum": "2020-02-10",
+   "ort": "",
+   "plaetze": {
+    "Anna": 1,
+    "Ben": 3,
+    "Clara": 2,
+    "David": 4
+   },
+   "quelle": "beispiel",
+   "nr": 90,
+   "id": "x090"
+  },
+  {
+   "datum": "2020-03-19",
+   "ort": "bei Ben",
+   "plaetze": {
+    "Anna": 4,
+    "Ben": 1,
+    "Clara": 3,
+    "David": 2
+   },
+   "quelle": "beispiel",
+   "nr": 91,
+   "id": "x091"
+  },
+  {
+   "datum": "2020-06-10",
+   "ort": "",
+   "plaetze": {
+    "Anna": 2,
+    "Ben": 3,
+    "Clara": 4,
+    "David": 1
+   },
+   "quelle": "beispiel",
+   "nr": 92,
+   "id": "x092"
+  },
+  {
+   "datum": "2020-06-24",
+   "ort": "",
+   "plaetze": {
+    "Anna": 3,
+    "Ben": 2,
+    "Clara": 4,
+    "David": 1
+   },
+   "quelle": "beispiel",
+   "nr": 93,
+   "id": "x093"
+  },
+  {
+   "datum": "2020-06-25",
+   "ort": "bei David",
+   "plaetze": {
+    "Anna": 4,
+    "Ben": 1,
+    "Clara": 2,
+    "David": 3
+   },
+   "quelle": "beispiel",
+   "nr": 94,
+   "id": "x094"
+  },
+  {
+   "datum": "2020-06-29",
+   "ort": "",
+   "plaetze": {
+    "Anna": 1,
+    "Ben": 3,
+    "Clara": 2,
+    "David": 4
+   },
+   "quelle": "beispiel",
+   "nr": 95,
+   "id": "x095"
+  },
+  {
+   "datum": "2020-08-04",
+   "ort": "",
+   "plaetze": {
+    "Anna": 1,
+    "Ben": 3,
+    "Clara": 4,
+    "David": 2
+   },
+   "quelle": "beispiel",
+   "nr": 96,
+   "id": "x096"
+  },
+  {
+   "datum": "2020-09-08",
+   "ort": "",
+   "plaetze": {
+    "Anna": 4,
+    "Ben": 3,
+    "Clara": 2,
+    "David": 1
+   },
+   "quelle": "beispiel",
+   "nr": 97,
+   "id": "x097"
+  },
+  {
+   "datum": "2020-09-12",
+   "ort": "",
+   "plaetze": {
+    "Anna": 2,
+    "Ben": 4,
+    "Clara": 3,
+    "David": 1
+   },
+   "quelle": "beispiel",
+   "nr": 98,
+   "id": "x098"
+  },
+  {
+   "datum": "2020-10-13",
+   "ort": "bei David",
+   "plaetze": {
+    "Anna": 3,
+    "Ben": 2,
+    "Clara": 4,
+    "David": 1
+   },
+   "quelle": "beispiel",
+   "nr": 99,
+   "id": "x099"
+  },
+  {
+   "datum": "2020-10-21",
+   "ort": "",
+   "plaetze": {
+    "Anna": 4,
+    "Ben": 3,
+    "Clara": 2,
+    "David": 1
+   },
+   "quelle": "beispiel",
+   "nr": 100,
+   "id": "x100"
+  },
+  {
+   "datum": "2020-11-01",
+   "ort": "bei Clara",
+   "plaetze": {
+    "Anna": 3,
+    "Ben": 1,
+    "Clara": 4,
+    "David": 2
+   },
+   "quelle": "beispiel",
+   "nr": 101,
+   "id": "x101"
+  },
+  {
+   "datum": "2020-12-09",
+   "ort": "bei David",
+   "plaetze": {
+    "Anna": 3,
+    "Ben": 4,
+    "Clara": 1,
+    "David": 2
+   },
+   "quelle": "beispiel",
+   "nr": 102,
+   "id": "x102"
+  },
+  {
+   "datum": "2020-12-22",
+   "ort": "",
+   "plaetze": {
+    "Anna": 3,
+    "Ben": 2,
+    "Clara": 4,
+    "David": 1
+   },
+   "quelle": "beispiel",
+   "nr": 103,
+   "id": "x103"
+  },
+  {
+   "datum": "2021-02-02",
+   "ort": "",
+   "plaetze": {
+    "Anna": 2,
+    "Ben": 1,
+    "Clara": 3,
+    "David": 4
+   },
+   "quelle": "beispiel",
+   "nr": 104,
+   "id": "x104"
+  },
+  {
+   "datum": "2021-02-04",
+   "ort": "",
+   "plaetze": {
+    "Anna": 2,
+    "Ben": 3,
+    "Clara": 1,
+    "David": 4
+   },
+   "quelle": "beispiel",
+   "nr": 105,
+   "id": "x105"
+  },
+  {
+   "datum": "2021-02-06",
+   "ort": "",
+   "plaetze": {
+    "Anna": 4,
+    "Ben": 1,
+    "Clara": 3,
+    "David": 2
+   },
+   "quelle": "beispiel",
+   "nr": 106,
+   "id": "x106"
+  },
+  {
+   "datum": "2021-02-18",
+   "ort": "",
+   "plaetze": {
+    "Anna": 1,
+    "Ben": 3,
+    "Clara": 2,
+    "David": 4
+   },
+   "quelle": "beispiel",
+   "nr": 107,
+   "id": "x107"
+  },
+  {
+   "datum": "2021-05-20",
+   "ort": "",
+   "plaetze": {
+    "Anna": 2,
+    "Ben": 3,
+    "Clara": 4,
+    "David": 1
+   },
+   "quelle": "beispiel",
+   "nr": 108,
+   "id": "x108"
+  },
+  {
+   "datum": "2021-05-27",
+   "ort": "",
+   "plaetze": {
+    "Anna": 3,
+    "Ben": 1,
+    "Clara": 2,
+    "David": 4
+   },
+   "quelle": "beispiel",
+   "nr": 109,
+   "id": "x109"
+  },
+  {
+   "datum": "2021-06-09",
+   "ort": "",
+   "plaetze": {
+    "Anna": 1,
+    "Ben": 4,
+    "Clara": 3,
+    "David": 2
+   },
+   "quelle": "beispiel",
+   "nr": 110,
+   "id": "x110"
+  },
+  {
+   "datum": "2021-08-18",
+   "ort": "bei Ben",
+   "plaetze": {
+    "Anna": 1,
+    "Ben": 3,
+    "Clara": 4,
+    "David": 2
+   },
+   "quelle": "beispiel",
+   "nr": 111,
+   "id": "x111"
+  },
+  {
+   "datum": "2021-08-23",
+   "ort": "",
+   "plaetze": {
+    "Anna": 3,
+    "Ben": 4,
+    "Clara": 2,
+    "David": 1
+   },
+   "quelle": "beispiel",
+   "nr": 112,
+   "id": "x112"
+  },
+  {
+   "datum": "2021-09-01",
+   "ort": "",
+   "plaetze": {
+    "Anna": 4,
+    "Ben": 3,
+    "Clara": 1,
+    "David": 2
+   },
+   "quelle": "beispiel",
+   "nr": 113,
+   "id": "x113"
+  },
+  {
+   "datum": "2021-10-24",
+   "ort": "",
+   "plaetze": {
+    "Anna": 3,
+    "Ben": 4,
+    "Clara": 1,
+    "David": 2
+   },
+   "quelle": "beispiel",
+   "nr": 114,
+   "id": "x114"
+  },
+  {
+   "datum": "2021-10-25",
+   "ort": "",
+   "plaetze": {
+    "Anna": 1,
+    "Ben": 4,
+    "Clara": 2,
+    "David": 3
+   },
+   "quelle": "beispiel",
+   "nr": 115,
+   "id": "x115"
+  },
+  {
+   "datum": "2021-11-29",
+   "ort": "bei Ben",
+   "plaetze": {
+    "Anna": 1,
+    "Ben": 3,
+    "Clara": 2,
+    "David": 4
+   },
+   "quelle": "beispiel",
+   "nr": 116,
+   "id": "x116"
+  },
+  {
+   "datum": "2021-12-08",
+   "ort": "",
+   "plaetze": {
+    "Anna": 3,
+    "Ben": 4,
+    "Clara": 1,
+    "David": 2
+   },
+   "quelle": "beispiel",
+   "nr": 117,
+   "id": "x117"
+  },
+  {
+   "datum": "2021-12-16",
+   "ort": "",
+   "plaetze": {
+    "Anna": 1,
+    "Ben": 2,
+    "Clara": 3,
+    "David": 4
+   },
+   "quelle": "beispiel",
+   "nr": 118,
+   "id": "x118"
+  },
+  {
+   "datum": "2021-12-24",
+   "ort": "bei David",
+   "plaetze": {
+    "Anna": 4,
+    "Ben": 1,
+    "Clara": 2,
+    "David": 3
+   },
+   "quelle": "beispiel",
+   "nr": 119,
+   "id": "x119"
+  },
+  {
+   "datum": "2021-12-27",
+   "ort": "",
+   "plaetze": {
+    "Anna": 1,
+    "Ben": 2,
+    "Clara": 3,
+    "David": 4
+   },
+   "quelle": "beispiel",
+   "nr": 120,
+   "id": "x120"
+  },
+  {
+   "datum": "2022-01-13",
+   "ort": "",
+   "plaetze": {
+    "Anna": 1,
+    "Ben": 2,
+    "Clara": 3,
+    "David": 4
+   },
+   "quelle": "beispiel",
+   "nr": 121,
+   "id": "x121"
+  },
+  {
+   "datum": "2022-02-01",
+   "ort": "bei Ben",
+   "plaetze": {
+    "Anna": 4,
+    "Ben": 1,
+    "Clara": 2,
+    "David": 3
+   },
+   "quelle": "beispiel",
+   "nr": 122,
+   "id": "x122"
+  },
+  {
+   "datum": "2022-03-02",
+   "ort": "bei Anna",
+   "plaetze": {
+    "Anna": 4,
+    "Ben": 2,
+    "Clara": 3,
+    "David": 1
+   },
+   "quelle": "beispiel",
+   "nr": 123,
+   "id": "x123"
+  },
+  {
+   "datum": "2022-03-09",
+   "ort": "bei Ben",
+   "plaetze": {
+    "Anna": 4,
+    "Ben": 1,
+    "Clara": 2,
+    "David": 3
+   },
+   "quelle": "beispiel",
+   "nr": 124,
+   "id": "x124"
+  },
+  {
+   "datum": "2022-03-29",
+   "ort": "bei Ben",
+   "plaetze": {
+    "Anna": 4,
+    "Ben": 2,
+    "Clara": 3,
+    "David": 1
+   },
+   "quelle": "beispiel",
+   "nr": 125,
+   "id": "x125"
+  },
+  {
+   "datum": "2022-04-23",
+   "ort": "",
+   "plaetze": {
+    "Anna": 1,
+    "Ben": 2,
+    "Clara": 4,
+    "David": 3
+   },
+   "quelle": "beispiel",
+   "nr": 126,
+   "id": "x126"
+  },
+  {
+   "datum": "2022-05-08",
+   "ort": "",
+   "plaetze": {
+    "Anna": 4,
+    "Ben": 3,
+    "Clara": 1,
+    "David": 2
+   },
+   "quelle": "beispiel",
+   "nr": 127,
+   "id": "x127"
+  },
+  {
+   "datum": "2022-05-29",
+   "ort": "bei Anna",
+   "plaetze": {
+    "Anna": 2,
+    "Ben": 4,
+    "Clara": 3,
+    "David": 1
+   },
+   "quelle": "beispiel",
+   "nr": 128,
+   "id": "x128"
+  },
+  {
+   "datum": "2022-06-28",
+   "ort": "bei Clara",
+   "plaetze": {
+    "Anna": 1,
+    "Ben": 3,
+    "Clara": 4,
+    "David": 2
+   },
+   "quelle": "beispiel",
+   "nr": 129,
+   "id": "x129"
+  },
+  {
+   "datum": "2022-07-02",
+   "ort": "",
+   "plaetze": {
+    "Anna": 2,
+    "Ben": 4,
+    "Clara": 1,
+    "David": 3
+   },
+   "quelle": "beispiel",
+   "nr": 130,
+   "id": "x130"
+  },
+  {
+   "datum": "2022-07-18",
+   "ort": "",
+   "plaetze": {
+    "Anna": 1,
+    "Ben": 2,
+    "Clara": 3,
+    "David": 4
+   },
+   "quelle": "beispiel",
+   "nr": 131,
+   "id": "x131"
+  },
+  {
+   "datum": "2022-08-26",
+   "ort": "",
+   "plaetze": {
+    "Anna": 1,
+    "Ben": 4,
+    "Clara": 2,
+    "David": 3
+   },
+   "quelle": "beispiel",
+   "nr": 132,
+   "id": "x132"
+  },
+  {
+   "datum": "2022-09-11",
+   "ort": "",
+   "plaetze": {
+    "Anna": 1,
+    "Ben": 4,
+    "Clara": 3,
+    "David": 2
+   },
+   "quelle": "beispiel",
+   "nr": 133,
+   "id": "x133"
+  },
+  {
+   "datum": "2022-11-10",
+   "ort": "",
+   "plaetze": {
+    "Anna": 3,
+    "Ben": 2,
+    "Clara": 1,
+    "David": 4
+   },
+   "quelle": "beispiel",
+   "nr": 134,
+   "id": "x134"
+  },
+  {
+   "datum": "2022-12-10",
+   "ort": "bei Clara",
+   "plaetze": {
+    "Anna": 3,
+    "Ben": 1,
+    "Clara": 2,
+    "David": 4
+   },
+   "quelle": "beispiel",
+   "nr": 135,
+   "id": "x135"
+  },
+  {
+   "datum": "2023-01-08",
+   "ort": "",
+   "plaetze": {
+    "Anna": 4,
+    "Ben": 2,
+    "Clara": 1,
+    "David": 3
+   },
+   "quelle": "beispiel",
+   "nr": 136,
+   "id": "x136"
+  },
+  {
+   "datum": "2023-02-12",
+   "ort": "",
+   "plaetze": {
+    "Anna": 3,
+    "Ben": 4,
+    "Clara": 1,
+    "David": 2
+   },
+   "quelle": "beispiel",
+   "nr": 137,
+   "id": "x137"
+  },
+  {
+   "datum": "2023-02-13",
+   "ort": "",
+   "plaetze": {
+    "Anna": 3,
+    "Ben": 2,
+    "Clara": 4,
+    "David": 1
+   },
+   "quelle": "beispiel",
+   "nr": 138,
+   "id": "x138"
+  },
+  {
+   "datum": "2023-03-13",
+   "ort": "",
+   "plaetze": {
+    "Anna": 2,
+    "Ben": 3,
+    "Clara": 1,
+    "David": 4
+   },
+   "quelle": "beispiel",
+   "nr": 139,
+   "id": "x139"
+  },
+  {
+   "datum": "2023-03-20",
+   "ort": "",
+   "plaetze": {
+    "Anna": 4,
+    "Ben": 1,
+    "Clara": 2,
+    "David": 3
+   },
+   "quelle": "beispiel",
+   "nr": 140,
+   "id": "x140"
+  },
+  {
+   "datum": "2023-03-28",
+   "ort": "",
+   "plaetze": {
+    "Anna": 4,
+    "Ben": 1,
+    "Clara": 3,
+    "David": 2
+   },
+   "quelle": "beispiel",
+   "nr": 141,
+   "id": "x141"
+  },
+  {
+   "datum": "2023-04-02",
+   "ort": "",
+   "plaetze": {
+    "Anna": 1,
+    "Ben": 2,
+    "Clara": 3,
+    "David": 4
+   },
+   "quelle": "beispiel",
+   "nr": 142,
+   "id": "x142"
+  },
+  {
+   "datum": "2023-04-30",
+   "ort": "bei Ben",
+   "plaetze": {
+    "Anna": 2,
+    "Ben": 4,
+    "Clara": 1,
+    "David": 3
+   },
+   "quelle": "beispiel",
+   "nr": 143,
+   "id": "x143"
+  },
+  {
+   "datum": "2023-05-01",
+   "ort": "",
+   "plaetze": {
+    "Anna": 3,
+    "Ben": 2,
+    "Clara": 1,
+    "David": 4
+   },
+   "quelle": "beispiel",
+   "nr": 144,
+   "id": "x144"
+  },
+  {
+   "datum": "2023-05-24",
+   "ort": "",
+   "plaetze": {
+    "Anna": 2,
+    "Ben": 3,
+    "Clara": 4,
+    "David": 1
+   },
+   "quelle": "beispiel",
+   "nr": 145,
+   "id": "x145"
+  },
+  {
+   "datum": "2023-07-04",
+   "ort": "",
+   "plaetze": {
+    "Anna": 4,
+    "Ben": 3,
+    "Clara": 1,
+    "David": 2
+   },
+   "quelle": "beispiel",
+   "nr": 146,
+   "id": "x146"
+  },
+  {
+   "datum": "2023-07-15",
+   "ort": "",
+   "plaetze": {
+    "Anna": 4,
+    "Ben": 1,
+    "Clara": 3,
+    "David": 2
+   },
+   "quelle": "beispiel",
+   "nr": 147,
+   "id": "x147"
+  },
+  {
+   "datum": "2023-07-21",
+   "ort": "bei Anna",
+   "plaetze": {
+    "Anna": 2,
+    "Ben": 3,
+    "Clara": 4,
+    "David": 1
+   },
+   "quelle": "beispiel",
+   "nr": 148,
+   "id": "x148"
+  },
+  {
+   "datum": "2023-07-24",
+   "ort": "",
+   "plaetze": {
+    "Anna": 3,
+    "Ben": 2,
+    "Clara": 1,
+    "David": 4
+   },
+   "quelle": "beispiel",
+   "nr": 149,
+   "id": "x149"
+  },
+  {
+   "datum": "2023-07-26",
+   "ort": "bei Anna",
+   "plaetze": {
+    "Anna": 1,
+    "Ben": 3,
+    "Clara": 4,
+    "David": 2
+   },
+   "quelle": "beispiel",
+   "nr": 150,
+   "id": "x150"
+  },
+  {
+   "datum": "2023-08-02",
+   "ort": "",
+   "plaetze": {
+    "Anna": 3,
+    "Ben": 2,
+    "Clara": 1,
+    "David": 4
+   },
+   "quelle": "beispiel",
+   "nr": 151,
+   "id": "x151"
+  },
+  {
+   "datum": "2023-08-10",
+   "ort": "",
+   "plaetze": {
+    "Anna": 4,
+    "Ben": 3,
+    "Clara": 1,
+    "David": 2
+   },
+   "quelle": "beispiel",
+   "nr": 152,
+   "id": "x152"
+  },
+  {
+   "datum": "2023-08-19",
+   "ort": "",
+   "plaetze": {
+    "Anna": 2,
+    "Ben": 4,
+    "Clara": 3,
+    "David": 1
+   },
+   "quelle": "beispiel",
+   "nr": 153,
+   "id": "x153"
+  },
+  {
+   "datum": "2023-09-07",
+   "ort": "bei Clara",
+   "plaetze": {
+    "Anna": 2,
+    "Ben": 3,
+    "Clara": 4,
+    "David": 1
+   },
+   "quelle": "beispiel",
+   "nr": 154,
+   "id": "x154"
+  },
+  {
+   "datum": "2023-09-13",
+   "ort": "bei Anna",
+   "plaetze": {
+    "Anna": 1,
+    "Ben": 3,
+    "Clara": 4,
+    "David": 2
+   },
+   "quelle": "beispiel",
+   "nr": 155,
+   "id": "x155"
+  },
+  {
+   "datum": "2023-10-10",
+   "ort": "",
+   "plaetze": {
+    "Anna": 4,
+    "Ben": 1,
+    "Clara": 2,
+    "David": 3
+   },
+   "quelle": "beispiel",
+   "nr": 156,
+   "id": "x156"
+  },
+  {
+   "datum": "2023-12-05",
+   "ort": "",
+   "plaetze": {
+    "Anna": 1,
+    "Ben": 3,
+    "Clara": 2,
+    "David": 4
+   },
+   "quelle": "beispiel",
+   "nr": 157,
+   "id": "x157"
+  },
+  {
+   "datum": "2023-12-17",
+   "ort": "bei Anna",
+   "plaetze": {
+    "Anna": 2,
+    "Ben": 4,
+    "Clara": 1,
+    "David": 3
+   },
+   "quelle": "beispiel",
+   "nr": 158,
+   "id": "x158"
+  },
+  {
+   "datum": "2023-12-29",
+   "ort": "",
+   "plaetze": {
+    "Anna": 2,
+    "Ben": 1,
+    "Clara": 4,
+    "David": 3
+   },
+   "quelle": "beispiel",
+   "nr": 159,
+   "id": "x159"
+  },
+  {
+   "datum": "2024-01-04",
+   "ort": "bei Anna",
+   "plaetze": {
+    "Anna": 1,
+    "Ben": 3,
+    "Clara": 4,
+    "David": 2
+   },
+   "quelle": "beispiel",
+   "nr": 160,
+   "id": "x160"
+  },
+  {
+   "datum": "2024-03-06",
+   "ort": "",
+   "plaetze": {
+    "Anna": 2,
+    "Ben": 4,
+    "Clara": 1,
+    "David": 3
+   },
+   "quelle": "beispiel",
+   "nr": 161,
+   "id": "x161"
+  },
+  {
+   "datum": "2024-03-16",
+   "ort": "bei David",
+   "plaetze": {
+    "Anna": 4,
+    "Ben": 1,
+    "Clara": 3,
+    "David": 2
+   },
+   "quelle": "beispiel",
+   "nr": 162,
+   "id": "x162"
+  },
+  {
+   "datum": "2024-04-04",
+   "ort": "",
+   "plaetze": {
+    "Anna": 3,
+    "Ben": 2,
+    "Clara": 4,
+    "David": 1
+   },
+   "quelle": "beispiel",
+   "nr": 163,
+   "id": "x163"
+  },
+  {
+   "datum": "2024-05-15",
+   "ort": "",
+   "plaetze": {
+    "Anna": 2,
+    "Ben": 1,
+    "Clara": 4,
+    "David": 3
+   },
+   "quelle": "beispiel",
+   "nr": 164,
+   "id": "x164"
+  },
+  {
+   "datum": "2024-05-25",
+   "ort": "",
+   "plaetze": {
+    "Anna": 1,
+    "Ben": 3,
+    "Clara": 2,
+    "David": 4
+   },
+   "quelle": "beispiel",
+   "nr": 165,
+   "id": "x165"
+  },
+  {
+   "datum": "2024-06-13",
+   "ort": "bei Ben",
+   "plaetze": {
+    "Anna": 1,
+    "Ben": 4,
+    "Clara": 2,
+    "David": 3
+   },
+   "quelle": "beispiel",
+   "nr": 166,
+   "id": "x166"
+  },
+  {
+   "datum": "2024-07-09",
+   "ort": "bei Clara",
+   "plaetze": {
+    "Anna": 4,
+    "Ben": 3,
+    "Clara": 2,
+    "David": 1
+   },
+   "quelle": "beispiel",
+   "nr": 167,
+   "id": "x167"
+  },
+  {
+   "datum": "2024-08-03",
+   "ort": "",
+   "plaetze": {
+    "Anna": 1,
+    "Ben": 3,
+    "Clara": 4,
+    "David": 2
+   },
+   "quelle": "beispiel",
+   "nr": 168,
+   "id": "x168"
+  },
+  {
+   "datum": "2024-09-21",
+   "ort": "",
+   "plaetze": {
+    "Anna": 3,
+    "Ben": 1,
+    "Clara": 2,
+    "David": 4
+   },
+   "quelle": "beispiel",
+   "nr": 169,
+   "id": "x169"
+  },
+  {
+   "datum": "2024-10-01",
+   "ort": "",
+   "plaetze": {
+    "Anna": 2,
+    "Ben": 4,
+    "Clara": 1,
+    "David": 3
+   },
+   "quelle": "beispiel",
+   "nr": 170,
+   "id": "x170"
+  },
+  {
+   "datum": "2024-10-17",
+   "ort": "bei Ben",
+   "plaetze": {
+    "Anna": 2,
+    "Ben": 3,
+    "Clara": 1,
+    "David": 4
+   },
+   "quelle": "beispiel",
+   "nr": 171,
+   "id": "x171"
+  },
+  {
+   "datum": "2024-10-29",
+   "ort": "",
+   "plaetze": {
+    "Anna": 4,
+    "Ben": 2,
+    "Clara": 3,
+    "David": 1
+   },
+   "quelle": "beispiel",
+   "nr": 172,
+   "id": "x172"
+  },
+  {
+   "datum": "2024-11-09",
+   "ort": "",
+   "plaetze": {
+    "Anna": 4,
+    "Ben": 3,
+    "Clara": 1,
+    "David": 2
+   },
+   "quelle": "beispiel",
+   "nr": 173,
+   "id": "x173"
+  },
+  {
+   "datum": "2024-11-13",
+   "ort": "",
+   "plaetze": {
+    "Anna": 4,
+    "Ben": 3,
+    "Clara": 1,
+    "David": 2
+   },
+   "quelle": "beispiel",
+   "nr": 174,
+   "id": "x174"
+  },
+  {
+   "datum": "2024-12-02",
+   "ort": "",
+   "plaetze": {
+    "Anna": 2,
+    "Ben": 4,
+    "Clara": 3,
+    "David": 1
+   },
+   "quelle": "beispiel",
+   "nr": 175,
+   "id": "x175"
+  },
+  {
+   "datum": "2024-12-20",
+   "ort": "",
+   "plaetze": {
+    "Anna": 1,
+    "Ben": 4,
+    "Clara": 2,
+    "David": 3
+   },
+   "quelle": "beispiel",
+   "nr": 176,
+   "id": "x176"
+  },
+  {
+   "datum": "2025-01-29",
+   "ort": "",
+   "plaetze": {
+    "Anna": 3,
+    "Ben": 1,
+    "Clara": 4,
+    "David": 2
+   },
+   "quelle": "beispiel",
+   "nr": 177,
+   "id": "x177"
+  },
+  {
+   "datum": "2025-02-02",
+   "ort": "",
+   "plaetze": {
+    "Anna": 3,
+    "Ben": 4,
+    "Clara": 2,
+    "David": 1
+   },
+   "quelle": "beispiel",
+   "nr": 178,
+   "id": "x178"
+  },
+  {
+   "datum": "2025-02-24",
+   "ort": "bei David",
+   "plaetze": {
+    "Anna": 3,
+    "Ben": 4,
+    "Clara": 1,
+    "David": 2
+   },
+   "quelle": "beispiel",
+   "nr": 179,
+   "id": "x179"
+  },
+  {
+   "datum": "2025-04-09",
+   "ort": "",
+   "plaetze": {
+    "Anna": 3,
+    "Ben": 2,
+    "Clara": 4,
+    "David": 1
+   },
+   "quelle": "beispiel",
+   "nr": 180,
+   "id": "x180"
+  },
+  {
+   "datum": "2025-07-21",
+   "ort": "",
+   "plaetze": {
+    "Anna": 4,
+    "Ben": 3,
+    "Clara": 2,
+    "David": 1
+   },
+   "quelle": "beispiel",
+   "nr": 181,
+   "id": "x181"
+  },
+  {
+   "datum": "2025-07-22",
+   "ort": "bei Anna",
+   "plaetze": {
+    "Anna": 4,
+    "Ben": 3,
+    "Clara": 1,
+    "David": 2
+   },
+   "quelle": "beispiel",
+   "nr": 182,
+   "id": "x182"
+  },
+  {
+   "datum": "2025-07-24",
+   "ort": "",
+   "plaetze": {
+    "Anna": 1,
+    "Ben": 4,
+    "Clara": 2,
+    "David": 3
+   },
+   "quelle": "beispiel",
+   "nr": 183,
+   "id": "x183"
+  },
+  {
+   "datum": "2025-07-25",
+   "ort": "bei Clara",
+   "plaetze": {
+    "Anna": 2,
+    "Ben": 3,
+    "Clara": 4,
+    "David": 1
+   },
+   "quelle": "beispiel",
+   "nr": 184,
+   "id": "x184"
+  },
+  {
+   "datum": "2025-07-26",
+   "ort": "",
+   "plaetze": {
+    "Anna": 1,
+    "Ben": 3,
+    "Clara": 4,
+    "David": 2
+   },
+   "quelle": "beispiel",
+   "nr": 185,
+   "id": "x185"
+  },
+  {
+   "datum": "2025-08-23",
+   "ort": "",
+   "plaetze": {
+    "Anna": 1,
+    "Ben": 4,
+    "Clara": 2,
+    "David": 3
+   },
+   "quelle": "beispiel",
+   "nr": 186,
+   "id": "x186"
+  },
+  {
+   "datum": "2025-09-05",
+   "ort": "",
+   "plaetze": {
+    "Anna": 3,
+    "Ben": 2,
+    "Clara": 1,
+    "David": 4
+   },
+   "quelle": "beispiel",
+   "nr": 187,
+   "id": "x187"
+  },
+  {
+   "datum": "2025-10-15",
+   "ort": "",
+   "plaetze": {
+    "Anna": 1,
+    "Ben": 2,
+    "Clara": 3,
+    "David": 4
+   },
+   "quelle": "beispiel",
+   "nr": 188,
+   "id": "x188"
+  },
+  {
+   "datum": "2025-11-22",
+   "ort": "bei Ben",
+   "plaetze": {
+    "Anna": 3,
+    "Ben": 4,
+    "Clara": 2,
+    "David": 1
+   },
+   "quelle": "beispiel",
+   "nr": 189,
+   "id": "x189"
+  },
+  {
+   "datum": "2025-12-14",
+   "ort": "",
+   "plaetze": {
+    "Anna": 3,
+    "Ben": 2,
+    "Clara": 1,
+    "David": 4
+   },
+   "quelle": "beispiel",
+   "nr": 190,
+   "id": "x190"
+  },
+  {
+   "datum": "2025-12-16",
+   "ort": "",
+   "plaetze": {
+    "Anna": 2,
+    "Ben": 3,
+    "Clara": 4,
+    "David": 1
+   },
+   "quelle": "beispiel",
+   "nr": 191,
+   "id": "x191"
+  },
+  {
+   "datum": "2026-01-02",
+   "ort": "",
+   "plaetze": {
+    "Anna": 4,
+    "Ben": 3,
+    "Clara": 2,
+    "David": 1
+   },
+   "quelle": "beispiel",
+   "nr": 192,
+   "id": "x192"
+  },
+  {
+   "datum": "2026-01-15",
+   "ort": "",
+   "plaetze": {
+    "Anna": 3,
+    "Ben": 4,
+    "Clara": 1,
+    "David": 2
+   },
+   "quelle": "beispiel",
+   "nr": 193,
+   "id": "x193"
+  },
+  {
+   "datum": "2026-01-28",
+   "ort": "bei Ben",
+   "plaetze": {
+    "Anna": 3,
+    "Ben": 1,
+    "Clara": 2,
+    "David": 4
+   },
+   "quelle": "beispiel",
+   "nr": 194,
+   "id": "x194"
+  },
+  {
+   "datum": "2026-02-05",
+   "ort": "",
+   "plaetze": {
+    "Anna": 2,
+    "Ben": 1,
+    "Clara": 3,
+    "David": 4
+   },
+   "quelle": "beispiel",
+   "nr": 195,
+   "id": "x195"
+  },
+  {
+   "datum": "2026-02-22",
+   "ort": "",
+   "plaetze": {
+    "Anna": 3,
+    "Ben": 4,
+    "Clara": 1,
+    "David": 2
+   },
+   "quelle": "beispiel",
+   "nr": 196,
+   "id": "x196"
+  },
+  {
+   "datum": "2026-02-23",
+   "ort": "bei Ben",
+   "plaetze": {
+    "Anna": 3,
+    "Ben": 1,
+    "Clara": 4,
+    "David": 2
+   },
+   "quelle": "beispiel",
+   "nr": 197,
+   "id": "x197"
+  },
+  {
+   "datum": "2026-02-27",
+   "ort": "",
+   "plaetze": {
+    "Anna": 3,
+    "Ben": 4,
+    "Clara": 2,
+    "David": 1
+   },
+   "quelle": "beispiel",
+   "nr": 198,
+   "id": "x198"
+  },
+  {
+   "datum": "2026-03-20",
+   "ort": "bei Clara",
+   "plaetze": {
+    "Anna": 1,
+    "Ben": 2,
+    "Clara": 3,
+    "David": 4
+   },
+   "quelle": "beispiel",
+   "nr": 199,
+   "id": "x199"
+  },
+  {
+   "datum": "2026-03-26",
+   "ort": "",
+   "plaetze": {
+    "Anna": 2,
+    "Ben": 3,
+    "Clara": 1,
+    "David": 4
+   },
+   "quelle": "beispiel",
+   "nr": 200,
+   "id": "x200"
+  },
+  {
+   "datum": "2026-04-18",
+   "ort": "",
+   "plaetze": {
+    "Anna": 1,
+    "Ben": 3,
+    "Clara": 4,
+    "David": 2
+   },
+   "quelle": "beispiel",
+   "nr": 201,
+   "id": "x201"
+  },
+  {
+   "datum": "2026-06-25",
+   "ort": "",
+   "plaetze": {
+    "Anna": 4,
+    "Ben": 2,
+    "Clara": 3,
+    "David": 1
+   },
+   "quelle": "beispiel",
+   "nr": 202,
+   "id": "x202"
+  },
+  {
+   "datum": "2026-10-07",
+   "ort": "",
+   "plaetze": {
+    "Anna": 1,
+    "Ben": 2,
+    "Clara": 3,
+    "David": 4
+   },
+   "quelle": "beispiel",
+   "nr": 203,
+   "id": "x203"
+  },
+  {
+   "datum": "2026-10-09",
+   "ort": "",
+   "plaetze": {
+    "Anna": 3,
+    "Ben": 1,
+    "Clara": 2,
+    "David": 4
+   },
+   "quelle": "beispiel",
+   "nr": 204,
+   "id": "x204"
+  }
+ ],
+ "termine": [
+  {
+   "datum": "2026-10-25",
+   "ort": "bei Anna + essen"
+  },
+  {
+   "datum": "2026-11-06",
+   "ort": "bei David"
+  },
+  {
+   "datum": "2026-12-09",
+   "ort": "bei Ben"
+  }
+ ]
+}

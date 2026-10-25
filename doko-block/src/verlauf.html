@@ -1,0 +1,109 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#1f4d3a">
+<meta name="robots" content="noindex,nofollow">
+<title>Doko-Block · Verlauf</title>
+<link rel="apple-touch-icon" href="icon-180.png">
+<style>
+/*BASIS_CSS*/
+body{padding-bottom:30px}
+.eintrag{display:flex;gap:11px;padding:11px 0;border-bottom:1px solid var(--linie)}
+.eintrag:last-child{border-bottom:0}
+.eintrag .sym{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex:none;font-size:1rem;background:var(--filz-hell)}
+.eintrag .sym.rot{background:var(--rot-hell)}.eintrag .sym.gold{background:var(--gold-hell)}
+.eintrag .was{flex:1;min-width:0}
+.eintrag .wann{font-size:.78rem;color:var(--leise)}
+.eintrag .ki-antwort{background:var(--papier);border-radius:10px;padding:8px 10px;margin-top:6px;font-size:.92rem;white-space:pre-wrap}
+.filter{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:6px}
+.filter button{min-height:34px;padding:5px 11px;font-size:.85rem;border-radius:999px;background:var(--filz-hell);color:var(--filz)}
+.filter button[aria-pressed=true]{background:var(--filz);color:#fff}
+@media (prefers-color-scheme:dark){.filter button[aria-pressed=true]{color:#0f1a14}}
+.stand{font-size:.78rem;font-weight:700;border-radius:999px;padding:2px 9px;white-space:nowrap}
+.stand.offen{background:var(--gold-hell);color:var(--gold)}
+.stand.arbeit{background:var(--filz-hell);color:var(--filz)}
+.stand.zu{background:var(--linie);color:var(--leise)}
+</style>
+</head>
+<body>
+<header class="kopf">
+  <span class="pips" aria-hidden="true">♥♦</span>
+  <h1>Verlauf<small>Wer hat was gemacht – alles offen</small></h1>
+  <a href="./">← Zurück</a>
+</header>
+<main>
+  <div class="karte">
+    <h2>Rückmeldungen</h2>
+    <p class="leise" style="margin:-4px 0 8px">Wünsche und Fehler aus der App – mit ihrem Stand.</p>
+    <div id="rueck"><p class="leise">Lädt …</p></div>
+  </div>
+  <div class="karte" id="papierkorb-karte">
+    <h2>Papierkorb</h2>
+    <div id="papierkorb"></div>
+  </div>
+  <div class="karte">
+    <h2>Protokoll</h2>
+    <div class="filter" id="filter">
+      <button data-f="alle" aria-pressed="true">Alles</button>
+      <button data-f="abende" aria-pressed="false">Abende</button>
+      <button data-f="ki" aria-pressed="false">KI-Gespräche</button>
+      <button data-f="feedback" aria-pressed="false">Rückmeldungen</button>
+    </div>
+    <div id="protokoll"><p class="leise">Lädt …</p></div>
+  </div>
+</main>
+<dialog id="dlg"><div class="innen" id="dlg-inhalt"></div></dialog>
+<script>
+/*BASIS_JS*/
+(async () => {
+const { api, esc, datum, zeit, toast, chips } = DK;
+const $ = s => document.querySelector(s);
+if (!DK.hatSchluessel()) { DK.sperre('Bitte öffne deinen persönlichen Link (mit dem Schlüssel), den du für eure Runde bekommen hast.'); return; }
+let V, D, filter = 'alle';
+const SYM = { farbe: ['🎨', ''], neu: ['🂡', ''], aendern: ['✎', 'gold'], loeschen: ['🗑', 'rot'], wiederherstellen: ['↺', ''], termin: ['📅', ''], auslesen: ['📷', ''], ki: ['💬', 'gold'], feedback: ['✉', 'gold'] };
+const GRUPPE = { farbe: 'abende', neu: 'abende', aendern: 'abende', loeschen: 'abende', wiederherstellen: 'abende', termin: 'abende', auslesen: 'abende', ki: 'ki', feedback: 'feedback' };
+function standVon(r) {
+  if (!r.offen) return r.labels.includes('live') ? ['erledigt ✓', 'zu'] : ['geschlossen', 'zu'];
+  if (r.labels.includes('vorschau') || r.labels.includes('freigegeben')) return ['fast fertig', 'arbeit'];
+  if (r.labels.includes('angenommen')) return ['angenommen', 'arbeit'];
+  if (r.labels.includes('rueckfrage')) return ['Rückfrage', 'offen'];
+  return ['neu', 'offen'];
+}
+function zeigeRueck() {
+  const r = V.rueckmeldungen;
+  if (r === null) { $('#rueck').innerHTML = '<p class="leise">Der Stand kann gerade nicht abgerufen werden.</p>'; return; }
+  $('#rueck').innerHTML = r.length ? r.map(x => { const [t, k] = standVon(x); return `<div class="eintrag"><div class="was"><b>Nr. ${x.nr}</b> ${esc(x.titel)}
+    <div class="wann">${zeit(x.am)}${x.kommentare ? ' · ' + x.kommentare + ' Kommentar' + (x.kommentare > 1 ? 'e' : '') : ''}</div></div><span class="stand ${k}">${t}</span></div>`; }).join('')
+    : '<p class="leise">Noch keine Rückmeldungen. Senden geht unter „Fragen“.</p>';
+}
+function zeigePapierkorb() {
+  const weg = D.abende.filter(a => a.geloescht);
+  $('#papierkorb').innerHTML = weg.length ? weg.map(a => `<div class="eintrag"><div class="was"><b>${datum(a.datum)}</b> <span class="leise">${esc(a.ort || '')}</span><div style="margin:4px 0">${chips(a.plaetze, D.spieler)}</div>
+    <div class="wann">gelöscht von ${esc(a.geloescht.von)} am ${zeit(a.geloescht.am)}${a.geloescht.grund ? ' – ' + esc(a.geloescht.grund) : ''}</div></div>
+    <button class="zweit klein" data-zurueck="${a.id}">Zurückholen</button></div>`).join('') : '<p class="leise">Leer.</p>';
+  $('#papierkorb').querySelectorAll('[data-zurueck]').forEach(b => b.onclick = async () => {
+    try { await api('wiederherstellen', { id: b.dataset.zurueck }); toast('Wiederhergestellt'); laden(); } catch (e) { toast(e.message); }
+  });
+}
+function zeigeProtokoll() {
+  const liste = V.eintraege.filter(e => e && (filter === 'alle' || GRUPPE[e.art] === filter));
+  $('#protokoll').innerHTML = liste.length ? liste.map(e => { const [s, k] = SYM[e.art] || ['•', ''];
+    let text = esc(e.text), extra = '';
+    if (e.art === 'ki') { text = `<b>${esc(e.wer)} fragte:</b> „${esc(e.text)}“`; extra = e.antwort ? `<div class="ki-antwort">${esc(e.antwort)}${e.vorschlaege ? `\n\n→ ${e.vorschlaege} Vorschlag${e.vorschlaege > 1 ? 'e' : ''}` : ''}</div>` : ''; }
+    else if (e.art === 'feedback') text = `<b>${esc(e.wer)}</b> · Rückmeldung Nr. ${e.issue} (${e.typ === 'fehler' ? 'Fehler' : 'Wunsch'}): „${esc(e.text)}“`;
+    else text = `<b>${esc(e.wer)}</b> · ${text}`;
+    return `<div class="eintrag"><div class="sym ${k}" aria-hidden="true">${s}</div><div class="was">${text}${extra}<div class="wann">${zeit(e.zeit)}${e.modell ? ' · ' + esc(e.modell) : ''}</div></div></div>`; }).join('')
+    : '<p class="leise">Noch nichts passiert.</p>';
+}
+$('#filter').querySelectorAll('button').forEach(b => b.onclick = () => { filter = b.dataset.f; $('#filter').querySelectorAll('button').forEach(x => x.setAttribute('aria-pressed', x === b)); zeigeProtokoll(); });
+async function laden() {
+  [V, D] = await Promise.all([api('verlauf'), api('daten')]);
+  DK.farben(D.farben); zeigeRueck(); zeigePapierkorb(); zeigeProtokoll();
+}
+try { await laden(); } catch (e) { if (e.status === 401) DK.sperre(e.message); else toast(e.message, 5000); }
+})();
+</script>
+</body>
+</html>

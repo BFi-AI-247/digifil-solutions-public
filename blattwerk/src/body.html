@@ -1,0 +1,152 @@
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="i-leaf" viewBox="0 0 24 24"><path d="M5 19c0-8 5-14 15-14-1 9-6 14-14 14zM5 19l8-8" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="i-undo" viewBox="0 0 24 24"><path d="M9 14L4 9l5-5M4 9h10a6 6 0 0 1 0 12h-3" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="i-redo" viewBox="0 0 24 24"><path d="M15 14l5-5-5-5M20 9H10a6 6 0 0 0 0 12h3" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="i-minus" viewBox="0 0 24 24"><path d="M6 12h12" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></symbol>
+  <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 6v12M6 12h12" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></symbol>
+  <symbol id="i-print" viewBox="0 0 24 24"><path d="M7 9V3h10v6M7 17H5a2 2 0 0 1-2-2v-4a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v4a2 2 0 0 1-2 2h-2M7 14h10v7H7z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></symbol>
+  <symbol id="i-page" viewBox="0 0 24 24"><path d="M6 3h9l4 4v14H6z M15 3v4h4" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M9 11h7M9 15h7" stroke="currentColor" stroke-width="1.6"/></symbol>
+  <symbol id="i-folder" viewBox="0 0 24 24"><path d="M3 6h7l2 2h9v11H3z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></symbol>
+  <symbol id="i-sliders" viewBox="0 0 24 24"><path d="M4 7h10M18 7h2M4 17h4M12 17h8" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><circle cx="16" cy="7" r="2" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="10" cy="17" r="2" fill="none" stroke="currentColor" stroke-width="2"/></symbol>
+  <symbol id="i-copy" viewBox="0 0 24 24"><rect x="8" y="8" width="12" height="12" rx="2" fill="none" stroke="currentColor" stroke-width="2"/><path d="M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2" fill="none" stroke="currentColor" stroke-width="2"/></symbol>
+  <symbol id="i-trash" viewBox="0 0 24 24"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="i-x" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></symbol>
+  <symbol id="i-check" viewBox="0 0 24 24"><path d="M5 12l5 5 9-10" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="i-chat" viewBox="0 0 24 24"><path d="M4 5h16v11H9l-5 4z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M8 9h8M8 12h5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></symbol>
+  <symbol id="i-edit" viewBox="0 0 24 24"><path d="M4 20h4L19 9l-4-4L4 16zM14 6l4 4" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></symbol>
+</svg>
+
+<div class="app">
+  <header class="top">
+    <div class="brand"><span class="brand-mark"><svg><use href="#i-leaf"/></svg></span><b>Blattwerk</b></div>
+    <input class="doc-title" id="docTitle" type="text" placeholder="Name des Blatts" aria-label="Name des Blatts" autocomplete="off">
+    <span class="stage" id="stageBadge" hidden>Vorschau</span>
+    <span class="state" id="saveState" aria-live="polite"></span>
+    <span class="spacer"></span>
+    <div class="grp">
+      <button class="btn icon ghost" id="btnUndo" title="Rückgängig" aria-label="Rückgängig" disabled><svg><use href="#i-undo"/></svg></button>
+      <button class="btn icon ghost" id="btnRedo" title="Wiederholen" aria-label="Wiederholen" disabled><svg><use href="#i-redo"/></svg></button>
+    </div>
+    <div class="grp">
+      <button class="btn icon ghost" id="btnZoomOut" title="Verkleinern" aria-label="Verkleinern"><svg><use href="#i-minus"/></svg></button>
+      <button class="btn ghost zoom-val" id="btnZoomFit" title="An Breite anpassen">100 %</button>
+      <button class="btn icon ghost" id="btnZoomIn" title="Vergrößern" aria-label="Vergrößern"><svg><use href="#i-plus"/></svg></button>
+    </div>
+    <button class="btn" id="btnSetup"><svg><use href="#i-page"/></svg><span class="txt">Seite einrichten</span></button>
+    <button class="btn" id="btnDocs"><svg><use href="#i-folder"/></svg><span class="txt">Meine Blätter</span></button>
+    <button class="btn" id="btnFeedback" hidden><svg><use href="#i-chat"/></svg><span class="txt">Rückmeldung</span></button>
+    <button class="btn primary" id="btnPrint"><svg><use href="#i-print"/></svg><span class="txt">Drucken / PDF</span></button>
+    <button class="btn icon only-narrow" id="btnInsp" aria-label="Eigenschaften"><svg><use href="#i-sliders"/></svg></button>
+  </header>
+
+  <div class="main">
+    <nav class="rail" aria-label="Elemente">
+      <div>
+        <h3>Aufgabe</h3>
+        <div class="tools">
+          <button class="tool" data-add="number" title="Aufgabennummer"><svg viewBox="0 0 40 26"><circle cx="20" cy="13" r="9.5" fill="none" stroke="currentColor" stroke-width="1.6"/><text x="20" y="17.5" text-anchor="middle" font-size="12" fill="currentColor" font-family="inherit">1</text></svg>Nummer</button>
+          <button class="tool" data-add="text" title="Textfeld"><svg viewBox="0 0 40 26"><rect x="5" y="3" width="30" height="20" rx="3" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M14 9h12M20 9v10" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>Text</button>
+        </div>
+      </div>
+      <div>
+        <h3>Lineaturen</h3>
+        <div class="tools">
+          <button class="tool" data-add="L1" title="Lineatur 1 für Klasse 1"><svg viewBox="0 0 40 26"><rect x="3" y="3" width="34" height="18" fill="none" stroke="currentColor" stroke-width="1.4"/><path d="M3 9h34M3 15h34" stroke="currentColor" stroke-width="1.1"/></svg>Lineatur 1</button>
+          <button class="tool" data-add="L2" title="Lineatur 2 für Klasse 2"><svg viewBox="0 0 40 26"><rect x="3" y="3" width="34" height="9" fill="none" stroke="currentColor" stroke-width="1.3"/><path d="M3 6h34M3 9h34" stroke="currentColor" stroke-width="1"/><rect x="3" y="14" width="34" height="9" fill="none" stroke="currentColor" stroke-width="1.3"/><path d="M3 17h34M3 20h34" stroke="currentColor" stroke-width="1"/></svg>Lineatur 2</button>
+          <button class="tool" data-add="L3" title="Lineatur 3 für Klasse 3"><svg viewBox="0 0 40 26"><rect x="3" y="4" width="34" height="4" fill="none" stroke="currentColor" stroke-width="1.3"/><rect x="3" y="12" width="34" height="4" fill="none" stroke="currentColor" stroke-width="1.3"/><rect x="3" y="20" width="34" height="4" fill="none" stroke="currentColor" stroke-width="1.3"/></svg>Lineatur 3</button>
+          <button class="tool" data-add="L4" title="Lineatur 4 für Klasse 4 und Aufsatz"><svg viewBox="0 0 40 26"><path d="M3 7h34M3 15h34M3 23h34" stroke="currentColor" stroke-width="1.4"/></svg>Lineatur 4</button>
+        </div>
+      </div>
+      <div>
+        <h3>Weitere</h3>
+        <div class="tools">
+          <button class="tool" data-add="karo" title="Kästchen"><svg viewBox="0 0 40 26"><path d="M4 4h32v18H4zM10 4v18M16 4v18M22 4v18M28 4v18M4 10h32M4 16h32" fill="none" stroke="currentColor" stroke-width="1"/></svg>Kästchen</button>
+          <button class="tool" data-add="table" title="Tabelle"><svg viewBox="0 0 40 26"><rect x="4" y="4" width="32" height="18" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M14.7 4v18M25.3 4v18M4 13h32" stroke="currentColor" stroke-width="1.2"/></svg>Tabelle</button>
+          <button class="tool" data-add="image" title="Bild"><svg viewBox="0 0 40 26"><rect x="5" y="3" width="30" height="20" rx="3" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M8 20l8-8 6 6 4-3 6 5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><circle cx="27" cy="9" r="2.2" fill="currentColor"/></svg>Bild</button>
+        </div>
+      </div>
+    </nav>
+
+    <section class="desk" id="desk" aria-label="Arbeitsblatt">
+      <div class="pages" id="pages"></div>
+      <div class="float" id="float" hidden>
+        <button class="btn icon" id="fEdit" title="Text bearbeiten" aria-label="Text bearbeiten"><svg><use href="#i-edit"/></svg></button>
+        <button class="btn icon" id="fCopy" title="Kopieren" aria-label="Kopieren"><svg><use href="#i-copy"/></svg></button>
+        <button class="btn icon" id="fDel" title="Löschen" aria-label="Löschen"><svg><use href="#i-trash"/></svg></button>
+        <button class="btn icon only-narrow" id="fProps" title="Eigenschaften" aria-label="Eigenschaften"><svg><use href="#i-sliders"/></svg></button>
+      </div>
+    </section>
+
+    <aside class="inspector" id="insp" aria-label="Eigenschaften"></aside>
+  </div>
+
+  <footer class="pagebar">
+    <span class="info" id="pageInfo">Seite 1 von 1</span>
+    <button class="btn" id="btnAddPage"><svg><use href="#i-plus"/></svg><span class="txt">Neue Seite</span></button>
+    <button class="btn" id="btnDupPage"><svg><use href="#i-copy"/></svg><span class="txt">Seite kopieren</span></button>
+    <button class="btn danger" id="btnDelPage"><svg><use href="#i-trash"/></svg><span class="txt">Seite löschen</span></button>
+    <span class="confirm" id="delPageConfirm" hidden>Seite wirklich löschen?
+      <button class="btn danger" id="btnDelPageYes">Ja, löschen</button><button class="btn" id="btnDelPageNo">Abbrechen</button></span>
+  </footer>
+</div>
+
+<div class="modal" id="mSetup" hidden>
+  <div class="dialog" role="dialog" aria-modal="true" aria-labelledby="mSetupT">
+    <header><h2 id="mSetupT">Seite einrichten</h2><button class="btn icon ghost" data-close aria-label="Schließen"><svg><use href="#i-x"/></svg></button></header>
+    <div class="sec"><h4>Seitenränder in cm</h4>
+      <div class="grid2">
+        <div class="row"><label for="mT">Oben</label><input class="inp num" id="mT" type="number" step="0.1" min="0.5" max="4"></div>
+        <div class="row"><label for="mB">Unten</label><input class="inp num" id="mB" type="number" step="0.1" min="0.5" max="4"></div>
+        <div class="row"><label for="mL">Links</label><input class="inp num" id="mL" type="number" step="0.1" min="0.5" max="4"></div>
+        <div class="row"><label for="mR">Rechts</label><input class="inp num" id="mR" type="number" step="0.1" min="0.5" max="4"></div>
+      </div>
+    </div>
+    <div class="sec"><h4>Linien des Seitenrahmens</h4>
+      <div class="seg" id="segLines" role="group" aria-label="Linien">
+        <button data-v="none">Ohne Linien</button><button data-v="outer">Nur außen</button><button data-v="all">Alle Linien</button>
+      </div>
+      <div class="row"><label for="lineW">Liniendicke</label>
+        <select class="inp" id="lineW"><option value="0.25">Dünn</option><option value="0.4">Standard</option><option value="0.6">Kräftig</option><option value="0.9">Sehr kräftig</option></select></div>
+      <div class="row"><label>Linienfarbe</label><div class="swatches" id="lineColors"></div></div>
+      <label class="chk"><input type="checkbox" id="optHand"> Handgezeichnet: Linien wirken wie von Hand gezogen</label>
+      <p class="hint">Dickere Linien helfen Kindern mit schwacher Wahrnehmung.</p>
+    </div>
+  </div>
+</div>
+
+<div class="modal" id="mDocs" hidden>
+  <div class="dialog" role="dialog" aria-modal="true" aria-labelledby="mDocsT">
+    <header><h2 id="mDocsT">Meine Blätter</h2><button class="btn icon ghost" data-close aria-label="Schließen"><svg><use href="#i-x"/></svg></button></header>
+    <ul class="doclist" id="docList"></ul>
+    <div class="row">
+      <button class="btn primary" id="btnNewDoc">Neues Blatt</button>
+      <button class="btn" id="btnDupDoc">Kopie</button>
+      <button class="btn danger" id="btnDelDoc">Löschen</button>
+    </div>
+    <div class="confirm" id="delDocConfirm" hidden>Dieses Blatt löschen?
+      <button class="btn danger" id="btnDelDocYes">Ja, löschen</button><button class="btn" id="btnDelDocNo">Abbrechen</button></div>
+    <div class="sec"><h4>Sichern und mitnehmen</h4>
+      <div class="row"><button class="btn" id="btnExport">Als Datei sichern</button><button class="btn" id="btnImport">Datei öffnen</button></div>
+      <p class="hint">Blätter bleiben auf diesem Gerät gespeichert. Als Datei kannst du sie auf ein anderes Gerät mitnehmen.</p>
+    </div>
+  </div>
+</div>
+
+<div class="modal" id="mFeedback" hidden>
+  <div class="dialog" role="dialog" aria-modal="true" aria-labelledby="mFeedbackT">
+    <header><h2 id="mFeedbackT">Rückmeldung</h2><button class="btn icon ghost" data-close aria-label="Schließen"><svg><use href="#i-x"/></svg></button></header>
+    <p class="hint">Was fehlt, was hakt, was wünschst du dir? Jede Rückmeldung wird ein Eintrag (Issue) im Projekt und wird dort beantwortet.</p>
+    <div class="seg" id="fbArt" role="group" aria-label="Art der Rückmeldung">
+      <button data-v="fehler">Etwas klappt nicht</button><button data-v="wunsch" aria-pressed="true">Ich wünsche mir</button><button data-v="frage">Ich habe eine Frage</button>
+    </div>
+    <textarea class="inp area" id="fbText" rows="6" placeholder="Zum Beispiel: Die Lineatur 2 ist mir zu eng. Ich hätte gern 5 mm statt 4 mm." aria-label="Deine Rückmeldung"></textarea>
+    <label class="chk"><input type="checkbox" id="fbBlatt" checked> Aktuelles Blatt mitschicken (ohne Bilder), damit Claude es genau nachbauen kann</label>
+    <div class="row"><button class="btn primary" id="fbSend">Senden</button><span class="hint" id="fbState" role="status"></span></div>
+    <div class="sec"><h4>Bisherige Rückmeldungen</h4><ul class="fblist" id="fbList"><li class="hint">Wird geladen …</li></ul></div>
+    <p class="hint" id="appVersion"></p>
+  </div>
+</div>
+
+<input type="file" id="fileImg" accept="image/*" hidden>
+<input type="file" id="fileDoc" accept=".blattwerk,.json,application/json" hidden>
+<div class="toast" id="toast" role="status" hidden></div>
