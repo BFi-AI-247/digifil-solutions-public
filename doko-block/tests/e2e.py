@@ -62,12 +62,36 @@ with sync_playwright() as pw:
         if w not in t: fehler.append(f"Verlauf ohne: {w}")
     pg.screenshot(path=OUT / "7-verlauf.png", full_page=True)
     pg.click("[data-zurueck]"); pg.wait_for_selector("#papierkorb >> text=Leer.")
+    # Downloads
+    assert "Zuletzt gesichert am 25.10.2026" in pg.inner_text("#sicherung"), pg.inner_text("#sicherung")
+    with pg.expect_download() as dl: pg.click("#dl-excel")
+    xp = OUT / "export.xlsx"; dl.value.save_as(xp)
+    import openpyxl
+    wb = openpyxl.load_workbook(xp); ws = wb["Dokoergebnisse"]
+    if ws["C4"].value.date().isoformat() != "2015-01-26" or ws["D4"].value != 4: fehler.append(f"Excel: erste Zeile falsch {ws['C4'].value} {ws['D4'].value}")
+    werte = [[c.value for c in r] for r in ws.iter_rows()]
+    if not any(r[1] == "Gesamt" for r in werte): fehler.append("Excel: keine Gesamt-Zeile")
+    if wb["Spiele"].max_row != 21: fehler.append(f"Excel: Spiele-Blatt hat {wb['Spiele'].max_row} Zeilen")
+    wb2 = openpyxl.load_workbook(xp, data_only=True)
+    g = [r for r in wb2["Dokoergebnisse"].iter_rows(values_only=True) if r[1] == "Gesamt"][0]
+    if g[0] != 205: fehler.append(f"Excel: Gesamt {g[0]}")
+    with pg.expect_download() as dl: pg.click("#dl-json")
+    jp = OUT / "export.json"; dl.value.save_as(jp)
+    import json as _j
+    if len(_j.loads(jp.read_text())["abende"]) != 205: fehler.append("JSON: Anzahl Abende")
     pg.goto(URL); pg.wait_for_selector("#hallo:has-text('205 Abende')")
     # Eigene Farbe
     pg.click("#meine-farbe"); pg.click('.muster button[data-c="#d94c3d"]'); pg.click("#f-ok"); pg.wait_for_timeout(800)
     pg.click("nav.unten button[data-s=abende]")
     bg = pg.eval_on_selector('.chip[data-p="Clara"]', "e => getComputedStyle(e).backgroundColor")
     assert bg == "rgb(217, 76, 61)", bg
+    # Personenwechsel per Link wird gemeldet; ohne gültigen Schlüssel gesperrt
+    pg.goto("about:blank"); pg.goto(URL + "#k=falsch"); pg.wait_for_selector("text=Kein Zugang")
+    assert pg.evaluate("localStorage.getItem('doko-k')") is None, "falscher Schlüssel bleibt gespeichert"
+    pg.goto("about:blank"); pg.goto(URL); pg.wait_for_selector("text=Kein Zugang")
+    pg.goto("about:blank"); pg.goto(URL + "#k=testschluessel"); pg.wait_for_selector("#hallo:has-text('Hallo Clara')")
+    pg.click("#meine-farbe"); pg.click("#f-ab"); pg.wait_for_selector("text=Kein Zugang")
+    pg.goto("about:blank"); pg.goto(URL + "#k=testschluessel"); pg.wait_for_selector("#hallo:has-text('Hallo Clara')")
     # Dunkel
     pg.emulate_media(color_scheme="dark"); pg.click("nav.unten button[data-s=abende]"); pg.screenshot(path=OUT / "8-dunkel.png")
     br.close()

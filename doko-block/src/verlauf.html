@@ -35,6 +35,12 @@ body{padding-bottom:30px}
 </header>
 <main>
   <div class="karte">
+    <h2>Eure Daten</h2>
+    <p class="leise" style="margin:-4px 0 10px" id="sicherung">Lädt …</p>
+    <div class="zeile"><button class="dehnen" id="dl-excel">Excel herunterladen</button><button class="zweit dehnen" id="dl-json">Sicherungsdatei</button></div>
+    <p class="leise" style="margin:10px 0 0;font-size:.82rem">Excel: alle Abende wie in der alten Liste, dazu die einzelnen Spiele und die Termine. Sicherungsdatei: der komplette Stand zum Wiedereinspielen.</p>
+  </div>
+  <div class="karte">
     <h2>Rückmeldungen</h2>
     <p class="leise" style="margin:-4px 0 8px">Wünsche und Fehler aus der App – mit ihrem Stand.</p>
     <div id="rueck"><p class="leise">Lädt …</p></div>
@@ -57,13 +63,14 @@ body{padding-bottom:30px}
 <dialog id="dlg"><div class="innen" id="dlg-inhalt"></div></dialog>
 <script>
 /*BASIS_JS*/
+/*XLSX_JS*/
 (async () => {
 const { api, esc, datum, zeit, toast, chips } = DK;
 const $ = s => document.querySelector(s);
 if (!DK.hatSchluessel()) { DK.sperre('Bitte öffne deinen persönlichen Link (mit dem Schlüssel), den du für eure Runde bekommen hast.'); return; }
 let V, D, filter = 'alle';
-const SYM = { farbe: ['🎨', ''], neu: ['🂡', ''], aendern: ['✎', 'gold'], loeschen: ['🗑', 'rot'], wiederherstellen: ['↺', ''], termin: ['📅', ''], auslesen: ['📷', ''], ki: ['💬', 'gold'], feedback: ['✉', 'gold'] };
-const GRUPPE = { farbe: 'abende', neu: 'abende', aendern: 'abende', loeschen: 'abende', wiederherstellen: 'abende', termin: 'abende', auslesen: 'abende', ki: 'ki', feedback: 'feedback' };
+const SYM = { export: ['⬇', ''], farbe: ['🎨', ''], neu: ['🂡', ''], aendern: ['✎', 'gold'], loeschen: ['🗑', 'rot'], wiederherstellen: ['↺', ''], termin: ['📅', ''], auslesen: ['📷', ''], ki: ['💬', 'gold'], feedback: ['✉', 'gold'] };
+const GRUPPE = { export: 'abende', farbe: 'abende', neu: 'abende', aendern: 'abende', loeschen: 'abende', wiederherstellen: 'abende', termin: 'abende', auslesen: 'abende', ki: 'ki', feedback: 'feedback' };
 function standVon(r) {
   if (!r.offen) return r.labels.includes('live') ? ['erledigt ✓', 'zu'] : ['geschlossen', 'zu'];
   if (r.labels.includes('vorschau') || r.labels.includes('freigegeben')) return ['fast fertig', 'arbeit'];
@@ -98,9 +105,59 @@ function zeigeProtokoll() {
     : '<p class="leise">Noch nichts passiert.</p>';
 }
 $('#filter').querySelectorAll('button').forEach(b => b.onclick = () => { filter = b.dataset.f; $('#filter').querySelectorAll('button').forEach(x => x.setAttribute('aria-pressed', x === b)); zeigeProtokoll(); });
+function zeigeSicherung() {
+  const s = V.sicherung;
+  $('#sicherung').innerHTML = s && s.zeit ? `✓ Zuletzt gesichert am ${zeit(s.zeit)} · ${s.abende} Abende${s.neu === false ? ' (unverändert)' : ''}. Die Sicherung läuft jede Nacht, außerhalb des Webspace.`
+    : 'Die nächtliche Sicherung hat sich noch nicht gemeldet.';
+}
+function speichere(blob, name) {
+  const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = name;
+  document.body.appendChild(a); a.click(); setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 2000);
+}
+function excel(d) {
+  const S = d.spieler, ab = d.abende.filter(a => !a.geloescht).sort((a, b) => a.datum.localeCompare(b.datum));
+  const L = i => XL.spalte(i), PS = 3; // Spalte D = erster Spieler
+  const z = [[{ v: 'Dokoergebnisse', s: 'fett' }], [], [{ v: 'Nr', s: 'fett' }, { v: 'Nr im Jahr', s: 'fett' }, { v: 'Datum', s: 'fett' }, ...S.map(s => ({ v: s, s: 'fett' })), { v: 'check', s: 'fett' }, { v: 'Bemerkung', s: 'fett' }]];
+  const jahre = [...new Set(ab.map(a => a.datum.slice(0, 4)))];
+  const summenZeilen = []; let nr = 0;
+  for (const j of jahre) {
+    const liste = ab.filter(a => a.datum.startsWith(j)); const von = z.length + 1;
+    liste.forEach((a, i) => { nr++; const r = z.length + 1;
+      z.push([nr, i + 1, { v: XL.excelDatum(a.datum), s: 'datum' }, ...S.map(s => a.plaetze[s]), { f: `SUM(${L(PS)}${r}:${L(PS + S.length - 1)}${r})`, v: 10 }, [a.ort, a.notiz].filter(Boolean).join(' – ')]); });
+    const bis = z.length, rS = z.length + 1;
+    z.push([{ v: liste.length, s: 'fett' }, { v: 'Summe ' + j, s: 'fett' }, null, ...S.map((s, k) => ({ f: `SUM(${L(PS + k)}${von}:${L(PS + k)}${bis})`, v: liste.reduce((t, a) => t + a.plaetze[s], 0), s: 'fett' }))]);
+    z.push([null, 'Ø Platz ' + j, null, ...S.map((s, k) => ({ f: `${L(PS + k)}${rS}/$A$${rS}`, v: liste.reduce((t, a) => t + a.plaetze[s], 0) / liste.length, s: 'zahl2' }))]);
+    z.push([null, 'Kasse ' + j, null, ...S.map((s, k) => ({ f: `${L(PS + k)}${rS}*${D.euro_pro_platz}`, v: liste.reduce((t, a) => t + a.plaetze[s], 0) * D.euro_pro_platz, s: 'euro' }))]);
+    summenZeilen.push(rS); z.push([]);
+  }
+  const rG = z.length + 1;
+  z.push([{ f: summenZeilen.map(r => `A${r}`).join('+'), v: ab.length, s: 'fett' }, { v: 'Gesamt', s: 'fett' }, null, ...S.map((s, k) => ({ f: summenZeilen.map(r => `${L(PS + k)}${r}`).join('+'), v: ab.reduce((t, a) => t + a.plaetze[s], 0), s: 'fett' }))]);
+  z.push([null, { v: 'Ø Platz gesamt', s: 'fett' }, null, ...S.map((s, k) => ({ f: `${L(PS + k)}${rG}/$A$${rG}`, v: ab.reduce((t, a) => t + a.plaetze[s], 0) / ab.length, s: 'fett-zahl2' }))]);
+  z.push([null, { v: 'Kasse gesamt', s: 'fett' }, null, ...S.map((s, k) => ({ f: `${L(PS + k)}${rG}*${D.euro_pro_platz}`, v: ab.reduce((t, a) => t + a.plaetze[s], 0) * D.euro_pro_platz, s: 'fett-euro' }))]);
+  const sp = [['Datum', 'Spiel', ...S, 'Solo', 'Notiz', 'Format'].map(v => ({ v, s: 'fett' }))];
+  ab.filter(a => (a.spiele || []).length).forEach(a => a.spiele.forEach(g => sp.push([{ v: XL.excelDatum(a.datum), s: 'datum' }, g.nr, ...S.map(s => g.werte[s] ?? null), g.solo || null, g.notiz || null, a.format === 'laufend' ? 'laufende Summe' : 'je Spiel'])));
+  const te = [[{ v: 'Datum', s: 'fett' }, { v: 'Ort / Bemerkung', s: 'fett' }], ...d.termine.map(t => [{ v: XL.excelDatum(t.datum), s: 'datum' }, t.ort])];
+  return XL.datei([
+    { name: 'Dokoergebnisse', zeilen: z, fixiert: 3, spalten: [7, 10, 12, ...S.map(() => 9), 7, 40] },
+    { name: 'Spiele', zeilen: sp, fixiert: 1, spalten: [12, 7, ...S.map(() => 8), 9, 24, 15] },
+    { name: 'Termine', zeilen: te, fixiert: 1, spalten: [12, 40] }]);
+}
+async function herunterladen(format, knopf) {
+  knopf.disabled = true;
+  try {
+    const r = await api('export', { format });
+    const tag = r.exportiert.slice(0, 10);
+    if (format === 'excel') speichere(excel(r.daten), `Dokoergebnisse_${tag}.xlsx`);
+    else speichere(new Blob([JSON.stringify(r.daten, null, 1)], { type: 'application/json' }), `doko-sicherung_${tag}.json`);
+    toast('Download gestartet'); laden();
+  } catch (e) { toast(e.message); }
+  knopf.disabled = false;
+}
+$('#dl-excel').onclick = e => herunterladen('excel', e.currentTarget);
+$('#dl-json').onclick = e => herunterladen('json', e.currentTarget);
 async function laden() {
   [V, D] = await Promise.all([api('verlauf'), api('daten')]);
-  DK.farben(D.farben); zeigeRueck(); zeigePapierkorb(); zeigeProtokoll();
+  DK.farben(D.farben); document.querySelector('.kopf h1 small').textContent = 'Alles offen · du bist ' + D.ich; zeigeSicherung(); zeigeRueck(); zeigePapierkorb(); zeigeProtokoll();
 }
 try { await laden(); } catch (e) { if (e.status === 401) DK.sperre(e.message); else toast(e.message, 5000); }
 })();

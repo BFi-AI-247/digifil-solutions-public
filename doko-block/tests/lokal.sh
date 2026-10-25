@@ -6,6 +6,7 @@ rm -rf "$W"; mkdir -p "$W/web" "$W/privat" "$W/attrappe"
 python3 "$H/tools/build.py" >/dev/null
 cp "$H"/dist/*.html "$H"/server/api.php "$H"/server/manifest.webmanifest "$H"/src/icon-*.png "$W/web/"
 cp "$H/tests/attrappe/altdaten.json" "$W/privat/"
+echo '{"zeit":"2026-10-25T03:17:00+00:00","abende":204,"neu":true,"stand":"abc1234"}' > "$W/privat/sicherung.json"
 cp "$H"/tests/attrappe/*.json "$W/attrappe/"
 python3 - "$W/privat/zugang.php" <<'P'
 import hashlib,sys

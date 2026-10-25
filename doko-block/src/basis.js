@@ -1,9 +1,12 @@
 // Gemeinsame Helfer für beide Seiten
 const DK = (() => {
-  let schluessel = '';
+  // Der Schlüssel aus dem persönlichen Link wird auf diesem Gerät gemerkt, bis man sich abmeldet
+  // oder einen anderen persönlichen Link öffnet (dann ist man ab sofort diese Person).
+  let schluessel = '', wechsel = false;
   try {
     const m = location.hash.match(/k=([A-Za-z0-9_\-]+)/);
-    if (m) { localStorage.setItem('doko-k', m[1]); history.replaceState(null, '', location.pathname + location.search); }
+    const vorher = localStorage.getItem('doko-k') || '';
+    if (m) { wechsel = vorher !== '' && vorher !== m[1]; localStorage.setItem('doko-k', m[1]); history.replaceState(null, '', location.pathname + location.search); }
     schluessel = localStorage.getItem('doko-k') || '';
   } catch (e) {
     const m = location.hash.match(/k=([A-Za-z0-9_\-]+)/); if (m) schluessel = m[1];
@@ -18,6 +21,7 @@ const DK = (() => {
     catch (e) { throw new Error('Keine Verbindung zum Server.'); }
     let j = {};
     try { j = await r.json(); } catch (e) { throw new Error('Der Server hat unerwartet geantwortet (' + r.status + ').'); }
+    if (r.status === 401) abmelden();
     if (!r.ok) { const f = new Error(j.fehler || ('Fehler ' + r.status)); f.status = r.status; f.daten = j; throw f; }
     return j;
   }
@@ -46,8 +50,9 @@ const DK = (() => {
     el.textContent = Object.entries(f || {}).filter(([, c]) => /^#[0-9a-f]{6}$/i.test(c))
       .map(([n, c]) => `.chip[data-p="${n.replace(/"/g, '')}"],[data-farbe="${n.replace(/"/g, '')}"]{background:${c}!important;color:${hell(c) ? '#1d1a10' : '#fff'}!important}`).join('\n');
   }
+  function abmelden() { schluessel = ''; try { localStorage.removeItem('doko-k'); } catch (e) {} }
   function sperre(text) {
     document.querySelector('main').innerHTML = `<div class="karte sperre"><h2>Kein Zugang</h2><p class="leise">${esc(text)}</p></div>`;
   }
-  return { api, fotoUrl, esc, datum, wochentag, zeit, euro, zahl, heute, toast, chips, farben, hell, sperre, hatSchluessel: () => !!schluessel };
+  return { api, fotoUrl, esc, datum, wochentag, zeit, euro, zahl, heute, toast, chips, farben, hell, sperre, abmelden, wechsel, hatSchluessel: () => !!schluessel };
 })();

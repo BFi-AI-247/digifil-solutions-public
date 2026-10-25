@@ -428,7 +428,13 @@ case 'verlauf':
             file_put_contents($cache, json_encode($issues, JSON_UNESCAPED_UNICODE));
         }
     }
-    antwort(200, ['eintraege' => $eintraege, 'rueckmeldungen' => $issues]);
+    $sicherung = json_decode((string)@file_get_contents(privat() . '/sicherung.json'), true);
+    antwort(200, ['eintraege' => $eintraege, 'rueckmeldungen' => $issues, 'sicherung' => is_array($sicherung) ? $sicherung : null]);
+
+case 'export':
+    $d = lese_daten();
+    protokoll('export', 'Daten heruntergeladen (' . (($in['format'] ?? '') === 'excel' ? 'Excel' : 'Sicherungsdatei') . ')');
+    antwort(200, ['daten' => $d, 'exportiert' => jetzt(), 'von' => $ICH]);
 
 default:
     antwort(400, ['fehler' => 'Unbekannte Aktion.']);

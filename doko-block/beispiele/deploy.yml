@@ -44,7 +44,7 @@ jobs:
         with: { python-version: "3.12" }
       - name: Bauen und testen
         run: |
-          python -m pip install --quiet playwright pillow && python -m playwright install --with-deps chromium
+          python -m pip install --quiet playwright pillow openpyxl && python -m playwright install --with-deps chromium
           command -v php >/dev/null || { sudo apt-get update -qq && sudo apt-get install -y -qq php-cli php-curl; }
           python tools/build.py && php -l server/api.php
           bash tests/lokal.sh "$RUNNER_TEMP/doko" && python tests/e2e.py "$RUNNER_TEMP/shots"

@@ -7,7 +7,8 @@ Ein Foto vom Block → die KI (Claude oder Mistral) liest die Spiele aus → pr�
 - **Abende:** Liste mit Suche, Details, Foto, Löschen in den Papierkorb (wiederherstellbar)
 - **Statistik:** Plätze, Jahresübersicht, Kassenbetrag je Abend, Punkte und Soli aus den erfassten Zetteln
 - **Fragen:** KI-Feld für Fragen zur Statistik und Korrekturen – es macht nur Vorschläge, ausgeführt wird erst nach „Übernehmen“
-- **Verlauf:** zweite Seite, auf der alle sehen, wer was gemacht hat, plus Stand der Rückmeldungen
+- **Verlauf:** zweite Seite, auf der alle sehen, wer was gemacht hat, plus Stand der Rückmeldungen und der Datensicherung (`privat/…/sicherung.json`)
+- **Herunterladen:** alle Daten als Excel (mit Gesamt-Zeile und Blatt der Einzelspiele) oder JSON; Abmelden und Personenwechsel auf einem Gerät
 - Termine, eigene Personenfarbe, als App auf den Home-Bildschirm (Manifest), hell und dunkel
 
 ## Einrichten
@@ -40,7 +41,7 @@ Ohne `altdaten.json` startet die Runde leer. Eine alte Excel-Liste lässt sich m
 ## Testen
 
 ```bash
-python3 -m pip install playwright pillow && python3 -m playwright install chromium
+python3 -m pip install playwright pillow openpyxl && python3 -m playwright install chromium
 bash tests/lokal.sh /tmp/doko && python3 tests/e2e.py /tmp/shots
 ```
 

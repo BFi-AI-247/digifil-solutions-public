@@ -75,7 +75,7 @@ nav.unten button[aria-current=true]{color:var(--filz)}
 <body>
 <header class="kopf">
   <span class="pips" aria-hidden="true">♣♠</span>
-  <h1><span id="runde">Doko-Block</span><small><span id="hallo">&nbsp;</span> <button id="meine-farbe" class="punkt verdeckt" aria-label="Meine Farbe ändern" title="Meine Farbe ändern"></button></small></h1>
+  <h1><span id="runde">Doko-Block</span><small><span id="hallo">&nbsp;</span> <button id="meine-farbe" class="punkt verdeckt" aria-label="Meine Farbe und Abmelden" title="Meine Farbe · Abmelden"></button></small></h1>
   <a href="verlauf.html">Verlauf</a>
 </header>
 <main>
@@ -196,6 +196,7 @@ async function laden() {
   if (D.runde) { $('#runde').textContent = D.runde; document.title = D.runde; }
   DK.farben(D.farben);
   const p = $('#meine-farbe'); p.dataset.farbe = D.ich; p.classList.remove('verdeckt');
+  if (DK.wechsel && !laden.gemeldet) { laden.gemeldet = true; toast('Auf diesem Gerät jetzt angemeldet als ' + D.ich, 5000); }
   zeigeTermine(); zeigeAbende(); zeigeStatistik();
 }
 
@@ -474,7 +475,9 @@ $('#fb-senden').onclick = async () => {
 const MUSTER = ['#e8c22e', '#f08a24', '#d94c3d', '#d6457f', '#7b4fb3', '#4a4fb8', '#2f6fc4', '#1f9bb5', '#2f8a4e', '#7fa33a', '#8a6a4a', '#4b5560'];
 $('#meine-farbe').onclick = () => {
   let wahl = (D.farben[D.ich] || '#888888').toLowerCase();
-  dialog(`<h2>Meine Farbe</h2><p class="leise" style="margin:4px 0 0">So erscheinst du (${esc(D.ich)}) bei allen in der Liste.</p>
+  dialog(`<h2>Du bist ${esc(D.ich)}</h2><p class="leise" style="margin:4px 0 0">Bist du nicht ${esc(D.ich)}? Dann melde dieses Gerät ab und öffne deinen eigenen Link.</p>
+    <button class="warn" id="f-ab" style="margin-top:10px;width:100%">Auf diesem Gerät abmelden</button>
+    <h3 style="margin-top:18px">Meine Farbe</h3><p class="leise" style="margin:0">So erscheinst du bei allen in der Liste.</p>
     <div class="muster">${MUSTER.map(c => `<button style="background:${c}" data-c="${c}" aria-label="Farbe ${c}" aria-pressed="${c === wahl}"></button>`).join('')}</div>
     <label>Oder eigene Farbe</label><input type="color" id="f-eigen" value="${wahl}" style="padding:4px;height:48px">
     <p style="margin:14px 0 4px">Vorschau: <span class="chip" id="f-vorschau">1. ${esc(D.ich)}</span></p>
@@ -484,6 +487,7 @@ $('#meine-farbe').onclick = () => {
   zeig(wahl);
   document.querySelectorAll('.muster button').forEach(b => b.onclick = () => zeig(b.dataset.c));
   $('#f-eigen').oninput = e => zeig(e.target.value.toLowerCase());
+  $('#f-ab').onclick = () => { if (!confirm('Dieses Gerät abmelden? Danach brauchst du wieder deinen persönlichen Link.')) return; DK.abmelden(); location.reload(); };
   $('#f-ok').onclick = async () => {
     try { await api('farbe', { farbe: wahl }); schliessen(); toast('Farbe gespeichert'); laden(); } catch (e) { toast(e.message); }
   };
@@ -495,7 +499,7 @@ function schliessen() { $('#dlg').close(); }
 $('#dlg').addEventListener('click', e => { if (e.target.id === 'dlg') schliessen(); });
 
 // ---------- Start ----------
-if (!DK.hatSchluessel()) { DK.sperre('Bitte öffne deinen persönlichen Link (mit dem Schlüssel), den du für eure Runde bekommen hast.'); document.querySelector('nav.unten').remove(); return; }
+if (!DK.hatSchluessel()) { DK.sperre('Bitte öffne deinen persönlichen Link (mit dem Schlüssel), den du für eure Runde bekommen hast. Das Gerät merkt sich, wer du bist, bis du dich abmeldest.'); document.querySelector('nav.unten').remove(); return; }
 zeigeChat();
 laden().then(() => { const s = merke('doko-seite'); if (s && document.getElementById('s-' + s)) zeige(s); })
   .catch(e => { if (e.status === 401) { DK.sperre(e.message); document.querySelector('nav.unten').remove(); } else toast(e.message, 5000); });
