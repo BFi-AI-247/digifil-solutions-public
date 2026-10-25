@@ -399,7 +399,7 @@ function zeigeStatistik() {
   const auswahl = sel.value === 'alle' ? aktiv() : aktiv().filter(a => a.datum.startsWith(sel.value));
   const r = auswerten(auswahl), S = D.spieler;
   const farben = ['var(--p1)', 'var(--p2)', 'var(--p3)', 'var(--p4)'];
-  $('#stat').innerHTML = `<p class="leise" style="margin:0 0 8px">${auswahl.length} Abende · ${euro(auswahl.length * 10 * D.euro_pro_platz)} in die Kasse · kleiner Schnitt = besser</p>
+  $('#stat').innerHTML = `<p class="leise" style="margin:0 0 8px">${auswahl.length} Abende · ${euro(auswahl.length * 10 * D.euro_pro_platz)} in die Kasse</p>
     <div class="rollen"><table><thead><tr><th>Spieler</th><th class="z">Ø Platz</th><th class="z">Siege</th><th>Plätze</th><th class="z">Kasse</th></tr></thead><tbody>
     ${S.map((s, i) => `<tr><td><b>${esc(s)}</b></td><td class="z">${zahl(r[s].schnitt)}</td><td class="z">${r[s].verteilung[0]}</td>
       <td><div class="verteilung" title="${r[s].verteilung.join(' / ')}">${r[s].verteilung.map((v, k) => `<i style="flex:${v};background:${farben[k]}"></i>`).join('')}</div><span class="leise" style="font-size:.75rem">${r[s].verteilung.join(' · ')}</span></td>
