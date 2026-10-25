@@ -20,6 +20,7 @@ function ein(string $k): mixed {
             'spiele' => 20,             // 16 normale + 4 Pflichtsoli
             'repo' => '',               // owner/repo für Rückmeldungen als Issues (leer = aus)
             'label' => 'doko',
+            'label_rueckfrage' => 'rueckfrage',
             'betreiber' => 'dem Betreiber',
         ], is_array(zugang()['einstellungen'] ?? null) ? zugang()['einstellungen'] : []);
         $vorgabe = ['#e8c22e', '#2f8a4e', '#7b4fb3', '#2f6fc4', '#d94c3d', '#3a9ea5'];
@@ -44,7 +45,12 @@ function antwort(int $code, array $d): void {
     echo json_encode($d, JSON_UNESCAPED_UNICODE);
     exit;
 }
-function privat(): string { return getenv('DOKO_PRIVAT') ?: __DIR__ . '/../../privat/doko-block'; }
+function privat(): string {
+    if ($p = getenv('DOKO_PRIVAT')) return $p;
+    $ort = @include __DIR__ . '/ort.php'; // optional: <?php return ['privat' => 'name'];
+    $name = (is_array($ort) && preg_match('/^[A-Za-z0-9_-]+$/', (string)($ort['privat'] ?? ''))) ? $ort['privat'] : 'doko-block';
+    return __DIR__ . '/../../privat/' . $name;
+}
 function zugang(): array { static $z = null; if ($z === null) { $z = @include privat() . '/zugang.php'; if (!is_array($z)) $z = []; } return $z; }
 function jetzt(): string { return date('c'); }
 function eingabe(): array {
@@ -260,7 +266,7 @@ case 'daten':
     $d = lese_daten();
     antwort(200, ['ich' => $ICH, 'spieler' => $d['spieler'], 'abende' => $d['abende'], 'termine' => $d['termine'], 'stand' => $d['stand'] ?? 0,
         'farben' => array_merge(DK_FARBEN, is_array($d['farben'] ?? null) ? $d['farben'] : []),
-        'euro_pro_platz' => DK_EURO_PRO_PLATZ, 'runde' => DK_RUNDE, 'betreiber' => (string)ein('betreiber'), 'ki' => ['claude' => !empty(zugang()['anthropic']), 'mistral' => !empty(zugang()['mistral'])]]);
+        'euro_pro_platz' => DK_EURO_PRO_PLATZ, 'runde' => DK_RUNDE, 'betreiber' => (string)ein('betreiber'), 'label_rueckfrage' => (string)ein('label_rueckfrage'), 'ki' => ['claude' => !empty(zugang()['anthropic']), 'mistral' => !empty(zugang()['mistral'])]]);
 
 case 'auslesen':
     @set_time_limit(180);

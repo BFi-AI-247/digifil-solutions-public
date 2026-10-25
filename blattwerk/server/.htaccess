@@ -1,9 +1,9 @@
 # Blattwerk
 DirectoryIndex index.php
 Options -Indexes
-<Files "lib.php">
+<FilesMatch "^(lib|ort)\.php$">
   Require all denied
-</Files>
+</FilesMatch>
 <IfModule mod_headers.c>
   Header set X-Robots-Tag "noindex, nofollow"
   <FilesMatch "\.(woff2|css)$">

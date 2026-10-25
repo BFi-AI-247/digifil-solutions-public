@@ -15,6 +15,13 @@ Jedes Werkzeug läuft auf einfachem PHP-Webspace, braucht keine Datenbank und sp
 - **Rückmeldungen als Issues (optional).** Beide Werkzeuge haben einen Rückmelde-Knopf, der Issues in einem Repo deiner Wahl anlegt.
 - **Upload per GitHub Actions.** Unter `beispiele/deploy.yml` liegt je ein Workflow für SFTP-Webspace; er ist nicht aktiv, bis du ihn nach `.github/workflows/` kopierst.
 
+## Woher der Code kommt
+
+Die Werkzeuge entstehen in privaten Repos und laufen dort auch im eigenen Betrieb – mit genau diesem Code.
+Persönliches (Namen, Pfade, Schlüssel, Daten) steckt nur in Einstellungen, die privat bleiben.
+[`werkzeug/spiegel.py`](werkzeug/spiegel.py) übernimmt neue Stände als Pull Request hierher und bricht ab,
+sobald ein verbotener Begriff oder ein Schlüssel auftaucht. Neues Werkzeug = ein Eintrag mehr in der Spiegel-Konfiguration.
+
 ## Selbst ausprobieren
 
 ```bash

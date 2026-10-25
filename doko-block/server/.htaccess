@@ -1,6 +1,9 @@
 # Doko-Block
 DirectoryIndex index.html
 Options -Indexes
+<Files "ort.php">
+  Require all denied
+</Files>
 AddType application/manifest+json .webmanifest
 <IfModule mod_headers.c>
   <FilesMatch "\.(html)$">

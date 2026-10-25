@@ -1,24 +1,30 @@
 <?php
 // Blattwerk – gemeinsame Teile für Passwort-Tür, App-Auslieferung und Rückmeldungen.
 // Aufbau auf dem Server:  <web>/<pfad>/lib.php  →  privat: <web>/../privat/blattwerk/ (nicht abrufbar)
+// Anderer privater Ordner: ort.php neben lib.php mit  <?php return ['privat' => 'name'];  (beim Upload erzeugt).
 // Einstellungen (Pfad, Repo, Name des Betreibers) kommen aus zugang.php, Feld 'einstellungen' (tools/make_zugang.py).
 declare(strict_types=1);
 
-const BW_COOKIE = 'bw_zugang';
 const BW_TAGE = 180;
-function bw_privat(): string { return getenv('BW_PRIVAT') ?: __DIR__ . '/../../privat/blattwerk'; }
+function bw_privat(): string {
+    if ($p = getenv('BW_PRIVAT')) return $p;
+    $ort = @include __DIR__ . '/ort.php';
+    $name = (is_array($ort) && preg_match('/^[A-Za-z0-9_-]+$/', (string)($ort['privat'] ?? ''))) ? $ort['privat'] : 'blattwerk';
+    return __DIR__ . '/../../privat/' . $name;
+}
 
 /** Einstellungen mit Vorgaben; überschreibbar über zugang.php → 'einstellungen' */
 function bw_einstellung(string $k): string {
     static $e = null;
     if ($e === null) {
         $z = @include bw_privat() . '/zugang.php';
-        $e = array_merge(['pfad' => '/blattwerk/', 'repo' => '', 'betreiber' => 'dem Betreiber'],
+        $e = array_merge(['pfad' => '/blattwerk/', 'repo' => '', 'betreiber' => 'dem Betreiber', 'cookie' => 'bw_zugang', 'label_rueckfrage' => 'rueckfrage'],
             (is_array($z) && is_array($z['einstellungen'] ?? null)) ? $z['einstellungen'] : []);
     }
     return (string)($e[$k] ?? '');
 }
 define('BW_PFAD', bw_einstellung('pfad'));
+define('BW_COOKIE', preg_match('/^[A-Za-z0-9_]+$/', bw_einstellung('cookie')) ? bw_einstellung('cookie') : 'bw_zugang');
 define('BW_REPO', bw_einstellung('repo'));
 
 function bw_header(): void {

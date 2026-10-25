@@ -39,7 +39,9 @@ privat/blattwerk/      app.html, app-vorschau.html, zugang.php
   Ein Gerät bleibt 180 Tage angemeldet, ein neues Passwort meldet alle Geräte ab. Abmelden: `…/<pfad>/?abmelden`.
 - `tools/make_zugang.py` erzeugt `zugang.php` aus Umgebungsvariablen:
   `BW_PASSWORT` (Pflicht, mind. 8 Zeichen – gespeichert wird nur ein Hash), `BW_PFAD` (z. B. `/blattwerk/`),
-  optional `BW_GITHUB_TOKEN` + `BW_REPO` (Rückmeldungen als Issues) und `BW_BETREIBER` (Name in Hinweisen).
+  optional `BW_GITHUB_TOKEN` + `BW_REPO` (Rückmeldungen als Issues), `BW_BETREIBER` (Name in Hinweisen),
+  `BW_COOKIE` (Name des Anmelde-Cookies) und `BW_LABEL_RUECKFRAGE` (Label für Rückfragen, Vorgabe `rueckfrage`).
+- Anderer privater Ordner als `privat/blattwerk`: `ort.php` neben `lib.php` mit `<?php return ['privat' => 'name'];`.
 - Ein fertiger Upload-Workflow für SFTP liegt in [`beispiele/deploy.yml`](beispiele/deploy.yml).
 
 ## Rückmeldungen

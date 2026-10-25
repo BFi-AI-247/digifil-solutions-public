@@ -68,7 +68,7 @@ function standVon(r) {
   if (!r.offen) return r.labels.includes('live') ? ['erledigt ✓', 'zu'] : ['geschlossen', 'zu'];
   if (r.labels.includes('vorschau') || r.labels.includes('freigegeben')) return ['fast fertig', 'arbeit'];
   if (r.labels.includes('angenommen')) return ['angenommen', 'arbeit'];
-  if (r.labels.includes('rueckfrage')) return ['Rückfrage', 'offen'];
+  if (r.labels.includes((D && D.label_rueckfrage) || 'rueckfrage')) return ['Rückfrage', 'offen'];
   return ['neu', 'offen'];
 }
 function zeigeRueck() {

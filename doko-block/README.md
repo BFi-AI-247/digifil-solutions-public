@@ -33,6 +33,7 @@ privat/doko-block/   zugang.php, optional altdaten.json – dazu legt die App da
 ```
 
 Daten, Fotos und Protokoll liegen außerhalb des Web-Ordners und werden beim Upload nie überschrieben.
+Anderer privater Ordner: `ort.php` neben `api.php` mit `<?php return ['privat' => 'name'];`.
 Ohne `altdaten.json` startet die Runde leer. Eine alte Excel-Liste lässt sich mit `tools/import_excel.py` übernehmen
 (Spalten im Skript beschrieben, ggf. anpassen).
 

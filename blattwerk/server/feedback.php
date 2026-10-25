@@ -20,7 +20,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
         if (isset($i['pull_request'])) continue;
         $labels = array_map(fn($l) => $l['name'], $i['labels'] ?? []);
         $status = 'Eingegangen';
-        if (in_array('rueckfrage', $labels, true)) $status = 'Rückfrage';
+        if (in_array(bw_einstellung('label_rueckfrage'), $labels, true)) $status = 'Rückfrage';
         if (in_array('vorschau', $labels, true)) $status = 'In der Vorschau';
         if (in_array('live', $labels, true) || ($i['state'] ?? '') === 'closed') $status = 'Erledigt';
         $out[] = ['nr' => $i['number'], 'titel' => preg_replace('/^Rückmeldung:\s*/u', '', (string)$i['title']), 'status' => $status, 'datum' => substr((string)$i['created_at'], 0, 10)];

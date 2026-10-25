@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Erzeugt zugang.php (Passwort-Hash, Cookie-Schlüssel, GitHub-Schlüssel für Rückmeldungen)
 aus den Umgebungsvariablen BW_PASSWORT und BW_GITHUB_TOKEN (optional) sowie den
-Einstellungen BW_PFAD (z. B. /blattwerk/), BW_REPO (owner/repo für Rückmeldungen) und BW_BETREIBER.
+Einstellungen BW_PFAD (z. B. /blattwerk/), BW_REPO (owner/repo für Rückmeldungen), BW_BETREIBER, BW_COOKIE und BW_LABEL_RUECKFRAGE.
 
 Das Passwort selbst landet nirgends. Die Werte sind deterministisch, damit ein neuer Upload
 die Anmeldung auf dem iPad nicht ungültig macht; erst ein neues Passwort meldet alle Geräte ab.
@@ -30,7 +30,11 @@ def einstellungen() -> dict:
     repo = os.environ.get("BW_REPO", "").strip()
     if repo and not re.fullmatch(r"[A-Za-z0-9_.\-]+/[A-Za-z0-9_.\-]+", repo):
         sys.exit("BW_REPO bitte als owner/repo angeben.")
-    return {"pfad": pfad, "repo": repo, "betreiber": os.environ.get("BW_BETREIBER", "dem Betreiber").strip()[:60]}
+    cookie = os.environ.get("BW_COOKIE", "bw_zugang").strip() or "bw_zugang"
+    if not re.fullmatch(r"[A-Za-z0-9_]+", cookie):
+        sys.exit("BW_COOKIE: nur Buchstaben, Ziffern und _")
+    return {"pfad": pfad, "repo": repo, "betreiber": os.environ.get("BW_BETREIBER", "dem Betreiber").strip()[:60] or "dem Betreiber", "cookie": cookie,
+            "label_rueckfrage": os.environ.get("BW_LABEL_RUECKFRAGE", "rueckfrage").strip()[:50] or "rueckfrage"}
 
 
 def main() -> None:
