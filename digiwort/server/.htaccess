@@ -1,0 +1,17 @@
+# Digiwort
+DirectoryIndex index.html
+Options -Indexes
+<Files "ort.php">
+  Require all denied
+</Files>
+AddType application/manifest+json .webmanifest
+<IfModule mod_headers.c>
+  <FilesMatch "\.(html)$">
+    Header set Cache-Control "no-cache"
+  </FilesMatch>
+  <FilesMatch "\.(png)$">
+    Header set Cache-Control "public, max-age=2592000"
+  </FilesMatch>
+  Header set X-Content-Type-Options "nosniff"
+  Header set Referrer-Policy "same-origin"
+</IfModule>

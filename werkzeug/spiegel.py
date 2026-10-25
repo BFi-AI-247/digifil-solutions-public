@@ -11,8 +11,12 @@ Die Konfiguration (z. B. .github/oeffentlich.json im privaten Repo):
      "ordner": ["src", "server", "tools", "tests"],
      "ohne": ["server/zugaenge.json", "server/einstellungen.json", "tools/*.xlsx"]}
   ],
-  "verboten": ["Name1", "Name2", "meine-domain.de"]
+  "verboten": ["Name1", "Name2", "meine-domain.de"],
+  "ausnahmen": {"doko-block/tools/quellen.py": ["Name1 Nachname"]}
 }
+
+"ausnahmen" erlaubt je Zieldatei bestimmte Begriffe oder Wendungen (z. B. eine Quellenangabe, die zufällig
+einen verbotenen Vornamen enthält). Sie werden vor der Prüfung aus der Zeile entfernt; alles andere wird weiter geprüft.
 
 Ablauf je Eintrag: Zielordner <nach>/<ordner> wird geleert und aus <von>/<ordner> neu befüllt
 (ohne die Muster in "ohne" und ohne __pycache__). Andere Dateien im Ziel (README, beispiele/ …)
@@ -63,7 +67,7 @@ def kopiere(quelle: Path, ziel: Path, eintrag: dict) -> list[Path]:
     return geschrieben
 
 
-def pruefe(dateien: list[Path], verboten: list[str], basis: Path) -> list[str]:
+def pruefe(dateien: list[Path], verboten: list[str], basis: Path, ausnahmen: dict | None = None) -> list[str]:
     muster = [(w, re.compile(r"(?<![\w])" + re.escape(w) + r"(?![\w])", re.IGNORECASE)) for w in verboten if w.strip()]
     muster += [("Schlüssel", re.compile(s)) for s in SCHLUESSEL]
     funde = []
@@ -74,7 +78,12 @@ def pruefe(dateien: list[Path], verboten: list[str], basis: Path) -> list[str]:
             text = d.read_text(encoding="utf-8")
         except UnicodeDecodeError:
             continue
+        rel = d.relative_to(basis).as_posix()
+        erlaubt = [re.compile(r"(?<![\w])" + re.escape(a) + r"(?![\w])", re.IGNORECASE)
+                   for a in sorted((ausnahmen or {}).get(rel, []), key=len, reverse=True)]
         for nr, zeile in enumerate(text.splitlines(), 1):
+            for rx in erlaubt:
+                zeile = rx.sub(" ", zeile)
             for name, rx in muster:
                 if rx.search(zeile):
                     funde.append(f"{d.relative_to(basis)}:{nr}: „{name}“")
@@ -91,7 +100,7 @@ def main() -> None:
         neu = kopiere(quelle, ziel, e)
         print(f"{e['von']} → {e['nach']}: {len(neu)} Dateien")
         alle += neu
-    funde = pruefe(alle, konfig.get("verboten", []), ziel)
+    funde = pruefe(alle, konfig.get("verboten", []), ziel, konfig.get("ausnahmen"))
     if funde:
         print("\nNICHT veröffentlicht – verbotene Begriffe oder Schlüssel gefunden:")
         print("\n".join("  " + f for f in funde[:50]))

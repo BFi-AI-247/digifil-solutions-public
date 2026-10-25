@@ -1,0 +1,594 @@
+<title>Digiwort</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<style>
+/* Layout: one-screen app – Kopfzeile, Modus- und Längen-Schalter, Spielfeld mittig, Tastatur unten. Dunkel als Standard. */
+:root{
+  --bg:#141a24; --panel:#1c2431; --line:#2e394a; --fg:#e9edf3; --muted:#9aa6b8;
+  --ok:#3f9a5a; --near:#c9a227; --off:#3a4252; --key:#56627a; --onfill:#ffffff; --warn:#e0645a;
+  --ui:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+  --tile:"Arial Black","Helvetica Neue",Arial,system-ui,sans-serif;
+  --mono:ui-monospace,"SF Mono",Menlo,Consolas,monospace;
+  color-scheme:dark;
+}
+:root[data-look="light"]{
+  --bg:#f3f5f8; --panel:#ffffff; --line:#cfd6e0; --fg:#18202c; --muted:#5d6878;
+  --ok:#3d8f54; --near:#c19a1f; --off:#7b8596; --key:#d5dbe4; --onfill:#ffffff; --warn:#c2412f; color-scheme:light;
+}
+:root[data-contrast="on"]{ --ok:#f5793a; --near:#5aaef5; }
+*{box-sizing:border-box}
+html,body{height:100%}
+body{margin:0;background:var(--bg);color:var(--fg);font-family:var(--ui);
+  -webkit-tap-highlight-color:transparent;overscroll-behavior:none;}
+.app{height:100%;max-width:540px;margin:0 auto;display:flex;flex-direction:column;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:0 8px}
+header{display:flex;align-items:center;gap:8px;padding-block:10px 8px;border-bottom:1px solid var(--line)}
+header h1{flex:1;margin:0;text-align:center;font:900 1.45rem/1 var(--tile);letter-spacing:.01em}
+header h1 span{color:var(--ok)}
+.ib{width:40px;height:40px;border-radius:10px;border:0;background:transparent;color:var(--fg);display:grid;place-items:center;cursor:pointer;flex:none}
+.ib:hover{background:var(--panel)}
+.ib svg{width:24px;height:24px}
+.bar2{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-top:10px}
+.seg{display:flex;gap:2px;background:var(--panel);border:1px solid var(--line);border-radius:999px;padding:3px}
+.seg button{border:0;background:transparent;color:var(--muted);font:600 .88rem var(--ui);padding:7px 14px;border-radius:999px;cursor:pointer;white-space:nowrap}
+.seg button[aria-pressed="true"]{background:var(--fg);color:var(--bg)}
+.sub{text-align:center;color:var(--muted);font-size:.8rem;margin-top:6px;min-height:1.2em;font-variant-numeric:tabular-nums}
+.boardwrap{flex:1;display:flex;align-items:center;justify-content:center;min-height:0;padding-block:8px}
+.board{--L:5;display:grid;grid-template-rows:repeat(6,1fr);gap:6px;
+  width:min(calc(66px * var(--L)),100%,calc((100dvh - 380px) * var(--L) / 6));aspect-ratio:var(--L)/6;max-width:100%}
+.row{display:grid;grid-template-columns:repeat(var(--L),1fr);gap:6px}
+.tile{display:grid;place-items:center;border:2px solid var(--line);border-radius:6px;
+  font:900 clamp(1.1rem,calc(36vw / var(--L)),2rem)/1 var(--tile);text-transform:uppercase;user-select:none;background:transparent}
+.tile.filled{border-color:var(--muted);animation:pop .1s}
+.tile.ok,.tile.near,.tile.off{border-color:transparent;color:var(--onfill)}
+.tile.ok{background:var(--ok)} .tile.near{background:var(--near)} .tile.off{background:var(--off)}
+.tile.flip{animation:flip .5s ease both}
+.row.shake{animation:shake .4s}
+.tile.win{animation:hop .5s ease}
+@keyframes pop{50%{transform:scale(1.08)}}
+@keyframes flip{0%{transform:rotateX(0)}50%{transform:rotateX(90deg)}100%{transform:rotateX(0)}}
+@keyframes shake{20%,60%{transform:translateX(-6px)}40%,80%{transform:translateX(6px)}}
+@keyframes hop{40%{transform:translateY(-14px)}}
+.kb{display:flex;flex-direction:column;gap:6px;user-select:none;padding-bottom:4px}
+.kr{display:flex;gap:4px;justify-content:center}
+.k{flex:1 1 0;min-width:0;height:54px;border:0;border-radius:6px;background:var(--key);color:var(--fg);
+  font:700 1rem var(--ui);cursor:pointer;padding:0;touch-action:manipulation}
+.k.wide{flex:1.6 1 0;font-size:.72rem;letter-spacing:.03em;text-transform:uppercase}
+.k.ok{background:var(--ok);color:var(--onfill)} .k.near{background:var(--near);color:var(--onfill)} .k.off{background:var(--off);color:var(--onfill);opacity:.75}
+.k:active{filter:brightness(1.2)}
+.k svg{width:22px;height:22px;vertical-align:middle}
+:focus-visible{outline:3px solid var(--near);outline-offset:2px}
+.toasts{position:fixed;left:0;right:0;top:calc(env(safe-area-inset-top,0px) + 120px);display:flex;flex-direction:column;align-items:center;gap:6px;pointer-events:none;z-index:50}
+.toast{background:var(--fg);color:var(--bg);font:700 .95rem var(--ui);padding:10px 14px;border-radius:8px;box-shadow:0 6px 20px #0006;max-width:90vw;text-align:center}
+.ov{position:fixed;inset:0;background:#0009;display:flex;align-items:flex-end;justify-content:center;z-index:40;
+  padding:env(safe-area-inset-top,0px) env(safe-area-inset-right,0px) 0 env(safe-area-inset-left,0px)}
+@media (min-width:600px){.ov{align-items:center}}
+.dlg{background:var(--panel);color:var(--fg);width:100%;max-width:480px;max-height:90%;overflow:auto;border-radius:16px 16px 0 0;
+  padding:20px max(20px,env(safe-area-inset-right,0px)) calc(24px + env(safe-area-inset-bottom,0px)) max(20px,env(safe-area-inset-left,0px));position:relative}
+@media (min-width:600px){.dlg{border-radius:16px}}
+.dlg h2{margin:0 44px 14px 0;font:900 1.15rem var(--tile);letter-spacing:.01em}
+.dlg h3{margin:20px 0 8px;font:700 .75rem var(--ui);text-transform:uppercase;letter-spacing:.08em;color:var(--muted)}
+.dlg p,.dlg li{line-height:1.5;font-size:.95rem}
+.dlg ul{padding-left:18px;margin:6px 0}
+.dlg a{color:inherit}
+.x{position:absolute;top:10px;right:10px}
+.ex{display:flex;gap:4px;margin:8px 0 4px}
+.ex .tile{width:38px;height:38px;font-size:1.2rem}
+.tabs{display:grid;grid-template-columns:repeat(2,1fr);gap:6px;margin-bottom:16px}
+.tabs button{border:1px solid var(--line);background:transparent;color:var(--muted);border-radius:10px;padding:8px 6px;font:600 .85rem var(--ui);cursor:pointer}
+.tabs button[aria-pressed="true"]{background:var(--fg);color:var(--bg);border-color:var(--fg)}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;text-align:center}
+.stats b{display:block;font:900 1.8rem/1.1 var(--tile);font-variant-numeric:tabular-nums}
+.stats span{font-size:.72rem;color:var(--muted)}
+.dist{display:flex;flex-direction:column;gap:4px}
+.bar{display:flex;align-items:center;gap:6px;font-size:.85rem;font-variant-numeric:tabular-nums}
+.bar i{font-style:normal;width:12px;text-align:right}
+.bar div{background:var(--off);color:#fff;padding:2px 7px;text-align:right;border-radius:3px;min-width:22px;font-weight:700}
+.bar div.cur{background:var(--ok)}
+.endrow{display:flex;gap:10px;align-items:center;margin-top:18px;flex-wrap:wrap}
+.next{flex:1;min-width:120px}
+.next small{display:block;color:var(--muted);font-size:.75rem}
+.next b{font:900 1.4rem var(--tile);font-variant-numeric:tabular-nums}
+.btn{border:0;border-radius:10px;padding:12px 18px;font:700 1rem var(--ui);cursor:pointer;background:var(--ok);color:#fff;display:inline-flex;gap:8px;align-items:center;justify-content:center}
+.btn.alt{background:var(--key);color:var(--fg)}
+.btn.warn{background:var(--warn)}
+.btn.sm{padding:9px 14px;font-size:.9rem}
+.sol{margin:0 0 12px;font-size:.95rem}
+.sol b{letter-spacing:.12em}
+.xfer{border-top:1px solid var(--line);margin-top:22px}
+.xfer p{color:var(--muted);font-size:.88rem;margin:0 0 10px}
+.xrow{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px}
+textarea.code{width:100%;min-height:84px;resize:vertical;border:1px solid var(--line);border-radius:10px;background:var(--bg);color:var(--fg);
+  font:.78rem/1.4 var(--mono);padding:10px;word-break:break-all}
+.msg{font-size:.88rem;margin:8px 0 0;min-height:1.2em}
+.msg.bad{color:var(--warn)}
+.set{display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--line)}
+.set div{flex:1}
+.set small{display:block;color:var(--muted);font-size:.8rem;margin-top:2px}
+.sw{appearance:none;width:46px;height:28px;border-radius:999px;background:var(--off);position:relative;cursor:pointer;flex:none;margin:0}
+.sw::after{content:"";position:absolute;top:3px;left:3px;width:22px;height:22px;border-radius:50%;background:#fff;transition:left .15s}
+.sw:checked{background:var(--ok)} .sw:checked::after{left:21px}
+.sw:disabled{opacity:.45;cursor:not-allowed}
+.fine{color:var(--muted);font-size:.8rem;line-height:1.55;margin-top:16px}
+.fine b{color:var(--fg)}
+.vbanner{background:#e8c547;color:#1b1600;text-align:center;font:700 .8rem var(--ui);padding:6px max(16px,env(safe-area-inset-right,0px)) 6px max(16px,env(safe-area-inset-left,0px))}
+body.vor .app{height:calc(100% - 30px)}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px}
+.chips button{border:1px solid var(--line);background:transparent;color:var(--fg);border-radius:999px;padding:8px 12px;font:600 .88rem var(--ui);cursor:pointer}
+.chips button[aria-pressed="true"]{background:var(--fg);color:var(--bg);border-color:var(--fg)}
+textarea.fb{width:100%;min-height:120px;resize:vertical;border:1px solid var(--line);border-radius:10px;background:var(--bg);color:var(--fg);font:1rem/1.45 var(--ui);padding:10px}
+.hp{position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden}
+.count{color:var(--muted);font-size:.78rem;text-align:right;margin-top:4px;font-variant-numeric:tabular-nums}
+.visits{text-align:center;color:var(--muted);font-size:.72rem;padding-top:2px;font-variant-numeric:tabular-nums}
+.visits b{color:var(--fg);font-weight:600}
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:1ms!important;animation-delay:0ms!important;transition:none!important}}
+@media (max-height:640px){.k{height:46px}.seg button{padding:5px 11px}}
+</style>
+<div class="vbanner" id="vbanner" hidden>Vorschau – eigener Spielstand, nicht die Live-Fassung</div>
+<div class="app">
+  <header>
+    <button class="ib" id="bHelp" aria-label="Spielregeln"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9.5"/><path d="M9.3 9.2a2.8 2.8 0 0 1 5.4 1c0 1.9-2.7 2.4-2.7 4"/><circle cx="12" cy="17.4" r=".6" fill="currentColor"/></svg></button>
+    <button class="ib" id="bFb" aria-label="Rückmeldung geben"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M4 5h16v11H9l-5 4z"/><path d="M8 9.5h8M8 12.5h5" stroke-linecap="round"/></svg></button>
+    <h1>Digi<span>wort</span></h1>
+    <button class="ib" id="bStats" aria-label="Statistik"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M5 20V11M12 20V4M19 20v-6"/></svg></button>
+    <button class="ib" id="bSet" aria-label="Einstellungen"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 7h10M18 7h2M4 17h4M12 17h8"/><circle cx="16" cy="7" r="2"/><circle cx="10" cy="17" r="2"/></svg></button>
+  </header>
+  <div class="bar2">
+    <div class="seg" role="group" aria-label="Spielmodus">
+      <button id="mDaily" aria-pressed="true">Tagesrätsel</button>
+      <button id="mEndless" aria-pressed="false">Endlos</button>
+    </div>
+    <div class="seg" role="group" aria-label="Wortlänge">
+      <button id="l5" aria-pressed="true" aria-label="5 Buchstaben">5</button>
+      <button id="l6" aria-pressed="false" aria-label="6 Buchstaben">6</button>
+    </div>
+  </div>
+  <div class="sub" id="sub"></div>
+  <div class="boardwrap"><div class="board" id="board" aria-live="polite"></div></div>
+  <div class="kb" id="kb"></div>
+  <div class="visits" id="visits" hidden aria-label="Besuche"></div>
+</div>
+<div class="toasts" id="toasts" role="status"></div>
+
+<div class="ov" id="dHelp" hidden><div class="dlg" role="dialog" aria-modal="true" aria-labelledby="hHelp">
+  <button class="ib x" data-close aria-label="Schließen">✕</button>
+  <h2 id="hHelp">So geht's</h2>
+  <p>Finde das gesuchte Wort in sechs Versuchen. Jeden Tag gibt es zwei Rätsel: eins mit fünf und eins mit sechs Buchstaben. Jeder Versuch muss ein echtes deutsches Wort sein.</p>
+  <div class="ex" id="ex1"></div><p>Das <b>B</b> steht an der richtigen Stelle.</p>
+  <div class="ex" id="ex2"></div><p>Das <b>A</b> kommt vor, aber an einer anderen Stelle.</p>
+  <div class="ex" id="ex3"></div><p>Das <b>U</b> kommt im Wort nicht vor.</p>
+  <h3>Gut zu wissen</h3>
+  <ul>
+    <li>Ä, Ö und Ü sind eigene Buchstaben. ARGER und ÄRGER sind verschieden.</li>
+    <li>ß wird als SS geschrieben, wie bei Großbuchstaben üblich: SPASS statt Spaß, GRÖSSE statt Größe. Auf der echten Tastatur wird ß automatisch zu SS.</li>
+    <li>Doppelte Buchstaben färben sich nur so oft, wie sie im Lösungswort vorkommen.</li>
+    <li><b>Tagesrätsel:</b> für alle gleich, neu um Mitternacht. <b>Endlos:</b> so viele Wörter, wie du willst.</li>
+    <li><b>Schwer-Modus:</b> Aufgedeckte Hinweise müssen in den nächsten Versuchen benutzt werden.</li>
+  </ul>
+</div></div>
+
+<div class="ov" id="dStats" hidden><div class="dlg" role="dialog" aria-modal="true" aria-labelledby="hStats">
+  <button class="ib x" data-close aria-label="Schließen">✕</button>
+  <h2 id="hStats">Statistik</h2>
+  <p class="sol" id="solLine" hidden></p>
+  <div class="tabs" id="statTabs" role="group" aria-label="Statistik wählen">
+    <button data-k="daily5">Tagesrätsel · 5</button><button data-k="daily6">Tagesrätsel · 6</button>
+    <button data-k="endless5">Endlos · 5</button><button data-k="endless6">Endlos · 6</button>
+  </div>
+  <div class="stats" id="statNums"></div>
+  <h3>Verteilung der Versuche</h3>
+  <div class="dist" id="dist"></div>
+  <div class="endrow" id="endRow" hidden>
+    <div class="next" id="nextBox"><small>Nächste Tagesrätsel in</small><b id="countdown">--:--:--</b></div>
+    <button class="btn alt" id="bNew" hidden>Neues Wort</button>
+    <button class="btn" id="bShare"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 3v12M7 8l5-5 5 5M5 14v5h14v-5"/></svg>Ergebnis teilen</button>
+  </div>
+  <div class="xfer">
+    <h3>Auf ein anderes Gerät übertragen</h3>
+    <p>Erstelle hier einen Code und gib ihn auf dem neuen Gerät unter „Code eingeben“ ein. Dann sind Statistik, Spielstand und Einstellungen dort.</p>
+    <div class="xrow">
+      <button class="btn alt sm" id="bExport">Code erstellen</button>
+      <button class="btn alt sm" id="bImportOpen">Code eingeben</button>
+    </div>
+    <div id="exportBox" hidden>
+      <label for="exportCode" class="msg" style="display:block;margin:0 0 6px">Dein Code:</label>
+      <textarea class="code" id="exportCode" readonly></textarea>
+      <div class="xrow" style="margin-top:8px"><button class="btn sm" id="bCopyCode">Code kopieren</button></div>
+    </div>
+    <div id="importBox" hidden>
+      <label for="importCode" class="msg" style="display:block;margin:0 0 6px">Code vom alten Gerät einfügen:</label>
+      <textarea class="code" id="importCode" spellcheck="false" autocomplete="off"></textarea>
+      <div class="xrow" style="margin-top:8px"><button class="btn sm" id="bImport">Übernehmen</button></div>
+      <p class="msg" id="importMsg"></p>
+    </div>
+  </div>
+</div></div>
+
+<div class="ov" id="dFb" hidden><div class="dlg" role="dialog" aria-modal="true" aria-labelledby="hFb">
+  <button class="ib x" data-close aria-label="Schließen">✕</button>
+  <h2 id="hFb">Rückmeldung</h2>
+  <p style="margin-top:0">Was ist dir aufgefallen? __LESER__</p>
+  <div class="chips" id="fbArt" role="group" aria-label="Art der Rückmeldung">
+    <button data-a="sonstiges" aria-pressed="true">Sonstiges</button><button data-a="fehler" aria-pressed="false">Fehler</button><button data-a="wunsch" aria-pressed="false">Wunsch</button>
+    <button data-a="wort-fehlt" aria-pressed="false">Wort fehlt</button><button data-a="wort-unpassend" aria-pressed="false">Wort passt nicht</button>
+  </div>
+  <label for="fbText" class="msg" style="display:block;margin:0 0 6px" id="fbLabel">Was möchtest du loswerden?</label>
+  <textarea class="fb" id="fbText" maxlength="1000"></textarea>
+  <div class="count" id="fbCount">0 / 1000</div>
+  <div class="hp" aria-hidden="true"><label for="fbWeb">Webseite</label><input id="fbWeb" tabindex="-1" autocomplete="off"></div>
+  <div class="xrow" style="margin-top:10px"><button class="btn" id="bFbSend">Senden</button></div>
+  <p class="msg" id="fbMsg"></p>
+  <p class="fine">Mitgeschickt werden nur dein Text, die Art, der Spielmodus, die Rätsel-Nummer und die Fassung. Bei beendeten Spielen auch deine Versuche. Kein Name, keine Adresse, keine IP.</p>
+</div></div>
+
+<div class="ov" id="dSet" hidden><div class="dlg" role="dialog" aria-modal="true" aria-labelledby="hSet">
+  <button class="ib x" data-close aria-label="Schließen">✕</button>
+  <h2 id="hSet">Einstellungen</h2>
+  <label class="set"><div>Schwer-Modus<small id="hardNote">Aufgedeckte Hinweise müssen benutzt werden.</small></div><input type="checkbox" class="sw" id="oHard"></label>
+  <label class="set"><div>Kontrast-Farben<small>Orange und Blau statt Grün und Gelb, gut bei Farbsehschwäche.</small></div><input type="checkbox" class="sw" id="oContrast"></label>
+  <label class="set"><div>Heller Modus<small>Standard ist dunkel.</small></div><input type="checkbox" class="sw" id="oLight"></label>
+  <p class="fine">Kein Konto, keine Werbung, kein Tracking. Spielstand und Statistik bleiben nur in diesem Browser. Besuche werden nur gezählt: einmal pro Tag und Gerät, ohne Cookie, ohne IP, ohne fremden Dienst.</p>
+  <h3>Danke an</h3>
+  <p class="fine" style="margin-top:0">
+    <b>igerman98</b> von Björn Jacke – deutsches Wörterbuch, Grundlage aller erlaubten Wörter. Lizenz GPL-2.0 oder GPL-3.0.
+    <a href="https://www.j3e.de/ispell/igerman98/" target="_blank" rel="noopener">j3e.de/ispell/igerman98</a>,
+    in der Fassung von <a href="https://github.com/wooorm/dictionaries" target="_blank" rel="noopener">wooorm/dictionaries</a> (Titus Wormer).<br><br>
+    <b>FrequencyWords</b> von Hermit Dave – Worthäufigkeiten aus OpenSubtitles 2018, danach sind die Lösungswörter ausgewählt. Inhalt CC BY-SA 4.0.
+    <a href="https://github.com/hermitdave/FrequencyWords" target="_blank" rel="noopener">github.com/hermitdave/FrequencyWords</a><br><br>
+    Die Wortlisten in diesem Spiel sind daraus abgeleitet und von Hand gefiltert. Das Spiel steht deshalb unter der GPL-3.0.
+  </p>
+  <p class="fine" id="verLine"></p>
+</div></div>
+
+<script>
+"use strict";
+const NAME="Digiwort", VERSION="__VERSION__", FASSUNG="__FASSUNG__", ADRESSE="__ADRESSE__";
+const AUF_SEITE=()=>location.protocol!=="file:"&&(!ADRESSE||location.hostname===new URL(ADRESSE).hostname);
+const START=[2026,9,25]; // 25.10.2026 = Rätsel Nr. 1 (Monat 0-basiert)
+function splitWords(s,n){const a=[...s],out=[];for(let i=0;i<a.length;i+=n)out.push(a.slice(i,i+n).join(""));return out;}
+const SOL={5:splitWords("__SOL5__",5),6:splitWords("__SOL6__",6)};
+const VALID={5:new Set(splitWords("__GUE5__",5)),6:new Set(splitWords("__GUE6__",6))};
+SOL[5].forEach(w=>VALID[5].add(w)); SOL[6].forEach(w=>VALID[6].add(w));
+
+/* ---------- reine Spiellogik ---------- */
+function score(guess,sol){
+  const g=[...guess],s=[...sol],n=s.length,res=Array(n).fill("off"),left={};
+  for(let i=0;i<n;i++){ if(g[i]===s[i]) res[i]="ok"; else left[s[i]]=(left[s[i]]||0)+1; }
+  for(let i=0;i<n;i++){ if(res[i]!=="ok" && left[g[i]]>0){ res[i]="near"; left[g[i]]--; } }
+  return res;
+}
+function hardCheck(guess,prev){ // prev: [{w,r}]
+  const g=[...guess];
+  for(const {w,r} of prev){ const p=[...w];
+    for(let i=0;i<p.length;i++) if(r[i]==="ok" && g[i]!==p[i]) return `${i+1}. Buchstabe muss ${p[i]} sein`;
+  }
+  for(const {w,r} of prev){ const p=[...w],need={};
+    for(let i=0;i<p.length;i++) if(r[i]!=="off") need[p[i]]=(need[p[i]]||0)+1;
+    for(const L in need){ const have=g.filter(x=>x===L).length; if(have<need[L]) return need[L]>1?`Wort muss ${need[L]}× ${L} enthalten`:`Wort muss ${L} enthalten`; }
+  }
+  return null;
+}
+function dayIndex(d=new Date()){
+  return Math.floor((Date.UTC(d.getFullYear(),d.getMonth(),d.getDate())-Date.UTC(...START))/864e5);
+}
+function dailyWord(idx,len){ const a=SOL[len],n=a.length; return a[((idx%n)+n)%n]; }
+
+/* ---------- Speicher (nur im Browser) ---------- */
+const P = FASSUNG==="vorschau" ? "dgw1v:" : "dgw1:";
+function load(k,def){ try{ const v=localStorage.getItem(P+k); return v?JSON.parse(v):def; }catch(e){ return def; } }
+function save(k,v){ try{ localStorage.setItem(P+k,JSON.stringify(v)); }catch(e){} }
+const blankStats=()=>({played:0,won:0,streak:0,best:0,dist:[0,0,0,0,0,0],last:null});
+(function migrate(){ // Daten aus der Testversion übernehmen
+  try{ if(FASSUNG==="vorschau"||localStorage.getItem(P+"settings")) return; const o="wdf1:";
+    const map={settings:"settings",stats_daily:"stats_daily5",stats_endless:"stats_endless5",game_daily:"game_daily5",game_endless:"game_endless5",seenHelp:"seenHelp",endlessNo:"endlessNo5"};
+    for(const k in map){ const v=localStorage.getItem(o+k); if(v!==null) localStorage.setItem(P+map[k],v); }
+  }catch(e){}
+})();
+
+let settings=load("settings",{hard:false,contrast:false,light:false});
+let mode=load("mode","daily"), len=load("len",5);
+if(len!==5&&len!==6) len=5;
+let game, busy=false, cur="";
+const gkey=(m,l)=>m+l;
+
+function newGame(m,l){
+  const base={mode:m,len:l,guesses:[],status:"play",hard:settings.hard,counted:false};
+  if(m==="daily"){ const idx=dayIndex(); return {...base,idx,sol:dailyWord(idx,l)}; }
+  return {...base,sol:SOL[l][Math.floor(Math.random()*SOL[l].length)],no:(load("endlessNo"+l,0)+1)};
+}
+function loadGame(m,l){
+  let g=load("game_"+gkey(m,l),null);
+  if(g && !g.len) g.len=l;
+  if(m==="daily" && (!g || g.idx!==dayIndex())) g=null;
+  if(g && !SOL[l].includes(g.sol)) g=null;
+  if(!g){ g=newGame(m,l); if(m==="endless") save("endlessNo"+l,g.no); save("game_"+gkey(m,l),g); }
+  return g;
+}
+const saveGame=()=>save("game_"+gkey(game.mode,game.len),game);
+
+/* ---------- Oberfläche ---------- */
+const $=id=>document.getElementById(id);
+const boardEl=$("board"), kbEl=$("kb");
+const ROWS=[["Q","W","E","R","T","Z","U","I","O","P","Ü"],["A","S","D","F","G","H","J","K","L","Ö","Ä"],["ENTER","Y","X","C","V","B","N","M","BACK"]];
+const keyEls={};
+function buildBoard(){
+  boardEl.innerHTML=""; boardEl.style.setProperty("--L",game.len);
+  for(let r=0;r<6;r++){ const row=document.createElement("div"); row.className="row";
+    for(let c=0;c<game.len;c++){ const t=document.createElement("div"); t.className="tile"; row.appendChild(t); }
+    boardEl.appendChild(row); }
+}
+function buildKb(){
+  ROWS.forEach(r=>{ const row=document.createElement("div"); row.className="kr";
+    r.forEach(k=>{ const b=document.createElement("button"); b.className="k"; b.type="button";
+      if(k==="ENTER"){ b.classList.add("wide"); b.textContent="Raten"; b.setAttribute("aria-label","Wort abschicken"); }
+      else if(k==="BACK"){ b.classList.add("wide"); b.setAttribute("aria-label","Löschen"); b.innerHTML='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M9 5h11v14H9l-6-7z"/><path d="M12.5 9.5l5 5m0-5l-5 5"/></svg>'; }
+      else { b.textContent=k; keyEls[k]=b; }
+      b.addEventListener("click",()=>{ press(k); b.blur(); });
+      row.appendChild(b); });
+    kbEl.appendChild(row); });
+}
+function tiles(r){ return boardEl.children[r].children; }
+function render(){
+  buildBoard();
+  game.guesses.forEach((w,r)=>{ const res=score(w,game.sol); [...w].forEach((L,i)=>{ const t=tiles(r)[i]; t.textContent=L; t.classList.add(res[i]); }); });
+  paintKeys(); drawCurrent(); renderSub();
+  $("mDaily").setAttribute("aria-pressed",game.mode==="daily"); $("mEndless").setAttribute("aria-pressed",game.mode==="endless");
+  $("l5").setAttribute("aria-pressed",game.len===5); $("l6").setAttribute("aria-pressed",game.len===6);
+}
+function drawCurrent(){
+  if(game.status!=="play") return;
+  const r=game.guesses.length, L=[...cur];
+  [...tiles(r)].forEach((t,i)=>{ t.textContent=L[i]||""; t.classList.toggle("filled",!!L[i]); });
+}
+function paintKeys(){
+  const rank={off:1,near:2,ok:3}, best={};
+  game.guesses.forEach(w=>{ const res=score(w,game.sol); [...w].forEach((L,i)=>{ if(!best[L]||rank[res[i]]>rank[best[L]]) best[L]=res[i]; }); });
+  for(const k in keyEls){ keyEls[k].classList.remove("ok","near","off"); if(best[k]) keyEls[k].classList.add(best[k]); }
+}
+function renderSub(){
+  const h=game.hard?" · Schwer":"";
+  $("sub").textContent = game.mode==="daily"
+    ? `Rätsel Nr. ${game.idx+1} · ${game.len} Buchstaben · ${new Date().toLocaleDateString("de-DE",{day:"numeric",month:"long"})}${h}`
+    : `Endlos · ${game.len} Buchstaben · Wort ${game.no}${h}`;
+}
+function toast(msg,ms=1600){
+  const t=document.createElement("div"); t.className="toast"; t.textContent=msg; $("toasts").appendChild(t);
+  setTimeout(()=>t.remove(),ms);
+}
+function shake(){ const row=boardEl.children[game.guesses.length]; row.classList.remove("shake"); void row.offsetWidth; row.classList.add("shake"); }
+
+function press(k){
+  if(busy || anyOpen()) return;
+  if(game.status!=="play"){ if(k==="ENTER") openStats(); return; }
+  if(k==="BACK"){ cur=[...cur].slice(0,-1).join(""); drawCurrent(); return; }
+  if(k==="ENTER"){ submit(); return; }
+  if([...cur].length<game.len){ cur+=k; drawCurrent(); }
+}
+function submit(){
+  const w=cur;
+  if([...w].length<game.len){ shake(); toast("Zu wenige Buchstaben"); return; }
+  if(!VALID[game.len].has(w)){ shake(); toast("Kein gültiges Wort"); return; }
+  if(game.hard){ const prev=game.guesses.map(x=>({w:x,r:score(x,game.sol)})); const msg=hardCheck(w,prev); if(msg){ shake(); toast(msg); return; } }
+  const r=game.guesses.length, res=score(w,game.sol);
+  game.guesses.push(w); cur="";
+  if(w===game.sol) game.status="won"; else if(game.guesses.length===6) game.status="lost";
+  saveGame();
+  busy=true;
+  const reduce=matchMedia("(prefers-reduced-motion: reduce)").matches, step=reduce?0:240;
+  [...tiles(r)].forEach((t,i)=>{
+    setTimeout(()=>{ t.classList.add("flip"); setTimeout(()=>{ t.classList.remove("filled"); t.classList.add(res[i]); },reduce?0:250); }, i*step);
+  });
+  setTimeout(()=>{ busy=false; paintKeys(); finishIfOver(true); }, (game.len-1)*step+(reduce?20:520));
+}
+const WIN=["Genial!","Großartig!","Stark!","Sehr gut!","Knapp!","Puh, geschafft!"];
+function finishIfOver(fresh){
+  if(game.status==="play") return;
+  if(!game.counted){ recordStats(); game.counted=true; saveGame(); }
+  if(!fresh) return;
+  if(game.status==="won"){ toast(WIN[game.guesses.length-1]); const r=game.guesses.length-1; [...tiles(r)].forEach((t,i)=>setTimeout(()=>{t.classList.remove("flip");t.classList.add("win");},i*90)); }
+  else toast(game.sol,2600);
+  setTimeout(openStats,1500);
+}
+function recordStats(){
+  const k="stats_"+gkey(game.mode,game.len), s=load(k,blankStats());
+  s.played++;
+  const contiguous = game.mode==="endless" || s.last===null || s.last===game.idx-1;
+  if(game.status==="won"){ s.won++; s.dist[game.guesses.length-1]++; s.streak = contiguous ? s.streak+1 : 1; s.best=Math.max(s.best,s.streak); }
+  else s.streak=0;
+  if(game.mode==="daily") s.last=game.idx;
+  save(k,s);
+}
+function statsFor(k){
+  const s=load("stats_"+k,blankStats());
+  if(k.startsWith("daily") && s.last!==null && s.last<dayIndex()-1) s.streak=0; // Tag verpasst
+  return s;
+}
+
+/* ---------- Dialoge ---------- */
+const DLGS=["dHelp","dStats","dSet","dFb"];
+const anyOpen=()=>DLGS.some(id=>!$(id).hidden);
+function openDlg(id){ $(id).hidden=false; const b=$(id).querySelector("[data-close]"); b&&b.focus(); }
+function closeAll(){ DLGS.forEach(id=>$(id).hidden=true); clearInterval(cdTimer); }
+document.querySelectorAll(".ov").forEach(o=>{ o.addEventListener("click",e=>{ if(e.target===o||e.target.closest("[data-close]")) closeAll(); }); });
+let cdTimer, statView;
+function openStats(){
+  statView=gkey(game.mode,game.len);
+  $("exportBox").hidden=true; $("importBox").hidden=true; $("importMsg").textContent=""; armed=false; $("bImport").textContent="Übernehmen";
+  drawStats();
+  const over=game.status!=="play";
+  $("solLine").hidden=game.status!=="lost";
+  if(game.status==="lost") $("solLine").innerHTML=`Gesucht war: <b>${game.sol}</b>`;
+  if(game.mode==="daily"){ tick(); cdTimer=setInterval(tick,1000); }
+  openDlg("dStats");
+}
+function drawStats(){
+  const s=statsFor(statView);
+  document.querySelectorAll("#statTabs button").forEach(b=>b.setAttribute("aria-pressed",b.dataset.k===statView));
+  const pct=s.played?Math.round(s.won/s.played*100):0;
+  $("statNums").innerHTML=[[s.played,"Gespielt"],[pct,"% gewonnen"],[s.streak,"Serie"],[s.best,"Beste Serie"]].map(([v,l])=>`<div><b>${v}</b><span>${l}</span></div>`).join("");
+  const mine=statView===gkey(game.mode,game.len), max=Math.max(1,...s.dist), curRow=(mine&&game.status==="won")?game.guesses.length-1:-1;
+  $("dist").innerHTML=s.dist.map((v,i)=>`<div class="bar"><i>${i+1}</i><div class="${i===curRow?"cur":""}" style="width:${Math.max(7,v/max*100)}%">${v}</div></div>`).join("");
+  const over=game.status!=="play";
+  $("endRow").hidden=!mine || (!over && game.mode!=="daily");
+  $("bShare").hidden=!over;
+  $("bNew").hidden=!(over && game.mode==="endless");
+  $("nextBox").hidden=game.mode!=="daily";
+}
+$("statTabs").addEventListener("click",e=>{ const b=e.target.closest("button"); if(b){ statView=b.dataset.k; drawStats(); } });
+function tick(){
+  const n=new Date(), m=new Date(n.getFullYear(),n.getMonth(),n.getDate()+1), d=Math.max(0,m-n);
+  const p=x=>String(x).padStart(2,"0");
+  $("countdown").textContent=`${p(Math.floor(d/36e5))}:${p(Math.floor(d/6e4)%60)}:${p(Math.floor(d/1e3)%60)}`;
+  if(game.mode==="daily" && game.idx!==dayIndex()){ closeAll(); switchTo("daily",game.len); toast("Neue Tagesrätsel!"); }
+}
+function shareText(){
+  const c=settings.contrast, E={ok:c?"🟧":"🟩",near:c?"🟦":"🟨",off:"⬛"};
+  const head = game.mode==="daily" ? `${NAME} #${game.idx+1} · ${game.len} Buchstaben` : `${NAME} Endlos · ${game.len} Buchstaben`;
+  const n = game.status==="won"?game.guesses.length:"X";
+  const grid=game.guesses.map(w=>score(w,game.sol).map(r=>E[r]).join("")).join("\n");
+  return `${head}\n${n}/6${game.hard?" (schwer)":""}\n\n${grid}${ADRESSE?"\n\n"+ADRESSE:""}`;
+}
+async function copyText(text,okMsg,ta){
+  try{ await navigator.clipboard.writeText(text); toast(okMsg); }
+  catch(e){ const t=ta||document.createElement("textarea"); if(!ta){ t.value=text; document.body.appendChild(t); }
+    t.focus(); t.select(); let ok=false; try{ ok=document.execCommand("copy"); }catch(_){}
+    if(!ta) t.remove(); toast(ok?okMsg:"Bitte markieren und selbst kopieren"); }
+}
+$("bShare").addEventListener("click",async()=>{
+  const text=shareText();
+  if(navigator.share && /Mobi|Android|iPhone|iPad/i.test(navigator.userAgent)){ try{ await navigator.share({text}); return; }catch(e){ if(e&&e.name==="AbortError") return; } }
+  copyText(text,"Ergebnis kopiert");
+});
+$("bNew").addEventListener("click",()=>{ closeAll(); game=newGame("endless",game.len); save("endlessNo"+game.len,game.no); saveGame(); cur=""; render(); });
+
+/* ---------- Übertragung per Code ---------- */
+const b64e=s=>btoa(String.fromCharCode(...new TextEncoder().encode(s))).replace(/\+/g,"-").replace(/\//g,"_").replace(/=+$/,"");
+const b64d=s=>new TextDecoder().decode(Uint8Array.from(atob(s.replace(/-/g,"+").replace(/_/g,"/")),c=>c.charCodeAt(0)));
+function exportCode(){
+  const data={};
+  try{ for(let i=0;i<localStorage.length;i++){ const k=localStorage.key(i); if(k.startsWith(P)) data[k.slice(P.length)]=localStorage.getItem(k); } }catch(e){}
+  return "DIGIWORT-"+b64e(JSON.stringify({v:1,d:data}));
+}
+function parseCode(code){
+  const c=code.replace(/\s+/g,"");
+  if(!c.startsWith("DIGIWORT-")) throw new Error("Das ist kein Digiwort-Code. Er beginnt mit DIGIWORT-.");
+  let o; try{ o=JSON.parse(b64d(c.slice(9))); }catch(e){ throw new Error("Der Code ist unvollständig. Kopiere ihn bitte noch einmal ganz."); }
+  if(!o||o.v!==1||typeof o.d!=="object") throw new Error("Der Code ist unvollständig. Kopiere ihn bitte noch einmal ganz.");
+  for(const k in o.d){ if(!/^[a-zA-Z0-9_]+$/.test(k)||typeof o.d[k]!=="string") throw new Error("Der Code enthält ungültige Daten."); JSON.parse(o.d[k]); }
+  return o.d;
+}
+$("bExport").addEventListener("click",()=>{ $("importBox").hidden=true; $("exportBox").hidden=false; $("exportCode").value=exportCode(); });
+$("bCopyCode").addEventListener("click",()=>copyText($("exportCode").value,"Code kopiert",$("exportCode")));
+$("bImportOpen").addEventListener("click",()=>{ $("exportBox").hidden=true; $("importBox").hidden=false; $("importCode").focus(); });
+let armed=false;
+$("importCode").addEventListener("input",()=>{ armed=false; $("bImport").textContent="Übernehmen"; $("bImport").classList.remove("warn"); $("importMsg").textContent=""; });
+$("bImport").addEventListener("click",()=>{
+  const msg=$("importMsg"); msg.className="msg";
+  let d; try{ d=parseCode($("importCode").value); }catch(e){ msg.textContent=e.message; msg.classList.add("bad"); return; }
+  const s=d["stats_daily5"]||d["stats_daily6"]; const played=["daily5","daily6","endless5","endless6"].reduce((a,k)=>a+(d["stats_"+k]?JSON.parse(d["stats_"+k]).played:0),0);
+  if(!armed){ armed=true; $("bImport").textContent="Ja, ersetzen"; $("bImport").classList.add("warn");
+    msg.textContent=`Der Code enthält ${played} gespielte Rätsel. Die Daten auf diesem Gerät werden dabei ersetzt.`; return; }
+  try{ const del=[]; for(let i=0;i<localStorage.length;i++){ const k=localStorage.key(i); if(k.startsWith(P)) del.push(k); }
+    del.forEach(k=>localStorage.removeItem(k)); for(const k in d) localStorage.setItem(P+k,d[k]); }
+  catch(e){ msg.textContent="Speichern ist in diesem Browser nicht möglich (privates Fenster?)."; msg.classList.add("bad"); return; }
+  settings=load("settings",{hard:false,contrast:false,light:false}); applyLook();
+  closeAll(); switchTo(load("mode","daily"),load("len",5)===6?6:5); toast("Daten übernommen");
+});
+
+/* ---------- Einstellungen ---------- */
+function applyLook(){
+  const r=document.documentElement;
+  if(settings.light) r.setAttribute("data-look","light"); else r.removeAttribute("data-look");
+  r.setAttribute("data-contrast",settings.contrast?"on":"off");
+}
+function openSet(){
+  $("oHard").checked=game.hard; $("oContrast").checked=settings.contrast; $("oLight").checked=settings.light;
+  const locked=game.status==="play" && game.guesses.length>0;
+  $("oHard").disabled=locked;
+  $("hardNote").textContent=locked?"Lässt sich erst vor dem ersten Versuch ändern.":"Aufgedeckte Hinweise müssen benutzt werden.";
+  openDlg("dSet");
+}
+$("oHard").addEventListener("change",e=>{ settings.hard=e.target.checked; save("settings",settings); if(game.status==="play"&&!game.guesses.length){ game.hard=settings.hard; saveGame(); renderSub(); } });
+$("oContrast").addEventListener("change",e=>{ settings.contrast=e.target.checked; save("settings",settings); applyLook(); });
+$("oLight").addEventListener("change",e=>{ settings.light=e.target.checked; save("settings",settings); applyLook(); });
+
+/* ---------- Modus & Länge ---------- */
+function switchTo(m,l){ mode=m; len=l; save("mode",m); save("len",l); game=loadGame(m,l); cur=""; render(); if(game.status!=="play") setTimeout(openStats,300); }
+$("mDaily").addEventListener("click",()=>{ if(!busy&&game.mode!=="daily") switchTo("daily",len); });
+$("mEndless").addEventListener("click",()=>{ if(!busy&&game.mode!=="endless") switchTo("endless",len); });
+$("l5").addEventListener("click",()=>{ if(!busy&&game.len!==5) switchTo(mode,5); });
+$("l6").addEventListener("click",()=>{ if(!busy&&game.len!==6) switchTo(mode,6); });
+document.querySelectorAll(".seg button").forEach(b=>b.addEventListener("click",()=>b.blur()));
+$("bHelp").addEventListener("click",()=>openDlg("dHelp"));
+$("bStats").addEventListener("click",openStats);
+$("bSet").addEventListener("click",openSet);
+
+/* ---------- echte Tastatur ---------- */
+document.addEventListener("keydown",e=>{
+  if(e.key==="Escape"){ closeAll(); return; }
+  if(e.ctrlKey||e.metaKey||e.altKey) return;
+  if(anyOpen()) return;
+  if(e.key==="Enter"){ e.preventDefault(); press("ENTER"); return; }
+  if(e.key==="Backspace"){ e.preventDefault(); press("BACK"); return; }
+  if(e.key==="ß"){ press("S"); press("S"); return; }
+  if(/^[a-zäöü]$/i.test(e.key)){ press(e.key.toUpperCase()); }
+});
+
+/* ---------- Hilfe-Beispiele ---------- */
+function ex(id,word,i,cls){ $(id).innerHTML=[...word].map((L,j)=>`<div class="tile ${j===i?cls:""}" style="${j===i?"":"border-color:var(--muted)"}">${L}</div>`).join(""); }
+ex("ex1","BLATT",0,"ok"); ex("ex2","PLANE",2,"near"); ex("ex3","TRAUM",3,"off");
+
+/* ---------- Rückmeldung ---------- */
+const FB_LABEL={"sonstiges":"Was möchtest du loswerden?","fehler":"Beschreibe kurz, was passiert ist:","wunsch":"Was wünschst du dir?","wort-fehlt":"Welches Wort wurde nicht angenommen?","wort-unpassend":"Welches Wort passt nicht – und warum?"};
+let fbArt="sonstiges", fbSent=0;
+function openFb(){ $("fbMsg").textContent=""; $("fbMsg").className="msg"; openDlg("dFb"); setTimeout(()=>$("fbText").focus(),50); }
+$("fbArt").addEventListener("click",e=>{ const b=e.target.closest("button"); if(!b) return; fbArt=b.dataset.a;
+  document.querySelectorAll("#fbArt button").forEach(x=>x.setAttribute("aria-pressed",x===b)); $("fbLabel").textContent=FB_LABEL[fbArt]; });
+$("fbText").addEventListener("input",()=>{ $("fbCount").textContent=`${[...$("fbText").value].length} / 1000`; });
+function geraet(){ const w=Math.min(screen.width,screen.height); return (/Mobi|Android|iPhone/i.test(navigator.userAgent)?"Handy":/iPad|Tablet/i.test(navigator.userAgent)||("ontouchend" in document&&w>=700)?"Tablet":"Computer")+` · ${innerWidth}×${innerHeight}`; }
+$("bFbSend").addEventListener("click",async()=>{
+  const msg=$("fbMsg"), text=$("fbText").value.trim(); msg.className="msg";
+  if([...text].length<3){ msg.textContent="Bitte schreib ein paar Worte dazu."; msg.classList.add("bad"); return; }
+  if(Date.now()-fbSent<30000){ msg.textContent="Danke! Bitte einen Moment warten, bevor du die nächste schickst."; return; }
+  const data={art:fbArt,text,web:$("fbWeb").value,fassung:`${VERSION} (${FASSUNG})`,modus:game.mode==="daily"?`Tagesrätsel Nr. ${game.idx+1}`:"Endlos",
+    laenge:game.len,versuche:game.status==="play"?`${game.guesses.length} (läuft noch)`:`${game.guesses.join(", ")} → ${game.status==="won"?"gewonnen":"verloren"}`,
+    schwer:game.hard,geraet:geraet()};
+  $("bFbSend").disabled=true; msg.textContent="Wird gesendet …";
+  try{
+    const r=await fetch(FASSUNG==="vorschau"?"../feedback.php":"feedback.php",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(data)});
+    const j=await r.json().catch(()=>({}));
+    if(!r.ok) throw new Error(j.fehler||"Senden hat gerade nicht geklappt. Bitte später noch einmal versuchen.");
+    fbSent=Date.now(); $("fbText").value=""; $("fbCount").textContent="0 / 1000";
+    msg.textContent=`Danke! Deine Rückmeldung ist angekommen (Nr. ${j.nr}).`;
+  }catch(e){
+    msg.classList.add("bad");
+    msg.textContent = !AUF_SEITE() ? "Rückmeldungen gehen nur auf der Seite des Spiels"+(ADRESSE?" ("+ADRESSE.replace(/^https?:\/\//,"")+")":"")+"." : (e.message||"Senden hat gerade nicht geklappt.");
+  }finally{ $("bFbSend").disabled=false; }
+});
+$("bFb").addEventListener("click",openFb);
+$("verLine").textContent=`Fassung ${VERSION}${FASSUNG==="live"?"":" · "+FASSUNG}`;
+if(FASSUNG==="vorschau"){ $("vbanner").hidden=false; document.body.classList.add("vor"); }
+
+/* ---------- Besuchszähler (eigener Server, nur Anzahl) ---------- */
+async function visits(){
+  if(!AUF_SEITE()) return;
+  const url=FASSUNG==="vorschau"?"../zaehler.php":"zaehler.php", heute=new Date().toLocaleDateString("sv-SE");
+  let zaehlen=false;
+  if(FASSUNG==="live") zaehlen=load("besucht",null)!==heute;
+  try{
+    const r=await fetch(url,zaehlen?{method:"POST",headers:{"Content-Type":"application/json"},body:"{}"}:{cache:"no-store"});
+    if(!r.ok) return; const z=await r.json();
+    if(zaehlen) save("besucht",heute);
+    const f=n=>Number(n||0).toLocaleString("de-DE");
+    $("visits").innerHTML=`Besuche heute <b>${f(z.heute)}</b> · letzte 7 Tage <b>${f(z.woche)}</b> · gesamt <b>${f(z.total)}</b>`;
+    $("visits").hidden=false;
+  }catch(e){}
+}
+
+/* ---------- Start ---------- */
+applyLook(); buildKb();
+game=loadGame(mode,len); render();
+if(game.status!=="play") setTimeout(openStats,400);
+else if(!load("seenHelp",false)){ save("seenHelp",true); openDlg("dHelp"); }
+visits();
+document.addEventListener("visibilitychange",()=>{ if(!document.hidden && game.mode==="daily" && game.idx!==dayIndex()) switchTo("daily",game.len); });
+</script>

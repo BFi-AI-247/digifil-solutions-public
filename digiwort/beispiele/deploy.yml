@@ -1,0 +1,61 @@
+# Beispiel: Digiwort per SFTP auf einen eigenen PHP-Webspace laden.
+# Nutzung: nach .github/workflows/digiwort-deploy.yml kopieren, Secrets und Variablen eintragen.
+#   main      → live:     <WEB>/<PFAD>/ (index.html, feedback.php, zaehler.php, .htaccess, Manifest, Icons)
+#   prototyp  → Vorschau: <WEB>/<PFAD>/vorschau/index.html (eigener Spielstand)
+# Secrets: SFTP_HOST, SFTP_USER, SFTP_PASSWORD, SFTP_KNOWN_HOSTS (empfohlen), DW_GITHUB_TOKEN (optional, Rückmeldungen)
+# Variablen: DW_PFAD (z. B. /digiwort/), DW_ADRESSE (z. B. https://example.org/digiwort/), DW_BETREIBER, DW_REPO (owner/repo)
+
+name: Deploy Digiwort
+
+on:
+  push:
+    branches: [main, prototyp]
+    paths: ["digiwort/**"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: digiwort
+    env:
+      H: ${{ secrets.SFTP_HOST }}
+      U: ${{ secrets.SFTP_USER }}
+      LFTP_PASSWORD: ${{ secrets.SFTP_PASSWORD }}
+      K: ${{ secrets.SFTP_KNOWN_HOSTS }}
+      DW_GITHUB_TOKEN: ${{ secrets.DW_GITHUB_TOKEN }}
+      DW_PFAD: ${{ vars.DW_PFAD || '/digiwort/' }}
+      DW_ADRESSE: ${{ vars.DW_ADRESSE }}
+      DW_BETREIBER: ${{ vars.DW_BETREIBER }}
+      DW_REPO: ${{ vars.DW_REPO }}
+      ZIEL: ${{ github.ref_name == 'main' && 'live' || 'vorschau' }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.12" }
+      - name: Bauen und testen
+        run: |
+          python -m pip install --quiet playwright && python -m playwright install --with-deps chromium
+          python tools/build.py
+          python tests/smoke.py dist/index.html
+      - name: Hochladen
+        run: |
+          mkdir -p out && python tools/make_zugang.py out/zugang.php
+          sudo apt-get update -qq && sudo apt-get install -y -qq lftp
+          mkdir -p ~/.ssh && { [ -n "$K" ] && printf '%s\n' "$K" || ssh-keyscan -T 15 "$H" 2>/dev/null; } > ~/.ssh/known_hosts
+          D="/web${DW_PFAD%/}"
+          if [ "$ZIEL" = "live" ]; then
+            CMDS="mkdir -p -f $D; mkdir -p -f /privat/digiwort;
+                  put server/.htaccess -o $D/.htaccess; put server/feedback.php -o $D/feedback.php; put server/zaehler.php -o $D/zaehler.php;
+                  put server/manifest.webmanifest -o $D/manifest.webmanifest;
+                  put src/icon-192.png -o $D/icon-192.png; put src/icon-512.png -o $D/icon-512.png;
+                  put out/zugang.php -o /privat/digiwort/zugang.php; put dist/index.html -o $D/index.html"
+          else
+            CMDS="mkdir -p -f $D/vorschau; put dist/vorschau.html -o $D/vorschau/index.html"
+          fi
+          lftp -c "set sftp:connect-program 'ssh -a -x -o StrictHostKeyChecking=yes -o UserKnownHostsFile=$HOME/.ssh/known_hosts';
+            open --env-password -u \"$U\" sftp://$H; $CMDS"

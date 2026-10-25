@@ -6,13 +6,14 @@ Jedes Werkzeug läuft auf einfachem PHP-Webspace, braucht keine Datenbank und sp
 | Ordner | Was es ist |
 |---|---|
 | [`blattwerk/`](blattwerk/) | Arbeitsblatt-Editor für die Grundschule (Klasse 1–4), gemacht fürs iPad: Seitenrahmen, frei platzierte Elemente, Lineaturen, Ausgabe als PDF. |
+| [`digiwort/`](digiwort/) | Deutsches Wortspiel: jeden Tag ein Wort mit 5 und eins mit 6 Buchstaben, sechs Versuche. Eine einzige HTML-Datei, kein Tracking. |
 | [`doko-block/`](doko-block/) | Ergebnisliste für eine feste Doppelkopf-Runde: Foto vom Block → KI liest die Spiele aus → prüfen → speichern. Statistik, Kasse, Termine. |
 
 ## Gemeinsame Bauweise
 
 - **Ein Ordner = ein Werkzeug**, mit `src/` (Oberfläche), `server/` (PHP), `tools/` (Bauen, Zugang erzeugen), `tests/` (Browser-Tests mit Playwright).
 - **Geheimes liegt nie im Repo.** Passwörter, API-Schlüssel und persönliche Zugänge erzeugt `tools/make_zugang.py` beim Upload als `zugang.php` in einem Ordner außerhalb des Web-Verzeichnisses.
-- **Rückmeldungen als Issues (optional).** Beide Werkzeuge haben einen Rückmelde-Knopf, der Issues in einem Repo deiner Wahl anlegt.
+- **Rückmeldungen als Issues (optional).** Alle Werkzeuge haben einen Rückmelde-Knopf, der Issues in einem Repo deiner Wahl anlegt.
 - **Upload per GitHub Actions.** Unter `beispiele/deploy.yml` liegt je ein Workflow für SFTP-Webspace; er ist nicht aktiv, bis du ihn nach `.github/workflows/` kopierst.
 
 ## Woher der Code kommt
@@ -36,4 +37,5 @@ cd doko-block && bash tests/lokal.sh /tmp/doko
 ## Lizenz
 
 [EUPL-1.2](LICENSE) – frei nutzbar, veränderbar und weitergebbar; Verbesserungen an verteilten Fassungen bleiben offen.
+**Ausnahme:** [`digiwort/`](digiwort/) steht unter der [GPL-3.0](digiwort/LICENSE), weil seine Wortlisten aus GPL-Quellen stammen.
 Die Schriften Andika und Lexend (Blattwerk) stehen unter der SIL Open Font License und werden nicht mitgeliefert, sondern beim Bauen geladen.
