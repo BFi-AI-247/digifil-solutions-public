@@ -9,6 +9,8 @@ Einstellungen (Umgebungsvariablen, alle optional):
   DW_ADRESSE     öffentliche Adresse des Spiels, z. B. https://example.org/digiwort/ – steht im geteilten Ergebnis;
                  Rückmeldungen und Besuchszähler laufen nur auf diesem Host (leer: auf jedem Webserver)
   DW_BETREIBER   Name im Rückmelde-Dialog („… liest jede Rückmeldung.“)
+  DW_HEIMAT      Webseite des Betreibers, z. B. https://example.org/ – Link unten auf der Seite und unter „Über Digiwort“
+  DW_QUELLCODE   Adresse des Quellcodes, z. B. https://github.com/<name>/<repo>/tree/main/digiwort – unter „Über Digiwort“
   artifact.html  nur der Seiteninhalt, ohne <head> (für die Vorschau im Claude-Chat)
 
 Aufruf: python3 tools/build.py
@@ -35,6 +37,13 @@ def liste(name: str, n: int) -> list[str]:
     return woerter
 
 
+# Manifest nicht für Samsung Internet: dessen „Installieren“ baut eine eigene App-Hülle (WebAPK) für eine alte
+# Android-Version, die Google Play Protect als „Unsichere App“ blockiert. Ohne Manifest legt Samsung Internet
+# eine normale Verknüpfung auf den Startbildschirm. Chrome und andere Browser bekommen das Manifest wie bisher.
+MANIFEST = ('<script>if(!/SamsungBrowser/i.test(navigator.userAgent)){var m=document.createElement("link");'
+            'm.rel="manifest";m.href="manifest.webmanifest";document.head.appendChild(m);}</script>')
+
+
 def main() -> None:
     version = (SRC / "VERSION").read_text().strip()
     core = (SRC / "game.html").read_text(encoding="utf-8")
@@ -46,6 +55,13 @@ def main() -> None:
     for zeichen in "<>&\"'`$\\":
         if zeichen in betreiber:
             sys.exit("DW_BETREIBER: bitte nur einen einfachen Namen")
+    links = {}
+    for k in ("DW_HEIMAT", "DW_QUELLCODE"):
+        v = os.environ.get(k, "").strip()
+        if v and not re.fullmatch(r"https://[A-Za-z0-9.\-]+(:\d+)?(/[A-Za-z0-9_.\-/]*)?", v):
+            sys.exit(f"{k} bitte als volle https-Adresse, z. B. https://example.org/")
+        links[k] = v
+    core = core.replace("__HEIMAT__", links["DW_HEIMAT"]).replace("__QUELLCODE__", links["DW_QUELLCODE"])
     core = core.replace("__ADRESSE__", adresse).replace("__LESER__", leser)
     for n in (5, 6):
         sol = liste(f"loesungen{n}.txt", n)
@@ -74,7 +90,7 @@ def main() -> None:
 <meta name="apple-mobile-web-app-title" content="Digiwort">
 <link rel="apple-touch-icon" href="data:image/png;base64,{i180}">
 <link rel="icon" type="image/png" href="data:image/png;base64,{i180}">
-{'' if fassung == "vorschau" else '<link rel="manifest" href="manifest.webmanifest">'}
+{'' if fassung == "vorschau" else MANIFEST}
 <style>:root{{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}}[hidden]{{display:none!important}}</style>
 """
         full = head + page[:cut] + "\n</head>\n<body>\n" + page[cut:] + "\n</body>\n</html>\n"

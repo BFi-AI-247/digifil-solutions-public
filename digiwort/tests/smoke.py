@@ -95,6 +95,10 @@ def main(datei: str, bilder: str | None) -> int:
         adresse = os.environ.get("DW_ADRESSE", "").strip()
         pruefe((t.rstrip().endswith(adresse) if adresse else "http" not in t) and not any(ch in t.split("\n\n")[1] for ch in "ABCDEFGHIJKLMNOPQRSTUVWXYZÄÖÜ"),
                "geteilter Text: nur Farbfelder" + (", Link zur Seite am Ende" if adresse else ", ohne Link (DW_ADRESSE leer)"))
+        print("Links")
+        heim, code = os.environ.get("DW_HEIMAT", "").strip(), os.environ.get("DW_QUELLCODE", "").strip()
+        pruefe(pg.evaluate("[...document.querySelectorAll('#visits a')].map(a=>a.href).join()") == heim, "Fußzeile: Link zur Webseite" if heim else "Fußzeile: kein Link (DW_HEIMAT leer)")
+        pruefe(pg.evaluate("$('ueberCode').hidden ? '' : $('codeLink').href") == code, "Über Digiwort: Link zum Quellcode" if code else "Über Digiwort: ohne Quellcode-Link (DW_QUELLCODE leer)")
         print("Statistik und Übertragung")
         pg.click("#bStats")
         pruefe(pg.is_visible("#dStats"), "Statistik öffnet")
@@ -131,6 +135,18 @@ def main(datei: str, bilder: str | None) -> int:
             pg.screenshot(path=str(out / "handy-dunkel.png"))
             pg.evaluate("document.documentElement.setAttribute('data-look','light')")
             pg.screenshot(path=str(out / "handy-hell.png"))
+
+        print("Statistik nur nach Rundenende")
+        pg.click("#mDaily"); pg.click("#l6"); pg.wait_for_timeout(200)
+        if pg.evaluate("game.status") == "play":
+            tippe(pg, pg.evaluate("game.sol"))
+            pg.wait_for_timeout(3600)
+            pruefe(pg.is_visible("#dStats"), "Statistik öffnet nach dem Lösen")
+            pg.keyboard.press("Escape"); pg.wait_for_timeout(200)
+        pg.click("#l5"); pg.wait_for_timeout(200); pg.click("#l6"); pg.wait_for_timeout(700)
+        pruefe(pg.evaluate("game.status") != "play" and not pg.is_visible("#dStats"), "Wechsel auf fertiges Rätsel öffnet keine Statistik")
+        pg.reload(); pg.wait_for_timeout(900)
+        pruefe(not pg.is_visible("#dStats"), "Start mit fertigem Rätsel öffnet keine Statistik")
 
         pruefe(not js, "keine JavaScript-Fehler" + (f": {js[:3]}" if js else ""))
         b.close()

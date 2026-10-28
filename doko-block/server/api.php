@@ -122,13 +122,17 @@ function pruefe_abend(array $in, array $spieler): array {
         foreach (array_slice($in['spiele'], 0, 40) as $i => $sp) {
             $z = ['nr' => $i + 1, 'werte' => []];
             foreach ($spieler as $s) $z['werte'][$s] = is_numeric($sp['werte'][$s] ?? null) ? (int)$sp['werte'][$s] : null;
-            $solo = text($sp['solo'] ?? '', 20); if (in_array($solo, $spieler, true)) $z['solo'] = $solo;
+            $solo = text($sp['solo'] ?? '', 20); if (in_array($solo, $spieler, true)) { $z['solo'] = $solo; $z['pflicht'] = !empty($sp['pflicht']); }
             $n = text($sp['notiz'] ?? '', 80); if ($n !== '') $z['notiz'] = $n;
+            if (is_numeric($sp['wert'] ?? null)) $z['wert'] = abs((int)$sp['wert']);
             $a['spiele'][] = $z;
         }
     }
     foreach (['sieger' => 20, 'notiz' => 500] as $k => $max) { $v = text($in[$k] ?? '', $max); if ($v !== '') $a[$k] = $v; }
     if (!empty($in['stechen'])) $a['stechen'] = true;
+    $so = is_array($in['sitzordnung'] ?? null) ? array_values($in['sitzordnung']) : [];
+    $test = $so; sort($test); $soll = $spieler; sort($soll);
+    if ($test === $soll) $a['sitzordnung'] = $so;
     $foto = text($in['foto'] ?? '', 40);
     if ($foto !== '' && preg_match('/^[a-f0-9]{24}$/', $foto) && is_file(privat() . "/fotos/$foto.jpg")) $a['foto'] = $foto;
     return $a;
@@ -188,10 +192,39 @@ function entwurf(array $k, array $spieler): array {
         $z = ['nr' => $i + 1, 'werte' => []];
         foreach ($spieler as $s) { $v = $sp['werte'][$s] ?? null; $z['werte'][$s] = is_numeric($v) ? (int)$v : null; }
         if (in_array($sp['solo'] ?? null, $spieler, true)) $z['solo'] = $sp['solo'];
+        if (is_numeric($sp['spielwert'] ?? null)) $z['wert'] = abs((int)$sp['spielwert']);
+        // „S“ in der Spalte Spiel kennzeichnet NUR Pflichtsoli
+        $z['pflicht'] = !empty($sp['pflichtsolo']) || (bool)preg_match('/(^|[\s\d\/])S\b/u', (string)($sp['notiz'] ?? ''));
         if (!empty($sp['notiz'])) $z['notiz'] = text($sp['notiz'], 80);
         $spiele[] = $z;
     }
     $hinweise = [];
+    // Punkte je Spiel: bei laufender Summe die Differenz zur Zeile davor
+    $vorher = array_fill_keys($spieler, 0);
+    foreach ($spiele as &$z) {
+        $delta = [];
+        foreach ($spieler as $s) {
+            $v = $z['werte'][$s];
+            $delta[$s] = $v === null ? null : ($format === 'laufend' ? $v - $vorher[$s] : $v);
+            if ($format === 'laufend' && $v !== null) $vorher[$s] = $v;
+        }
+        if (in_array(null, $delta, true)) continue;
+        if (array_sum($delta) !== 0) { $hinweise[] = "Spiel {$z['nr']}: die Punkte ergeben zusammen nicht 0."; continue; }
+        // Solo-Muster: einer +3x, die drei anderen je −x
+        $plus = array_keys(array_filter($delta, fn($v) => $v > 0));
+        $minus = array_values(array_filter($delta, fn($v) => $v < 0));
+        if (!empty($z['pflicht']) && !isset($z['solo']) && count($plus) !== 1) $hinweise[] = "Spiel {$z['nr']}: als Pflichtsolo (S) markiert, aber kein Solist erkennbar.";
+        if (!isset($z['solo']) && count($spieler) === 4 && count($plus) === 1 && count($minus) === 3 && count(array_unique($minus)) === 1 && $delta[$plus[0]] === -3 * $minus[0]) $z['solo'] = $plus[0];
+        // Spielwert aus der Spalte „Spiel“ gegenprüfen
+        if (isset($z['wert']) && $z['wert'] > 0) {
+            $gewinner = max($delta);
+            $erwartet = isset($z['solo']) ? 3 * $z['wert'] : $z['wert'];
+            if ($gewinner !== $erwartet && $gewinner !== $z['wert']) $hinweise[] = "Spiel {$z['nr']}: Spielwert {$z['wert']} passt nicht zu den Punkten – bitte prüfen.";
+        }
+    }
+    unset($z);
+    foreach ($spiele as &$z) { if (!isset($z['solo'])) unset($z['pflicht']); } // pflicht nur bei Soli
+    unset($z);
     // Endstand: vom Zettel, sonst errechnet
     $rechnung = [];
     foreach ($spieler as $s) {
@@ -203,11 +236,33 @@ function entwurf(array $k, array $spieler): array {
     foreach ($spieler as $s) if ($rechnung[$s] !== null && $end[$s] !== null && $rechnung[$s] !== $end[$s])
         $hinweise[] = "$s: Endstand auf dem Zettel {$end[$s]}, nachgerechnet {$rechnung[$s]}. Es zählt der Zettel.";
     if (count($spiele) !== DK_SPIELE) $hinweise[] = count($spiele) . ' Spiele erkannt (üblich sind ' . DK_SPIELE . ').';
-    if ($format === 'einzeln') foreach ($spiele as $z) {
-        $w = array_values($z['werte']);
-        if (!in_array(null, $w, true) && array_sum($w) !== 0) $hinweise[] = "Spiel {$z['nr']}: die vier Werte ergeben nicht 0.";
-    }
     foreach (($k['unsicher'] ?? []) as $u) $hinweise[] = 'Unsicher: ' . text($u, 160);
+    // Sitzordnung = Spaltenreihenfolge auf dem Zettel; daraus Geber und Pflicht-/Lustsolo ableiten
+    $so = array_values(array_filter(is_array($k['sitzordnung'] ?? null) ? $k['sitzordnung'] : [], fn($n) => in_array($n, $spieler, true)));
+    if (count(array_unique($so)) !== count($spieler)) {
+        $so = [];
+        foreach ((is_array($k['spalten'] ?? null) ? $k['spalten'] : []) as $b) { $n = $k['zuordnung'][$b] ?? null; if (in_array($n, $spieler, true) && !in_array($n, $so, true)) $so[] = $n; }
+        if (count($so) !== count($spieler)) $so = [];
+    }
+    if ($so) {
+        $normal = 0; $pflicht = [];
+        foreach ($spiele as &$z) {
+            $s = $z['solo'] ?? null;
+            if ($s !== null && !empty($z['pflicht'])) {
+                if (in_array($s, $pflicht, true)) { // je Spieler genau ein Pflichtsolo pro Abend
+                    $z['pflicht'] = false; $normal++;
+                    $hinweise[] = "Spiel {$z['nr']}: $s hatte schon ein Pflichtsolo – dieses Solo zählt als Lustsolo.";
+                } else $pflicht[] = $s;
+            } else $normal++;
+        }
+        unset($z);
+        $pflicht = array_values(array_unique($pflicht));
+        $n = count($spieler);
+        if (count($spiele) === DK_SPIELE && ($normal !== DK_SPIELE - $n || count($pflicht) !== $n))
+            $hinweise[] = "Ablauf: $normal normale Spiele und " . count($pflicht) . " Pflichtsoli erkannt (erwartet " . (DK_SPIELE - $n) . " und $n) – bitte die Soli prüfen.";
+        $ohne = array_diff($spieler, $pflicht);
+        if (count($spiele) === DK_SPIELE && $ohne) $hinweise[] = 'Ohne Pflichtsolo: ' . implode(', ', $ohne) . '.';
+    }
     // Plätze: vom Zettel, sonst nach Endstand (höchster = 1), bei Gleichstand oben zählt der vermerkte Sieger
     $sieger = in_array($k['sieger'] ?? null, $spieler, true) ? $k['sieger'] : null;
     $pl = [];
@@ -226,7 +281,7 @@ function entwurf(array $k, array $spieler): array {
     }
     if ($sieger !== null && $pl[$sieger] !== 1) $hinweise[] = "Auf dem Zettel ist $sieger als Sieger vermerkt – bitte die Plätze prüfen.";
     return ['datum' => $k['datum'] ?? null, 'format' => $format, 'spiele' => $spiele, 'endstand' => $end, 'plaetze' => $pl,
-        'sieger' => $sieger, 'stechen' => !empty($k['stechen']), 'notiz' => text($k['notiz'] ?? '', 500), 'hinweise' => $hinweise];
+        'sieger' => $sieger, 'stechen' => !empty($k['stechen']), 'sitzordnung' => $so ?: null, 'notiz' => text($k['notiz'] ?? '', 500), 'hinweise' => $hinweise];
 }
 
 function zettel_anweisung(array $spieler): string {
@@ -237,11 +292,20 @@ function zettel_anweisung(array $spieler): string {
     return <<<T
 Du liest einen handgeschriebenen Doppelkopf-Block ab. Die Runde: $n (Spalten oft nur mit Anfangsbuchstaben beschriftet, Reihenfolge kann abweichen).
 Ein Abend hat normalerweise $spiele Spiele (bei 20: 16 normale und 4 Pflichtsoli). Am Ende ist ein Sieger vermerkt; bei Gleichstand wurde gestochen.
+Hinweise zum Zettel: Das Foto ist oft gedreht (Zettel quer fotografiert) – lies in Schreibrichtung. Geschrieben wird gern auf die Rückseite
+einer Werbe- oder Visitenkarte mit Kästchenraster; Aufdrucke, Logos und Werbung ignorieren. Oben steht meist das Datum, darunter die Spielerspalten.
+Meist wird die LAUFENDE SUMME je Spieler notiert (format "laufend"): jede Zeile ist der Stand nach dem Spiel, nicht die Punkte des Spiels.
+Rechts steht eine Spalte „Spiel“ mit dem Spielwert – das ist KEIN Spieler: eine Zahl wie „1“ oder „2“ bei normalen Spielen,
+„3/-1 S“ bei einem PFLICHTSOLO (Solist +3, die anderen je −1). Das „S“ steht NUR bei Pflichtsoli: dann "pflichtsolo": true.
+Ein Solo ohne „S“ (gleiches Punktemuster, z. B. „3/-1“) ist ein Lustsolo: "solo" = Solist, "pflichtsolo": false.
+Gib den Spielwert als Zahl in "spielwert" an (bei „3/-1 S“ die 1) und den Text der Spalte zusätzlich als "notiz". Durchgestrichene Zeilen sind ungültig und werden komplett weggelassen.
+Vorzeichen (+/−) genau übernehmen; ein Wert ohne Vorzeichen ist positiv, „0“ ist null Punkte.
 Wichtig: Der Zettel gilt als richtig. Lies genau ab, was dort steht – nichts korrigieren, nichts erfinden. Unleserliches als null und in "unsicher" nennen.
 Antworte NUR mit JSON in genau dieser Form:
-{"datum":"JJJJ-MM-TT oder null","spalten":["Beschriftung wie auf dem Zettel"],"zuordnung":{"Beschriftung":"Name"},
+{"datum":"JJJJ-MM-TT oder null","spalten":["Beschriftung wie auf dem Zettel, von links nach rechts"],"zuordnung":{"Beschriftung":"Name"},
+"sitzordnung":["Name der linken Spieler-Spalte", "…", "Name der rechten Spieler-Spalte"],
 "format":"einzeln (Punkte pro Spiel) oder laufend (laufende Summe)",
-"spiele":[{"werte":$null,"solo":"Name oder null","notiz":"z. B. Bock, Hochzeit, sonst leer"}],
+"spiele":[{"werte":$null,"spielwert":1,"solo":"Name des Solisten oder null","pflichtsolo":false,"notiz":"Text der Spalte Spiel, z. B. 3/-1 S"}],
 "endstand":$null,"sieger":"Name oder null","stechen":false,
 "plaetze":$platz – nur wenn auf dem Zettel Plätze stehen, sonst weglassen,
 "unsicher":["was schwer lesbar war"],"notiz":"sonstige Vermerke auf dem Zettel"}
@@ -378,8 +442,27 @@ case 'ki':
     [$t, $modell] = ki(($in['anbieter'] ?? '') === 'mistral' ? 'mistral' : 'claude', $system, ($verlauf ? "Bisheriges Gespräch:\n$verlauf\n" : '') . "Neue Nachricht von {$ICH}: $frage", null, 3000);
     $j = json_aus($t) ?? ['antwort' => trim($t), 'vorschlaege' => []];
     $v = array_values(array_filter(is_array($j['vorschlaege'] ?? null) ? $j['vorschlaege'] : [], fn($x) => in_array($x['typ'] ?? '', ['abend_aendern', 'abend_loeschen', 'termin_neu', 'termin_loeschen', 'feedback'], true)));
+    // Prüfen statt glauben: Vorschläge nur zu Abenden und Terminen, die es gibt, und nur mit gültigem Datum
+    $ids = array_map(fn($a) => $a['id'] ?? '', array_filter($d['abende'], fn($a) => empty($a['geloescht'])));
+    $termin_daten = array_map(fn($x) => $x['datum'], $d['termine']);
+    $verworfen = 0;
+    $v = array_values(array_filter($v, function ($x) use ($ids, $termin_daten, &$verworfen) {
+        $ok = match ($x['typ']) {
+            'abend_aendern', 'abend_loeschen' => in_array((string)($x['id'] ?? ''), $ids, true)
+                && (!isset($x['felder']['datum']) || preg_match('/^\d{4}-\d{2}-\d{2}$/', (string)$x['felder']['datum'])),
+            'termin_neu' => (bool)preg_match('/^\d{4}-\d{2}-\d{2}$/', (string)($x['datum'] ?? '')),
+            'termin_loeschen' => in_array((string)($x['datum'] ?? ''), $termin_daten, true),
+            default => true,
+        };
+        if (!$ok) $verworfen++;
+        return $ok;
+    }));
     $antw = text($j['antwort'] ?? '', 3000);
-    protokoll('ki', $frage, ['antwort' => $antw, 'vorschlaege' => count($v), 'modell' => $modell]);
+    // Die KI schlägt nur vor; ausgeführt wird erst nach Bestätigung. Behauptet sie trotzdem eine Ausführung, sagen wir es dazu.
+    $behauptet = '/\b(ich\s+habe\s+(?:\S+\s+){0,4}(gespeichert|geändert|gelöscht|eingetragen|entfernt)|(ist|wurde|wurden|sind)\s+(jetzt\s+|nun\s+)?(gespeichert|geändert|gelöscht|eingetragen|entfernt))\b/iu';
+    if (preg_match($behauptet, $antw)) $antw .= $v ? "\n\n(Noch ist nichts geändert – das passiert erst, wenn du den Vorschlag unten bestätigst.)" : "\n\n(Geändert wurde nichts.)";
+    if ($verworfen) $antw .= "\n\n(" . ($verworfen === 1 ? 'Ein Vorschlag passte nicht zu den gespeicherten Abenden oder Terminen und wurde' : "$verworfen Vorschläge passten nicht zu den gespeicherten Abenden oder Terminen und wurden") . ' weggelassen.)';
+    protokoll('ki', $frage, ['antwort' => $antw, 'vorschlaege' => count($v), 'verworfen' => $verworfen, 'modell' => $modell]);
     antwort(200, ['antwort' => $antw, 'vorschlaege' => $v, 'modell' => $modell]);
 
 case 'feedback':

@@ -1,0 +1,20 @@
+{
+  "id": "noch-geheim",
+  "status": "entwurf",
+  "datum": "2026-01-01T10:00:00+01:00",
+  "titel": "Noch geheim",
+  "text": "Entwurf.",
+  "serie": null,
+  "stichwoerter": [],
+  "en": {
+    "titel": "",
+    "text": "",
+    "geprueft": false,
+    "stand": ""
+  },
+  "herkunft": {
+    "quelle": "blogspot",
+    "url": "https://example.org/alt/noch-geheim.html",
+    "titel": "Noch geheim"
+  }
+}

@@ -1,0 +1,23 @@
+{
+  "id": "tomaten-im-oktober",
+  "status": "veroeffentlicht",
+  "datum": "2024-12-01T10:00:00+01:00",
+  "titel": "Tomaten im Oktober",
+  "text": "Die letzten **Tomaten** hängen noch.\n\n![Ein Testbild](bilder/import/testbild.png)\n\nMehr dazu [hier](https://example.org/).",
+  "serie": "gedanken-zum-garten",
+  "stichwoerter": [
+    "Garten",
+    "Herbst"
+  ],
+  "en": {
+    "titel": "Tomatoes in October",
+    "text": "The last **tomatoes** are still hanging.",
+    "geprueft": true,
+    "stand": ""
+  },
+  "herkunft": {
+    "quelle": "blogspot",
+    "url": "https://example.org/alt/tomaten-im-oktober.html",
+    "titel": "Tomaten im Oktober"
+  }
+}

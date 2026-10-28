@@ -1,0 +1,20 @@
+{
+  "id": "schnecken",
+  "status": "veroeffentlicht",
+  "datum": "2025-01-02T10:00:00+01:00",
+  "titel": "Schnecken",
+  "text": "> Geduld ist alles.\n\nDie Schnecken sehen das anders.",
+  "serie": "gedanken-zum-garten",
+  "stichwoerter": [],
+  "en": {
+    "titel": "",
+    "text": "",
+    "geprueft": false,
+    "stand": ""
+  },
+  "herkunft": {
+    "quelle": "blogspot",
+    "url": "https://example.org/alt/schnecken.html",
+    "titel": "Schnecken"
+  }
+}

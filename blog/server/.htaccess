@@ -1,0 +1,26 @@
+# Blog – alle Lese-Adressen laufen über index.php; echte Dateien (CSS, JS, Bilder, api.php, editor/) direkt
+DirectoryIndex index.php index.html
+Options -Indexes
+<FilesMatch "^(ort|lib)\.php$">
+  Require all denied
+</FilesMatch>
+RewriteEngine On
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^ index.php [L,QSA]
+AddType application/atom+xml .xml
+<IfModule mod_headers.c>
+  Header set X-Content-Type-Options "nosniff"
+  Header set Referrer-Policy "strict-origin-when-cross-origin"
+  <FilesMatch "\.(css|js)$">
+    Header set Cache-Control "no-cache"
+  </FilesMatch>
+  <FilesMatch "\.(jpe?g|png|webp|gif)$">
+    Header set Cache-Control "max-age=2592000"
+  </FilesMatch>
+</IfModule>
+<IfModule mod_php.c>
+  php_value upload_max_filesize 10M
+  php_value post_max_size 12M
+  php_value max_execution_time 180
+</IfModule>

@@ -1,0 +1,21 @@
+{
+  "serien": [
+    {
+      "id": "gedanken-zum-garten",
+      "titel": "Gedanken zum Garten",
+      "einleitung": "Kleine Beobachtungen aus dem Gemüsebeet.\n\nIn loser Folge.",
+      "en": {
+        "titel": "Thoughts on the Garden",
+        "einleitung": "Small observations from the vegetable patch.",
+        "geprueft": true,
+        "stand": ""
+      }
+    },
+    {
+      "id": "leere-serie",
+      "titel": "Leere Serie",
+      "einleitung": "",
+      "en": {}
+    }
+  ]
+}

@@ -50,9 +50,25 @@ const DK = (() => {
     el.textContent = Object.entries(f || {}).filter(([, c]) => /^#[0-9a-f]{6}$/i.test(c))
       .map(([n, c]) => `.chip[data-p="${n.replace(/"/g, '')}"],[data-farbe="${n.replace(/"/g, '')}"]{background:${c}!important;color:${hell(c) ? '#1d1a10' : '#fff'}!important}`).join('\n');
   }
+  // Geber und Solo-Art je Spiel: erster Geber = linke Spalte, danach reihum.
+  // Beim Pflichtsolo (auf dem Zettel mit „S“) gibt derselbe Geber noch einmal, beim Lustsolo (ohne „S“) nicht.
+  function ablauf(a) {
+    const so = a.sitzordnung; if (!so || !so.length || !(a.spiele || []).length) return null;
+    // Neuere Abende tragen das Kennzeichen vom Zettel („S“ = Pflichtsolo); sonst gilt das erste Solo eines Spielers als Pflicht.
+    const mitKennzeichen = a.spiele.some(sp => sp.solo && typeof sp.pflicht === 'boolean');
+    let g = 0; const gehabt = new Set();
+    return a.spiele.map(sp => {
+      const r = { geber: so[g % so.length], art: null };
+      // je Spieler und Abend genau ein Pflichtsolo: ein weiteres (auch mit „S“) zählt als Lustsolo
+      const pflicht = sp.solo && !gehabt.has(sp.solo) && (mitKennzeichen ? sp.pflicht === true : true);
+      if (pflicht) { r.art = 'pflicht'; gehabt.add(sp.solo); }
+      else { if (sp.solo) r.art = 'lust'; g++; }
+      return r;
+    });
+  }
   function abmelden() { schluessel = ''; try { localStorage.removeItem('doko-k'); } catch (e) {} }
   function sperre(text) {
     document.querySelector('main').innerHTML = `<div class="karte sperre"><h2>Kein Zugang</h2><p class="leise">${esc(text)}</p></div>`;
   }
-  return { api, fotoUrl, esc, datum, wochentag, zeit, euro, zahl, heute, toast, chips, farben, hell, sperre, abmelden, wechsel, hatSchluessel: () => !!schluessel };
+  return { api, fotoUrl, esc, datum, wochentag, zeit, euro, zahl, heute, toast, chips, farben, hell, sperre, abmelden, ablauf, wechsel, hatSchluessel: () => !!schluessel };
 })();

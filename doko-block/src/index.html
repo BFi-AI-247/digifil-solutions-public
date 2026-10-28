@@ -18,6 +18,8 @@ nav.unten button[aria-current=true]{color:var(--filz)}
 .muster{display:grid;grid-template-columns:repeat(6,1fr);gap:10px;margin:12px 0}
 .muster button{aspect-ratio:1;min-height:0;padding:0;border-radius:50%;border:3px solid transparent}
 .muster button[aria-pressed=true]{border-color:var(--tinte)}
+.seit{display:inline-flex;align-items:center;gap:6px;margin:0;font-size:1rem;color:var(--tinte);cursor:pointer;min-height:44px}
+.seit input{width:22px;height:22px;min-height:0;margin:0;accent-color:var(--filz)}
 .seite{display:none}.seite.an{display:block}
 .termin{display:flex;gap:12px;align-items:center}
 .termin .tag{background:var(--filz-hell);color:var(--filz);border-radius:12px;padding:6px 10px;text-align:center;font-weight:700;line-height:1.1;min-width:58px}
@@ -35,7 +37,7 @@ nav.unten button[aria-current=true]{color:var(--filz)}
 .platz-gitter select{text-align:center;padding:8px 4px}
 .platz-gitter input{text-align:center;padding:8px 4px}
 .spiele input{min-height:34px;padding:4px;text-align:center;width:58px;border-radius:7px}
-.spiele select{min-height:34px;padding:4px;width:76px;border-radius:7px;font-size:.85rem}
+.spiele select{min-height:34px;padding:4px;width:92px;border-radius:7px;font-size:.85rem}
 .spiele td{padding:3px 3px}
 .abend{display:flex;gap:10px;align-items:center;padding:11px 2px;border-bottom:1px solid var(--linie);cursor:pointer}
 .abend:last-child{border-bottom:0}
@@ -58,6 +60,8 @@ nav.unten button[aria-current=true]{color:var(--filz)}
 .jahr-kopf h3{margin:0}
 .balken{height:8px;border-radius:4px;background:var(--linie);overflow:hidden;display:flex}
 .balken i{display:block;height:100%}
+.platzzahl{text-align:center;padding-left:2px;padding-right:2px}
+.platzzahl span{display:inline-block;min-width:30px;padding:3px 4px;border-radius:7px;font-weight:700;font-variant-numeric:tabular-nums;font-size:.88rem}
 .verteilung{display:flex;gap:2px;height:8px;border-radius:4px;overflow:hidden;min-width:64px}
 .verteilung i{display:block}
 .chat{display:flex;flex-direction:column;gap:10px;margin-bottom:12px}
@@ -90,6 +94,7 @@ nav.unten button[aria-current=true]{color:var(--filz)}
       <span class="leise">Antippen zum Fotografieren oder ein Bild auswählen</span>
     </label>
     <img id="foto-vorschau" class="vorschau verdeckt" alt="Ausgewähltes Foto">
+    <div class="zeile verdeckt" id="foto-dreh" style="justify-content:center;margin-top:8px"><button type="button" class="zweit klein" id="drehen">↻ Foto drehen</button><span class="leise" style="font-size:.82rem">Schrift sollte waagerecht stehen</span></div>
     <div class="zeile" style="margin-top:12px">
       <span class="leise">Auslesen mit</span>
       <div class="wahl" id="anbieter-wahl">
@@ -119,7 +124,7 @@ nav.unten button[aria-current=true]{color:var(--filz)}
 
 <section class="seite" id="s-statistik">
   <div class="karte">
-    <div class="zeile"><h2 class="dehnen" style="margin:0">Statistik</h2><select id="stat-jahr" style="width:auto"></select></div>
+    <div class="zeile"><h2 class="dehnen" style="margin:0">Statistik</h2><label class="seit verdeckt" id="stat-seit-l"><input type="checkbox" id="stat-seit"> seit</label><select id="stat-jahr" style="width:auto" aria-label="Jahr"></select></div>
     <div id="stat" style="margin-top:10px"></div>
   </div>
   <div class="karte"><h3>Jahr für Jahr</h3><div id="jahre" class="rollen"></div></div>
@@ -241,8 +246,17 @@ $('#foto').onchange = async e => {
     const v = $('#foto-vorschau'); v.src = URL.createObjectURL(fotoBlob); v.classList.remove('verdeckt');
     v.onclick = () => dialog(`<img class="gross-foto" src="${v.src}" alt="Foto"><div class="zeile" style="margin-top:10px"><button class="dehnen zweit" data-zu>Schließen</button></div>`);
     $('#foto-wahl strong').textContent = '📷 Anderes Foto wählen';
+    $('#foto-dreh').classList.remove('verdeckt');
     $('#auslesen').disabled = false;
   } catch (err) { $('#auslese-status').innerHTML = `<div class="fehler">${esc(err.message)}</div>`; }
+};
+$('#drehen').onclick = async () => {
+  if (!fotoBlob) return;
+  const bild = await createImageBitmap(fotoBlob);
+  const c = document.createElement('canvas'); c.width = bild.height; c.height = bild.width;
+  const g = c.getContext('2d'); g.translate(c.width, 0); g.rotate(Math.PI / 2); g.drawImage(bild, 0, 0);
+  fotoBlob = await new Promise(ok => c.toBlob(ok, 'image/jpeg', 0.88));
+  $('#foto-vorschau').src = URL.createObjectURL(fotoBlob);
 };
 $('#auslesen').onclick = async () => {
   if (!fotoBlob) return;
@@ -275,6 +289,8 @@ function zeigeEntwurf(e) {
     ${(e.hinweise || []).map(h => `<div class="hinweis">${esc(h)}</div>`).join('')}
     <div class="gitter2"><div><label>Datum</label><input type="date" id="e-datum" value="${d}"></div>
       <div><label>Ort / Bemerkung</label><input id="e-ort" value="${esc(ort)}" placeholder="z. B. bei Anna"></div></div>
+    ${e.hand ? '' : `<label>Sitzordnung (wie auf dem Zettel, links = erster Geber)</label>
+    <div class="platz-gitter">${S.map((_, i) => `<div><select data-sitz="${i}">${S.map(s => `<option ${(e.sitzordnung || S)[i] === s ? 'selected' : ''}>${esc(s)}</option>`).join('')}</select></div>`).join('')}</div>`}
     <label>Plätze</label>
     <div class="platz-gitter">${S.map(s => `<div><b>${esc(s)}</b>${auswahl(s)}</div>`).join('')}</div>
     ${e.hand ? '' : `<label>Endstand laut Zettel</label>
@@ -283,7 +299,7 @@ function zeigeEntwurf(e) {
     ${spiele.length ? `<details style="margin-top:12px"><summary><b>${spiele.length} Spiele</b> <span class="leise">(${e.format === 'laufend' ? 'laufende Summe' : 'Punkte je Spiel'}) – antippen zum Prüfen</span></summary>
       <div class="rollen" style="margin-top:8px"><table class="spiele"><thead><tr><th>#</th>${S.map(s => `<th>${esc(s.slice(0, 3))}</th>`).join('')}<th>Solo</th></tr></thead><tbody>
       ${spiele.map((z, i) => `<tr><td class="leise">${i + 1}</td>${S.map(s => `<td><input inputmode="numeric" data-sp="${i}" data-s="${esc(s)}" value="${z.werte[s] ?? ''}"></td>`).join('')}
-        <td><select data-solo="${i}"><option value="">–</option>${S.map(s => `<option ${z.solo === s ? 'selected' : ''}>${esc(s)}</option>`).join('')}</select></td></tr>`).join('')}
+        <td><select data-solo="${i}"><option value="">–</option>${S.map(s => `<option value="${esc(s)}|p" ${z.solo === s && z.pflicht ? 'selected' : ''}>${esc(s)} S</option><option value="${esc(s)}|l" ${z.solo === s && !z.pflicht ? 'selected' : ''}>${esc(s)} Lust</option>`).join('')}</select></td></tr>`).join('')}
       </tbody></table></div></details>` : ''}
     <label>Notiz</label><input id="e-notiz" value="${esc(e.notiz || '')}" placeholder="optional">
     <div class="zeile" style="margin-top:14px"><button class="zweit" id="e-weg">Verwerfen</button><button class="dehnen" id="e-ok">Abend speichern</button></div>
@@ -311,9 +327,12 @@ async function speichern() {
     abend.endstand = {}; S.forEach(s => { const v = document.querySelector(`[data-end="${s}"]`).value.trim(); abend.endstand[s] = v === '' ? null : +v; });
     abend.format = e.format; abend.foto = e.foto; abend.anbieter = e.anbieter; abend.modell = e.modell;
     abend.sieger = e.sieger; abend.stechen = e.stechen;
+    abend.sitzordnung = [...document.querySelectorAll('[data-sitz]')].map(el => el.value);
+    if (new Set(abend.sitzordnung).size !== S.length) { toast('Sitzordnung: jeder Name genau einmal'); return; }
     abend.spiele = (e.spiele || []).map((z, i) => {
       const w = {}; S.forEach(s => { const v = document.querySelector(`[data-sp="${i}"][data-s="${s}"]`).value.trim(); w[s] = v === '' ? null : +v; });
-      return { werte: w, solo: document.querySelector(`[data-solo="${i}"]`).value || null, notiz: z.notiz };
+      const [solo, art] = (document.querySelector(`[data-solo="${i}"]`).value || '|').split('|');
+      return { werte: w, solo: solo || null, pflicht: art === 'p', notiz: z.notiz, wert: z.wert };
     });
   }
   if (aktiv().some(a => a.datum === abend.datum) && !confirm('Für den ' + datum(abend.datum) + ' gibt es schon einen Abend. Trotzdem einen weiteren speichern?')) return;
@@ -322,7 +341,7 @@ async function speichern() {
     await api('speichern', { abend });
     toast('Abend gespeichert 🎉');
     $('#entwurf').innerHTML = ''; ENTWURF = null; fotoBlob = null;
-    $('#foto').value = ''; $('#foto-vorschau').classList.add('verdeckt'); $('#auslesen').disabled = true;
+    $('#foto').value = ''; $('#foto-vorschau').classList.add('verdeckt'); $('#foto-dreh').classList.add('verdeckt'); $('#auslesen').disabled = true;
     $('#foto-wahl strong').textContent = '📷 Foto vom Block';
     await laden(); zeige('abende');
   } catch (err) { toast(err.message); b.disabled = false; }
@@ -356,8 +375,8 @@ function zeigeAbend(id) {
       <span class="leise">${a.endstand && a.endstand[s] != null ? a.endstand[s] + ' Pkt · ' : ''}${euro(a.plaetze[s] * D.euro_pro_platz)}</span></div>`).join('')}
     ${a.stechen ? '<p class="leise">Mit Stechen entschieden.</p>' : ''}
     ${a.notiz ? `<p>${esc(a.notiz)}</p>` : ''}
-    ${sp.length ? `<details style="margin-top:10px"><summary><b>${sp.length} Spiele</b></summary><div class="rollen"><table><thead><tr><th>#</th>${S.map(s => `<th class="z">${esc(s.slice(0, 3))}</th>`).join('')}<th></th></tr></thead><tbody>
-      ${sp.map(z => `<tr><td class="leise">${z.nr}</td>${S.map(s => `<td class="z">${z.werte[s] ?? '–'}</td>`).join('')}<td class="leise">${z.solo ? 'Solo ' + esc(z.solo) : ''} ${esc(z.notiz || '')}</td></tr>`).join('')}</tbody></table></div></details>` : ''}
+    ${sp.length ? (() => { const ab = DK.ablauf(a), SO = a.sitzordnung || S; return `<details style="margin-top:10px"><summary><b>${sp.length} Spiele</b>${a.sitzordnung ? ` <span class="leise">· Sitzordnung ${SO.map(esc).join(' → ')}</span>` : ''}</summary><div class="rollen"><table><thead><tr><th>#</th>${ab ? '<th>Geber</th>' : ''}${SO.map(s => `<th class="z">${esc(s.slice(0, 3))}</th>`).join('')}<th></th></tr></thead><tbody>
+      ${sp.map((z, i) => `<tr><td class="leise">${z.nr}</td>${ab ? `<td class="leise">${esc(ab[i].geber.slice(0, 3))}</td>` : ''}${SO.map(s => `<td class="z">${z.werte[s] ?? '–'}</td>`).join('')}<td class="leise">${z.solo ? (ab && ab[i].art === 'pflicht' ? 'Pflichtsolo ' : ab && ab[i].art === 'lust' ? 'Lustsolo ' : 'Solo ') + esc(z.solo) : ''} ${esc(z.notiz || '')}</td></tr>`).join('')}</tbody></table></div></details>`; })() : ''}
     <div id="d-foto"></div>
     <p class="leise" style="font-size:.8rem;margin-top:12px">${a.quelle === 'excel' ? 'Aus der alten Excel-Liste übernommen.' : `Erfasst von ${esc(a.erfasst?.von)} am ${DK.zeit(a.erfasst?.am)}${a.modell ? ' · ausgelesen mit ' + esc(a.modell) : ''}.`}
       ${a.geaendert ? ` Zuletzt geändert von ${esc(a.geaendert.von)} am ${DK.zeit(a.geaendert.am)}.` : ''}</p>
@@ -397,13 +416,15 @@ function zeigeStatistik() {
   const sel = $('#stat-jahr'), alt = sel.value || 'alle';
   sel.innerHTML = `<option value="alle">Seit 2015</option>` + jahre.map(j => `<option>${j}</option>`).join('');
   sel.value = [...sel.options].some(o => o.value === alt) ? alt : 'alle';
-  const auswahl = sel.value === 'alle' ? aktiv() : aktiv().filter(a => a.datum.startsWith(sel.value));
+  const seit = statArt() === 'seit';
+  $('#stat-seit-l').classList.toggle('verdeckt', sel.value === 'alle');
+  const auswahl = sel.value === 'alle' ? aktiv() : aktiv().filter(a => seit ? a.datum.slice(0, 4) >= sel.value : a.datum.startsWith(sel.value));
   const r = auswerten(auswahl), S = D.spieler;
   const farben = ['var(--p1)', 'var(--p2)', 'var(--p3)', 'var(--p4)'];
-  $('#stat').innerHTML = `<p class="leise" style="margin:0 0 8px">${auswahl.length} Abende · ${euro(auswahl.length * 10 * D.euro_pro_platz)} in die Kasse</p>
-    <div class="rollen"><table><thead><tr><th>Spieler</th><th class="z">Ø Platz</th><th class="z">Siege</th><th>Plätze</th><th class="z">Kasse</th></tr></thead><tbody>
-    ${S.map((s, i) => `<tr><td><b>${esc(s)}</b></td><td class="z">${zahl(r[s].schnitt)}</td><td class="z">${r[s].verteilung[0]}</td>
-      <td><div class="verteilung" title="${r[s].verteilung.join(' / ')}">${r[s].verteilung.map((v, k) => `<i style="flex:${v};background:${farben[k]}"></i>`).join('')}</div><span class="leise" style="font-size:.75rem">${r[s].verteilung.join(' · ')}</span></td>
+  $('#stat').innerHTML = `<p class="leise" style="margin:0 0 8px">${sel.value === 'alle' ? '' : (seit ? 'Seit ' + sel.value + ': ' : sel.value + ': ')}${auswahl.length} Abende · ${euro(auswahl.length * 10 * D.euro_pro_platz)} in die Kasse</p>
+    <div class="rollen"><table><thead><tr><th>Spieler</th><th class="z">Ø Platz</th>${[1, 2, 3, 4].map(p => `<th class="platzzahl">${p}.</th>`).join('')}<th class="z">Kasse</th></tr></thead><tbody>
+    ${S.map(s => `<tr><td><b>${esc(s)}</b></td><td class="z">${zahl(r[s].schnitt)}</td>
+      ${r[s].verteilung.map((v, k) => `<td class="platzzahl"><span class="pl${k + 1}">${v}</span></td>`).join('')}
       <td class="z">${euro(r[s].euro)}</td></tr>`).join('')}</tbody></table></div>`;
   // Jahr für Jahr
   const alle = [...new Set(aktiv().map(a => a.datum.slice(0, 4)))].sort().reverse();
@@ -415,22 +436,26 @@ function zeigeStatistik() {
   const mitSpielen = auswahl.filter(a => (a.spiele || []).length);
   const det = $('#stat-details');
   if (!mitSpielen.length) { det.innerHTML = '<h3>Details aus den Zetteln</h3><p class="leise" style="margin:0">Sobald Abende per Foto erfasst sind, erscheinen hier Punkte und Soli.</p>'; return; }
-  const z = {}; D.spieler.forEach(s => z[s] = { punkte: 0, soli: 0, soliGewonnen: 0, spiele: 0, plus: 0 });
+  const z = {}; D.spieler.forEach(s => z[s] = { punkte: 0, pflicht: 0, pflichtGew: 0, lust: 0, lustGew: 0, spiele: 0, plus: 0 });
   mitSpielen.forEach(a => {
     let vorher = {}; D.spieler.forEach(s => vorher[s] = 0);
-    a.spiele.forEach(sp => D.spieler.forEach(s => {
+    const ab = DK.ablauf(a);
+    a.spiele.forEach((sp, i) => D.spieler.forEach(s => {
       const w = sp.werte[s]; if (w == null) return;
       const wert = a.format === 'laufend' ? w - vorher[s] : w; vorher[s] = a.format === 'laufend' ? w : vorher[s];
       z[s].spiele++; if (wert > 0) z[s].plus++;
-      if (sp.solo === s) { z[s].soli++; if (wert > 0) z[s].soliGewonnen++; }
+      if (sp.solo === s) { const lust = ab ? ab[i].art === 'lust' : false; z[s][lust ? 'lust' : 'pflicht']++; if (wert > 0) z[s][lust ? 'lustGew' : 'pflichtGew']++; }
     }));
     D.spieler.forEach(s => { if (a.endstand && a.endstand[s] != null) z[s].punkte += a.endstand[s]; });
   });
-  det.innerHTML = `<h3>Details aus den Zetteln</h3><p class="leise" style="margin:0 0 8px">${mitSpielen.length === 1 ? 'Ein Abend' : mitSpielen.length + ' Abende'} mit einzelnen Spielen</p>
-    <div class="rollen"><table><thead><tr><th>Spieler</th><th class="z">Punkte</th><th class="z">Spiele im Plus</th><th class="z">Soli (gewonnen)</th></tr></thead><tbody>
-    ${D.spieler.map(s => `<tr><td><b>${esc(s)}</b></td><td class="z">${z[s].punkte}</td><td class="z">${z[s].spiele ? Math.round(100 * z[s].plus / z[s].spiele) : 0} %</td><td class="z">${z[s].soli} (${z[s].soliGewonnen})</td></tr>`).join('')}</tbody></table></div>`;
+  det.innerHTML = `<h3>Details aus den Zetteln · ${mitSpielen.length === 1 ? '1 Abend' : mitSpielen.length + ' Abende'}</h3><p class="leise" style="margin:0 0 8px">Pflicht- und Lustsolo: gewonnen / gespielt</p>
+    <div class="rollen"><table><thead><tr><th>Spieler</th><th class="z">Pkt</th><th class="z">Im Plus</th><th class="z">Pflicht&shy;solo</th><th class="z">Lust&shy;solo</th></tr></thead><tbody>
+    ${D.spieler.map(s => `<tr><td><b>${esc(s)}</b></td><td class="z">${z[s].punkte}</td><td class="z">${z[s].spiele ? Math.round(100 * z[s].plus / z[s].spiele) : 0} %</td><td class="z">${z[s].pflichtGew} / ${z[s].pflicht}</td><td class="z">${z[s].lustGew} / ${z[s].lust}</td></tr>`).join('')}</tbody></table></div>`;
 }
 $('#stat-jahr').onchange = zeigeStatistik;
+const statArt = () => $('#stat-seit').checked ? 'seit' : 'nur';
+$('#stat-seit').checked = merke('doko-stat-art') === 'seit';
+$('#stat-seit').onchange = () => { merke('doko-stat-art', statArt()); zeigeStatistik(); };
 
 // ---------- KI ----------
 function zeigeChat() {

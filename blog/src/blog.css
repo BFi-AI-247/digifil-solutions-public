@@ -1,0 +1,154 @@
+/* Blog – Lese-Seiten. Gestaltungen über <html data-stil="a|b|c">, hell/dunkel nach Geräteeinstellung.
+   Nur Systemschriften, keine Fremdserver. Handy zuerst (360–430 px), ab 720 px mehr Luft. */
+
+/* ---------- A · Kaffeehaus: warm, Papier und Espresso, Serifen im Text ---------- */
+:root, [data-stil="a"] {
+  --bg: #f6efe4; --flaeche: #fffaf2; --text: #2a211b; --leise: #75665a; --linie: #e2d5c3;
+  --akzent: #a4582a; --akzent-text: #fff; --chip: #efe2cf;
+  --schrift-text: "Iowan Old Style", "Palatino Linotype", Palatino, Charter, "Book Antiqua", Georgia, serif;
+  --schrift-ui: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --schrift-titel: var(--schrift-text);
+  --radius: 14px; --breite: 40rem; --titel-gewicht: 700;
+}
+@media (prefers-color-scheme: dark) {
+  :root, [data-stil="a"] { --bg: #1a1511; --flaeche: #231c16; --text: #eee3d6; --leise: #ab9b8b; --linie: #3a2f26; --akzent: #e09a5f; --akzent-text: #1a1511; --chip: #33281f; }
+}
+
+/* ---------- B · Klar: Magazin-Stil, viel Weiß, kräftige Überschriften, eine starke Farbe ---------- */
+[data-stil="b"] {
+  --bg: #ffffff; --flaeche: #f5f5f8; --text: #121318; --leise: #5c6370; --linie: #e4e6ea;
+  --akzent: #3b3fd8; --akzent-text: #fff; --chip: #ecedfc;
+  --schrift-text: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --schrift-ui: var(--schrift-text); --schrift-titel: var(--schrift-text);
+  --radius: 6px; --breite: 38rem; --titel-gewicht: 800;
+}
+@media (prefers-color-scheme: dark) {
+  [data-stil="b"] { --bg: #0e0e12; --flaeche: #1a1a22; --text: #f0f0f4; --leise: #a0a3ae; --linie: #2a2a34; --akzent: #a5a8ff; --akzent-text: #0e0e12; --chip: #23233a; }
+}
+
+/* ---------- C · digifil: Kacheln und Grün wie Digiwort, aber warm und mit Serifen (näher am Kaffeehaus); hell/dunkel nach Gerät ---------- */
+[data-stil="c"] {
+  --bg: #f1eee6; --flaeche: #fbf9f3; --text: #24231e; --leise: #6c6a5e; --linie: #dcd6c6;
+  --akzent: #4c7d40; --akzent-text: #fff; --chip: #e4e7d6;
+  --schrift-text: "Iowan Old Style", "Palatino Linotype", Palatino, Charter, "Book Antiqua", Georgia, serif;
+  --schrift-ui: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --schrift-titel: var(--schrift-text);
+  --radius: 12px; --breite: 40rem; --titel-gewicht: 700;
+}
+@media (prefers-color-scheme: dark) {
+  [data-stil="c"] { --bg: #1a1916; --flaeche: #23221d; --text: #ece6da; --leise: #a39b8c; --linie: #37342c; --akzent: #86b873; --akzent-text: #161511; --chip: #2d2c24; }
+}
+
+/* ---------- Grundgerüst ---------- */
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body { margin: 0; background: var(--bg); color: var(--text); font: 1.0625rem/1.6 var(--schrift-ui); }
+a { color: var(--akzent); text-underline-offset: .18em; }
+.breit { max-width: var(--breite); margin: 0 auto; padding: 0 16px; }
+.klein { font-size: .875rem; color: var(--leise); }
+.versteckt { position: absolute; left: -9999px; width: 1px; height: 1px; opacity: 0; }
+
+.vorschau-schild { position: sticky; top: 0; z-index: 50; background: #f6d743; color: #2a2200; font: 600 .82rem/1.3 var(--schrift-ui);
+  padding: 6px 10px; text-align: center; display: flex; flex-wrap: wrap; gap: 6px; justify-content: center; align-items: center; }
+.vorschau-schild button { font: inherit; border: 1px solid #2a2200; background: transparent; color: inherit; border-radius: 999px; padding: 3px 10px; cursor: pointer; }
+.vorschau-schild button[aria-pressed="true"] { background: #2a2200; color: #f6d743; }
+
+.kopf { padding: 28px 0 18px; border-bottom: 1px solid var(--linie); margin-bottom: 8px; }
+.marke { font: var(--titel-gewicht) 1.55rem/1.15 var(--schrift-titel); color: var(--text); text-decoration: none; letter-spacing: -.01em; }
+.unter { margin: 6px 0 0; color: var(--leise); font-size: .92rem; font-style: italic; }
+[data-stil="b"] .unter { font-style: normal; }
+.leiste { display: flex; gap: 16px; margin-top: 12px; font-size: .92rem; font-weight: 600; }
+.leiste a { text-decoration: none; }
+
+main { padding-bottom: 40px; }
+.abschnitt { font: 700 .78rem/1 var(--schrift-ui); text-transform: uppercase; letter-spacing: .12em; color: var(--leise); margin: 28px 0 10px; }
+.leer { color: var(--leise); }
+
+/* Serien-Kasten auf der Startseite */
+.serien { list-style: none; padding: 0; margin: 0; display: flex; flex-wrap: wrap; gap: 8px; }
+.serien li { background: var(--chip); border-radius: 999px; padding: 6px 12px; font-size: .92rem; }
+.serien a { font-weight: 650; text-decoration: none; }
+.zahl { color: var(--leise); font-size: .85em; white-space: nowrap; }
+
+/* Beitragskarten */
+.karte { padding: 18px 0; border-bottom: 1px solid var(--linie); }
+.karte h2 { font: var(--titel-gewicht) 1.3rem/1.25 var(--schrift-titel); margin: 0 0 6px; }
+.karte h2 a { color: var(--text); text-decoration: none; }
+.karte h2 a:hover { color: var(--akzent); }
+.anriss { margin: 8px 0 0; color: var(--leise); font-family: var(--schrift-text); }
+[data-stil="c"] .karte { background: var(--flaeche); border: 1px solid var(--linie); border-radius: var(--radius); padding: 16px; margin: 12px 0; }
+[data-stil="b"] .karte h2 { font-size: 1.4rem; letter-spacing: -.015em; }
+
+.meta { margin: 0; color: var(--leise); font-size: .86rem; display: flex; flex-wrap: wrap; gap: 2px 6px; align-items: center; }
+.serie-chip { background: var(--chip); color: var(--text); text-decoration: none; border-radius: 999px; padding: 1px 9px; font-weight: 600; }
+.blaettern { display: flex; justify-content: space-between; gap: 12px; margin: 24px 0; font-weight: 600; }
+
+/* Beitrag */
+.vorspann { margin: 24px 0 4px; font: 650 .85rem/1.3 var(--schrift-ui); color: var(--akzent); }
+.vorspann a { text-decoration: none; }
+.beitrag h1, main > h1 { font: var(--titel-gewicht) clamp(1.7rem, 6vw, 2.3rem)/1.15 var(--schrift-titel); margin: 4px 0 10px; letter-spacing: -.015em; }
+.text { font: 1.14rem/1.7 var(--schrift-text); margin-top: 22px; overflow-wrap: break-word; }
+[data-stil="b"] .text { font-size: 1.08rem; }
+.text p { margin: 0 0 1.05em; }
+.text h2, .text h3, .text h4 { font-family: var(--schrift-titel); line-height: 1.25; margin: 1.6em 0 .5em; }
+.text img { max-width: 100%; height: auto; border-radius: calc(var(--radius) / 2); display: block; margin: 1.2em auto; }
+.text blockquote { margin: 1.2em 0; padding: .2em 0 .2em 1em; border-left: 3px solid var(--akzent); color: var(--leise); }
+.text code { font-size: .9em; background: var(--chip); padding: .1em .35em; border-radius: 4px; }
+.text hr { border: 0; border-top: 1px solid var(--linie); margin: 2em 0; }
+.text ul, .text ol { padding-left: 1.3em; }
+.stichwoerter { margin-top: 26px; font-size: .9rem; display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+.stichwoerter span { color: var(--leise); }
+.stichwoerter a { background: var(--chip); color: var(--text); text-decoration: none; padding: 2px 10px; border-radius: 999px; }
+.ursprung { color: var(--leise); font-size: .85rem; font-style: italic; }
+
+/* Serien-Navigation unter dem Beitrag */
+.serien-nav { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 30px 0 0; padding: 14px; background: var(--flaeche);
+  border: 1px solid var(--linie); border-radius: var(--radius); }
+.serien-nav a { text-decoration: none; color: var(--text); font-weight: 600; font-size: .95rem; line-height: 1.3; }
+.serien-nav a span { display: block; color: var(--akzent); font-size: .8rem; margin-bottom: 2px; }
+.serien-nav .nach { text-align: right; }
+.serien-nav .alle { grid-column: 1 / -1; text-align: center; color: var(--akzent); font-size: .9rem; border-top: 1px solid var(--linie); padding-top: 10px; }
+
+/* Serienseite */
+.einleitung { margin-top: 10px; }
+.knopf { display: inline-block; background: var(--akzent); color: var(--akzent-text); text-decoration: none; font-weight: 700; padding: 10px 18px; border-radius: var(--radius); }
+.teile { padding-left: 1.6em; margin: 22px 0; }
+.teile li { padding: 8px 0; border-bottom: 1px solid var(--linie); }
+.teile a { font-weight: 600; text-decoration: none; color: var(--text); font-family: var(--schrift-titel); font-size: 1.08rem; }
+.teile .zahl { display: block; }
+
+/* Fuß und Rückmeldung */
+.fuss { border-top: 1px solid var(--linie); padding: 18px 0 30px; }
+.rm summary { cursor: pointer; font-weight: 600; color: var(--akzent); }
+.rm form { margin-top: 10px; }
+.arten { display: flex; flex-wrap: wrap; gap: 12px; margin: 8px 0; font-size: .92rem; }
+.rm textarea { width: 100%; font: 1rem/1.45 var(--schrift-ui); padding: 10px; border-radius: 10px; border: 1px solid var(--linie); background: var(--flaeche); color: var(--text); }
+.rm button { margin-top: 8px; font: 700 .95rem var(--schrift-ui); background: var(--akzent); color: var(--akzent-text); border: 0; border-radius: 10px; padding: 9px 16px; cursor: pointer; }
+.rm-status { font-size: .9rem; color: var(--leise); }
+/* Wahl der Gestaltung im Fuß (Leser: Kaffeehaus / digifil, im Browser gemerkt) */
+.stilwahl { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+.stilwahl button { font: 600 .82rem/1.2 var(--schrift-ui); border: 1px solid var(--linie); background: transparent; color: var(--leise); border-radius: 999px; padding: 3px 10px; cursor: pointer; }
+.stilwahl button[aria-pressed="true"] { background: var(--chip); color: var(--text); border-color: var(--akzent); }
+
+/* B: Kopf mit Farbband, mittig, Großbuchstaben; Karten mit Farbkante; Serien-Navigation als Farbfläche */
+[data-stil="b"] .kopf { border-top: 6px solid var(--akzent); text-align: center; padding-top: 22px; }
+[data-stil="b"] .marke { text-transform: uppercase; letter-spacing: .08em; font-size: 1.35rem; }
+[data-stil="b"] .leiste { justify-content: center; }
+[data-stil="b"] .karte { border-bottom: 0; border-left: 4px solid var(--akzent); padding: 4px 0 4px 14px; margin: 22px 0; }
+[data-stil="b"] .abschnitt { color: var(--akzent); }
+[data-stil="b"] .beitrag h1 { font-size: clamp(2rem, 8vw, 2.8rem); line-height: 1.05; }
+[data-stil="b"] .serien-nav { background: var(--akzent); border: 0; }
+[data-stil="b"] .serien-nav a, [data-stil="b"] .serien-nav a span, [data-stil="b"] .serien-nav .alle { color: var(--akzent-text); }
+[data-stil="b"] .serien-nav .alle { border-top-color: color-mix(in srgb, var(--akzent-text) 35%, transparent); }
+/* C: Kopf als Kachel */
+[data-stil="c"] .kopf { border-bottom: 0; }
+[data-stil="c"] .kopf .breit { background: var(--flaeche); border: 1px solid var(--linie); border-radius: var(--radius); padding: 16px; }
+[data-stil="c"] .kopf { padding: 16px 0 6px; }
+[data-stil="c"] .marke::before { content: "☕ "; }
+
+@media (min-width: 720px) {
+  .kopf { padding-top: 44px; }
+  .marke { font-size: 1.9rem; }
+  .karte h2 { font-size: 1.45rem; }
+  .teile .zahl { display: inline; margin-left: 6px; }
+}
