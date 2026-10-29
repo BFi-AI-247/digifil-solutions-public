@@ -1,0 +1,22 @@
+{
+  "id": "ein-buch",
+  "status": "veroeffentlicht",
+  "datum": "2025-08-07T10:00:00+01:00",
+  "titel": "Ein Buch für den Winter",
+  "text": "Ein ruhiges Buch.\n\n## Fazit\n\nLesenswert. Passt zu [den Tomaten](beitrag:tomaten-im-oktober).",
+  "serie": null,
+  "stichwoerter": [
+    "Bücher"
+  ],
+  "en": {
+    "titel": "",
+    "text": "",
+    "geprueft": false,
+    "stand": ""
+  },
+  "herkunft": {
+    "quelle": "blogspot",
+    "url": "https://example.org/alt/ein-buch.html",
+    "titel": "Ein Buch für den Winter"
+  }
+}

@@ -120,6 +120,9 @@ textarea.fb{width:100%;min-height:120px;resize:vertical;border:1px solid var(--l
 .count{color:var(--muted);font-size:.78rem;text-align:right;margin-top:4px;font-variant-numeric:tabular-nums}
 .visits{text-align:center;color:var(--muted);font-size:.72rem;padding-top:2px;font-variant-numeric:tabular-nums}
 .visits b{color:var(--fg);font-weight:600}
+.visits a{color:var(--muted);text-decoration:underline;text-underline-offset:2px}
+.visits a:hover{color:var(--fg)}
+.ueber a{color:var(--fg)}
 @media (prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:1ms!important;animation-delay:0ms!important;transition:none!important}}
 @media (max-height:640px){.k{height:46px}.seg button{padding:5px 11px}}
 </style>
@@ -145,7 +148,7 @@ textarea.fb{width:100%;min-height:120px;resize:vertical;border:1px solid var(--l
   <div class="sub" id="sub"></div>
   <div class="boardwrap"><div class="board" id="board" aria-live="polite"></div></div>
   <div class="kb" id="kb"></div>
-  <div class="visits" id="visits" hidden aria-label="Besuche"></div>
+  <div class="visits" id="visits" hidden></div>
 </div>
 <div class="toasts" id="toasts" role="status"></div>
 
@@ -227,6 +230,13 @@ textarea.fb{width:100%;min-height:120px;resize:vertical;border:1px solid var(--l
   <label class="set"><div>Kontrast-Farben<small>Orange und Blau statt Grün und Gelb, gut bei Farbsehschwäche.</small></div><input type="checkbox" class="sw" id="oContrast"></label>
   <label class="set"><div>Heller Modus<small>Standard ist dunkel.</small></div><input type="checkbox" class="sw" id="oLight"></label>
   <p class="fine">Kein Konto, keine Werbung, kein Tracking. Spielstand und Statistik bleiben nur in diesem Browser. Besuche werden nur gezählt: einmal pro Tag und Gerät, ohne Cookie, ohne IP, ohne fremden Dienst.</p>
+  <div id="ueber" hidden>
+    <h3>Über Digiwort</h3>
+    <p class="fine ueber" style="margin-top:0">
+      <span id="ueberHeim" hidden>Digiwort ist ein Projekt von <a id="heimLink2" target="_blank" rel="noopener"></a>.<br></span>
+      <span id="ueberCode" hidden>Der Code ist offen: <a id="codeLink" target="_blank" rel="noopener">Digiwort auf GitHub</a> <span style="white-space:nowrap">(GPL-3.0)</span>.</span>
+    </p>
+  </div>
   <h3>Danke an</h3>
   <p class="fine" style="margin-top:0">
     <b>igerman98</b> von Björn Jacke – deutsches Wörterbuch, Grundlage aller erlaubten Wörter. Lizenz GPL-2.0 oder GPL-3.0.
@@ -241,7 +251,7 @@ textarea.fb{width:100%;min-height:120px;resize:vertical;border:1px solid var(--l
 
 <script>
 "use strict";
-const NAME="Digiwort", VERSION="__VERSION__", FASSUNG="__FASSUNG__", ADRESSE="__ADRESSE__";
+const NAME="Digiwort", VERSION="__VERSION__", FASSUNG="__FASSUNG__", ADRESSE="__ADRESSE__", HEIMAT="__HEIMAT__", QUELLCODE="__QUELLCODE__";
 const AUF_SEITE=()=>location.protocol!=="file:"&&(!ADRESSE||location.hostname===new URL(ADRESSE).hostname);
 const START=[2026,9,25]; // 25.10.2026 = Rätsel Nr. 1 (Monat 0-basiert)
 function splitWords(s,n){const a=[...s],out=[];for(let i=0;i<a.length;i+=n)out.push(a.slice(i,i+n).join(""));return out;}
@@ -512,7 +522,7 @@ $("oContrast").addEventListener("change",e=>{ settings.contrast=e.target.checked
 $("oLight").addEventListener("change",e=>{ settings.light=e.target.checked; save("settings",settings); applyLook(); });
 
 /* ---------- Modus & Länge ---------- */
-function switchTo(m,l){ mode=m; len=l; save("mode",m); save("len",l); game=loadGame(m,l); cur=""; render(); if(game.status!=="play") setTimeout(openStats,300); }
+function switchTo(m,l){ mode=m; len=l; save("mode",m); save("len",l); game=loadGame(m,l); cur=""; render(); if(game.status!=="play" && m==="endless") setTimeout(openStats,300); }
 $("mDaily").addEventListener("click",()=>{ if(!busy&&game.mode!=="daily") switchTo("daily",len); });
 $("mEndless").addEventListener("click",()=>{ if(!busy&&game.mode!=="endless") switchTo("endless",len); });
 $("l5").addEventListener("click",()=>{ if(!busy&&game.len!==5) switchTo(mode,5); });
@@ -569,7 +579,20 @@ $("verLine").textContent=`Fassung ${VERSION}${FASSUNG==="live"?"":" · "+FASSUNG
 if(FASSUNG==="vorschau"){ $("vbanner").hidden=false; document.body.classList.add("vor"); }
 
 /* ---------- Besuchszähler (eigener Server, nur Anzahl) ---------- */
+const heimName=()=>HEIMAT?new URL(HEIMAT).hostname.replace(/^www\./,""):"";
+function fuss(zahlen){
+  const el=$("visits"); el.textContent="";
+  if(zahlen){ const sp=document.createElement("span"); sp.innerHTML=zahlen; el.appendChild(sp); }
+  if(HEIMAT){ if(zahlen) el.append(" · "); const a=document.createElement("a"); a.href=HEIMAT; a.target="_blank"; a.rel="noopener"; a.textContent=heimName(); el.appendChild(a); }
+  el.hidden=!el.childNodes.length;
+}
+function ueber(){
+  if(HEIMAT){ $("heimLink2").href=HEIMAT; $("heimLink2").textContent=heimName(); $("ueberHeim").hidden=false; }
+  if(QUELLCODE){ $("codeLink").href=QUELLCODE; $("ueberCode").hidden=false; }
+  $("ueber").hidden=!(HEIMAT||QUELLCODE);
+}
 async function visits(){
+  fuss("");
   if(!AUF_SEITE()) return;
   const url=FASSUNG==="vorschau"?"../zaehler.php":"zaehler.php", heute=new Date().toLocaleDateString("sv-SE");
   let zaehlen=false;
@@ -579,16 +602,15 @@ async function visits(){
     if(!r.ok) return; const z=await r.json();
     if(zaehlen) save("besucht",heute);
     const f=n=>Number(n||0).toLocaleString("de-DE");
-    $("visits").innerHTML=`Besuche heute <b>${f(z.heute)}</b> · letzte 7 Tage <b>${f(z.woche)}</b> · gesamt <b>${f(z.total)}</b>`;
-    $("visits").hidden=false;
+    fuss(`Besuche heute <b>${f(z.heute)}</b> · letzte 7 Tage <b>${f(z.woche)}</b> · gesamt <b>${f(z.total)}</b>`);
   }catch(e){}
 }
 
 /* ---------- Start ---------- */
 applyLook(); buildKb();
 game=loadGame(mode,len); render();
-if(game.status!=="play") setTimeout(openStats,400);
-else if(!load("seenHelp",false)){ save("seenHelp",true); openDlg("dHelp"); }
-visits();
+if(game.status!=="play" && game.mode==="endless") setTimeout(openStats,400);
+else if(game.status==="play" && !load("seenHelp",false)){ save("seenHelp",true); openDlg("dHelp"); }
+ueber(); visits();
 document.addEventListener("visibilitychange",()=>{ if(!document.hidden && game.mode==="daily" && game.idx!==dayIndex()) switchTo("daily",game.len); });
 </script>

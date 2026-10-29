@@ -1,0 +1,16 @@
+{
+  "live": true,
+  "name": "Mein Blog",
+  "untertitel": "Gedanken für eine Tasse Kaffee.",
+  "untertitel_en": "Thoughts for a cup of coffee.",
+  "autor": "Autorin",
+  "adresse": "https://example.org/Blog/",
+  "stil": "a",
+  "repo": "",
+  "label": "blog",
+  "fusszeile": [],
+  "quellen_namen": {
+    "blogspot": "Blogspot",
+    "projektlog": "Projekt-Log"
+  }
+}

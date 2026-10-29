@@ -27,13 +27,18 @@ with sync_playwright() as pw:
     pg.screenshot(path=OUT / "1-erfassen.png", full_page=True)
     # Foto auslesen
     pg.set_input_files("#foto", str(foto()))
-    pg.wait_for_selector("#auslesen:not([disabled])"); pg.click("#auslesen")
+    pg.wait_for_selector("#auslesen:not([disabled])")
+    w0 = pg.evaluate("document.querySelector('#foto-vorschau').naturalWidth")
+    pg.click("#drehen"); pg.wait_for_function(f"document.querySelector('#foto-vorschau').naturalWidth !== {w0} && document.querySelector('#foto-vorschau').complete")
+    pg.click("#auslesen")
     pg.wait_for_selector("#e-ok"); pg.wait_for_timeout(300)
     assert pg.input_value("#e-datum") == "2026-10-25"
     assert pg.input_value("#e-ort") == "bei Anna + essen", pg.input_value("#e-ort")
     pl = {s: pg.input_value(f'[data-platz="{s}"]') for s in ["Anna", "Ben", "Clara", "David"]}
     assert pl == {"Anna": "2", "Ben": "1", "Clara": "4", "David": "3"}, pl
     assert "Unsicher" in pg.inner_text("#entwurf")
+    assert "Ohne Pflichtsolo: Clara" in pg.inner_text("#entwurf"), pg.inner_text("#entwurf")[:600]
+    assert pg.input_value('[data-sitz="0"]') == "David"
     pg.click("#entwurf summary"); pg.screenshot(path=OUT / "2-entwurf.png", full_page=True)
     pg.click("#e-ok"); pg.wait_for_selector("#s-abende.an")
     pg.wait_for_selector(".abend >> text=25.10.2026")
@@ -41,14 +46,24 @@ with sync_playwright() as pw:
     pg.screenshot(path=OUT / "3-abende.png")
     # Details
     pg.click(".abend >> nth=0"); pg.wait_for_selector("#d-weg"); pg.wait_for_timeout(400)
+    pg.click("#dlg summary"); t = pg.inner_text("#dlg")
+    for w in ["Sitzordnung David → Anna → Ben → Clara", "Pflichtsolo David", "Lustsolo Anna", "Pflichtsolo Anna"]:
+        if w not in t: fehler.append(f"Abend-Ansicht ohne: {w}")
     pg.screenshot(path=OUT / "4-abend.png", full_page=False); pg.click("[data-zu]")
     # Statistik
     pg.click("nav.unten button[data-s=statistik]"); pg.select_option("#stat-jahr", "2026")
-    t = pg.inner_text("#s-statistik"); assert "14 Abende" in t and "Details aus den Zetteln" in t and "Ein Abend mit einzelnen Spielen" in t, t[:400]
+    t = pg.inner_text("#s-statistik"); assert "2026: 14 Abende" in t and "Details aus den Zetteln · 1 Abend" in t and "mit einzelnen Spielen" not in t, t[:400]
     pg.screenshot(path=OUT / "5-statistik.png", full_page=True)
+    pg.select_option("#stat-jahr", "2025"); pg.check('#stat-seit')
+    assert "Seit 2025: 29 Abende" in pg.inner_text("#stat"), pg.inner_text("#stat")[:120]
+    pg.uncheck('#stat-seit'); assert "2025: 15 Abende" in pg.inner_text("#stat")
     # KI
     pg.click("nav.unten button[data-s=fragen]"); pg.fill("#ki-text", "Am 9.10. war Ben Erster")
     pg.click("#ki-senden"); pg.wait_for_selector("[data-v]")
+    t = pg.inner_text("#s-fragen")
+    if pg.locator("[data-v]").count() != 2: fehler.append(f"KI: {pg.locator('[data-v]').count()} Vorschläge statt 2 (unbekannter Abend / falsches Datum nicht weggelassen)")
+    for w in ["2 Vorschläge passten nicht", "Noch ist nichts geändert"]:
+        if w not in t: fehler.append(f"KI-Antwort ohne: {w}")
     pg.click("[data-v='1:0']"); pg.wait_for_selector("text=✓ übernommen")
     pg.click("[data-v='1:1']"); pg.wait_for_timeout(500)
     pg.screenshot(path=OUT / "6-ki.png", full_page=True)

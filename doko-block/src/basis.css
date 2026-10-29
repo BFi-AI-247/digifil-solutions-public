@@ -60,3 +60,10 @@ dialog{border:0;border-radius:18px;padding:0;max-width:min(560px,94vw);width:100
 dialog::backdrop{background:rgba(10,20,15,.55)}
 dialog .innen{padding:18px;max-height:82vh;overflow:auto}
 .sperre{padding:40px 20px;text-align:center}
+@media (max-width:400px){
+  table{font-size:.84rem}
+  th,td{padding:6px 3px}
+  th{font-size:.7rem;letter-spacing:.02em}
+  .karte{padding:14px 12px}
+  .platzzahl span{min-width:24px!important;padding:2px 3px!important;font-size:.8rem!important}
+}

@@ -1,0 +1,22 @@
+{
+  "id": "der-kompost",
+  "status": "veroeffentlicht",
+  "datum": "2024-12-05T10:00:00+01:00",
+  "titel": "Der Kompost",
+  "text": "Kompost ist *Gold*.\n\n- Laub\n- Schnitt\n- Kaffeesatz",
+  "serie": "gedanken-zum-garten",
+  "stichwoerter": [
+    "Garten"
+  ],
+  "en": {
+    "titel": "",
+    "text": "",
+    "geprueft": false,
+    "stand": ""
+  },
+  "herkunft": {
+    "quelle": "blogspot",
+    "url": "https://example.org/alt/der-kompost.html",
+    "titel": "Der Kompost"
+  }
+}
