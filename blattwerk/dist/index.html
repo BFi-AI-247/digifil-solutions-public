@@ -162,6 +162,7 @@ button { cursor: pointer; -webkit-tap-highlight-color: transparent; touch-action
 .item.table.editing { touch-action: auto; }
 .item.table.editing td { cursor: text; -webkit-user-select: text; user-select: text; }
 .item.table.editing td.cur { box-shadow: inset 0 0 0 0.5mm rgba(47, 111, 228, .55); }
+.item.table.editing td.insel { background-image: linear-gradient(rgba(47, 111, 228, .16), rgba(47, 111, 228, .16)); }
 .grid2 > .btn { min-width: 0; white-space: normal; line-height: 1.15; padding: 4px 8px; }
 .swatch.none { background-image: linear-gradient(135deg, transparent 45%, #b4382c 45%, #b4382c 55%, transparent 55%) !important; }
 .item.number .num { position: absolute; inset: 0; display: grid; place-items: center; font-size: 11pt; font-family: var(--font-sheet); }
@@ -279,6 +280,7 @@ select.inp { padding-right: 6px; }
   .page .ttl:empty::before, .item.text .txt:empty::before { content: none; }
   .item.image .ph { display: none; }
   .item.table table.noline td, .item.table td.cur { box-shadow: none; }
+  .item.table td.insel { background-image: none; }
   .page .pts.sel { background: none; }
 }
 
@@ -436,7 +438,7 @@ select.inp { padding-right: 6px; }
 <input type="file" id="fileDoc" accept=".blattwerk,.json,application/json" hidden>
 <div class="toast" id="toast" role="status" hidden></div>
 
-<script>window.BLATT_ENV = 'web'; window.BLATT_STAGE = 'live'; window.BLATT_DB = 'blattwerk2'; window.BLATT_VERSION = '0.3.2';</script>
+<script>window.BLATT_ENV = 'web'; window.BLATT_STAGE = 'live'; window.BLATT_DB = 'blattwerk2'; window.BLATT_VERSION = '0.3.3';</script>
 <script>
 /*
  * Blattwerk – Kern: Datenmodell, Seitenrahmen-Geometrie, Lineaturen, Handgezeichnet-Stil, Punkte und Noten.
@@ -922,6 +924,9 @@ select.inp { padding-right: 6px; }
   var editBefore = null;   // Stand vor dem Hineinschreiben (ein Rückgängig-Schritt je Schreibvorgang)
   var kcur = null;         // Schreibmarke in Kästchen {r, c, c0}
   var tcur = null;         // aktive Zelle in einer Tabelle {r, c}
+  var tanc = null;         // Anfang einer Zellen-Auswahl in der Tabelle {r, c} (Ende = tcur)
+  var textend = false;     // nächstes Antippen einer Zelle erweitert die Auswahl (iPad)
+  var tdrag = null;        // Auswahl mit der Maus aufziehen
   var WRITABLE = ['text', 'lineatur', 'karo', 'table'];
   var CELL_BG = ['', '#fff3c4', '#dcefe8', '#dbe8f7', '#f9dede', '#ececec'];
   var cur = 0;             // aktuelle Seite
@@ -943,7 +948,7 @@ select.inp { padding-right: 6px; }
   }
   function undo() { if (!undoStack.length) return; redoStack.push(snap()); restore(undoStack.pop()); after(); }
   function redo() { if (!redoStack.length) return; undoStack.push(snap()); restore(redoStack.pop()); after(); }
-  function after() { if (sel && !(sel.id ? selItem() : page(sel.pi))) sel = null; cur = Math.min(cur, D.pages.length - 1); editing = null; editBefore = null; kcur = null; tcur = null; save(); updateUndo(); render(); }
+  function after() { if (sel && !(sel.id ? selItem() : page(sel.pi))) sel = null; cur = Math.min(cur, D.pages.length - 1); editing = null; editBefore = null; kcur = null; tcur = null; tanc = null; textend = false; save(); updateUndo(); render(); }
   function updateUndo() { $('btnUndo').disabled = !undoStack.length; $('btnRedo').disabled = !redoStack.length; }
 
   var saveT = null, storageOk = true;
@@ -1026,6 +1031,32 @@ select.inp { padding-right: 6px; }
     if (!td) return;
     Array.prototype.forEach.call(d.querySelectorAll('td.cur'), function (x) { x.classList.remove('cur'); }); td.classList.add('cur');
     if (document.activeElement !== td) { if (caretEnd === false) td.focus({ preventScroll: true }); else focusRow(td); }
+  }
+
+  // Zellen-Auswahl: Rechteck von tanc bis tcur
+  function tRange(it) {
+    if (!tcur) return null;
+    var a = tanc || tcur, R = it ? it.rows - 1 : 99, C = it ? it.cols - 1 : 99;
+    return { r0: Math.min(Math.min(a.r, tcur.r), R), r1: Math.min(Math.max(a.r, tcur.r), R), c0: Math.min(Math.min(a.c, tcur.c), C), c1: Math.min(Math.max(a.c, tcur.c), C) };
+  }
+  function tEach(it, fn) {
+    var g = tRange(it); if (!g) return;
+    for (var r = g.r0; r <= g.r1; r++) for (var c = g.c0; c <= g.c1; c++) fn(it.cells[r][c], r, c);
+  }
+  function tCount(it) { var g = tRange(it); return g ? (g.r1 - g.r0 + 1) * (g.c1 - g.c0 + 1) : 0; }
+  function markRange(d, it) {
+    var g = tRange(it), multi = tCount(it) > 1;
+    Array.prototype.forEach.call(d.querySelectorAll('td'), function (td) {
+      var r = Number(td.dataset.r), c = Number(td.dataset.c);
+      td.classList.toggle('insel', !!(multi && editing === it.id && r >= g.r0 && r <= g.r1 && c >= g.c0 && c <= g.c1));
+    });
+  }
+  function tableExtend(it, r, c) {
+    if (!tcur) { tcur = { r: r, c: c }; return; }
+    if (!tanc) tanc = { r: tcur.r, c: tcur.c };
+    tcur = { r: r, c: c }; textend = false;
+    var d = itemEl(it.id); if (d) markRange(d, it);
+    focusCell(false); renderInspector();
   }
 
   function renderPage(p, pi) {
@@ -1133,6 +1164,7 @@ select.inp { padding-right: 6px; }
           td.style.textAlign = it.ha; td.style.verticalAlign = it.va;
           if (cell.bg) td.style.background = cell.bg;
           td.style.borderTop = e.t ? bl : 'none'; td.style.borderRight = e.r ? bl : 'none'; td.style.borderBottom = e.b ? bl : 'none'; td.style.borderLeft = e.l ? bl : 'none';
+          if (cell.u) { td.style.borderBottom = r1(Math.max(0.6, Number(it.lineW) + 0.3)) + 'mm solid ' + it.lineColor; td.classList.add('under'); }
           td.innerHTML = cell.t || '';
           if (ted) { td.contentEditable = 'true'; td.spellcheck = true; if (tcur && tcur.r === tr && tcur.c === tc) td.classList.add('cur'); }
           row.appendChild(td);
@@ -1140,6 +1172,7 @@ select.inp { padding-right: 6px; }
       }
       d.innerHTML = ''; d.appendChild(tb);
       d.classList.toggle('editing', ted);
+      if (ted) markRange(d, it);
     } else if (it.type === 'image') {
       var src = it.asset && D.assets[it.asset];
       d.innerHTML = src ? '<img alt="">' : '<div class="ph">Bild antippen<br>oder hierher ziehen</div>';
@@ -1229,7 +1262,7 @@ select.inp { padding-right: 6px; }
       if (at) { var ly = at.y - it.y; i = tr.length - 1; for (var k = 0; k < tr.length; k++) if (ly <= tr[k].base + 2) { i = k; break; } }
       focusRow(d.querySelectorAll('.lrow')[i]);
     } else if (it.type === 'table') {
-      tcur = { r: 0, c: 0 };
+      tcur = { r: 0, c: 0 }; tanc = null; textend = false;
       if (at) {
         var trs = d.querySelectorAll('tr'), sw = 0, tw = it.colW.reduce(function (a, b) { return a + Number(b); }, 0), fx = (at.x - it.x) / it.w;
         Array.prototype.forEach.call(trs, function (row, k) { if (it.y + row.offsetTop / PX_MM <= at.y) tcur.r = k; });
@@ -1259,7 +1292,7 @@ select.inp { padding-right: 6px; }
       t.contentEditable = 'false';
     } else {
       if (before && snap() !== before) { undoStack.push(before); if (undoStack.length > 60) undoStack.shift(); redoStack = []; updateUndo(); save(); }
-      kcur = null; tcur = null; hideKInput();
+      kcur = null; tcur = null; tanc = null; textend = false; hideKInput();
       if (it && d) { fillItem(d, it); if (it.type === 'table') syncTableH(d, it); }
     }
     if (d) d.classList.remove('editing');
@@ -1465,6 +1498,9 @@ select.inp { padding-right: 6px; }
       var itEl = t.closest('.item');
       if (itEl) {
         var pi = Number(itEl.dataset.pi), id = itEl.dataset.id;
+        var tdx = editing === id && t.closest('td');
+        if (tdx && (e.shiftKey || textend) && tcur) { e.preventDefault(); tableExtend(itemById(pi, id), Number(tdx.dataset.r), Number(tdx.dataset.c)); return; }
+        if (tdx && e.pointerType !== 'touch') tdrag = { pid: e.pointerId, pi: pi, id: id, r: Number(tdx.dataset.r), c: Number(tdx.dataset.c), on: false };
         if (editing === id && (t.closest('.txt') || t.closest('.lrow') || t.closest('td'))) return; // Schreiben: Browser übernimmt
         if (editing === id && itEl.classList.contains('karo')) { e.preventDefault(); karoTap(e, itemById(pi, id)); return; }
         e.preventDefault();
@@ -1481,8 +1517,19 @@ select.inp { padding-right: 6px; }
       if (pg) { setCur(Number(pg.dataset.pi)); if (!t.closest('[contenteditable=true]')) select(null); else if (sel) select(null); return; }
       if (!t.closest('.page-wrap')) select(null);
     });
-    document.addEventListener('pointermove', function (e) { if (drag && e.pointerId === drag.pid) moveDrag(e); });
-    document.addEventListener('pointerup', function (e) { if (drag && e.pointerId === drag.pid) endDrag(e); });
+    document.addEventListener('pointermove', function (e) {
+      if (drag && e.pointerId === drag.pid) moveDrag(e);
+      if (tdrag && e.pointerId === tdrag.pid && e.buttons) {
+        var over = document.elementFromPoint(e.clientX, e.clientY), od = over && over.closest && over.closest('.item.table td');
+        if (!od || od.closest('.item').dataset.id !== tdrag.id || editing !== tdrag.id) return;
+        var r = Number(od.dataset.r), c = Number(od.dataset.c), ti = itemById(tdrag.pi, tdrag.id);
+        if (!tdrag.on && r === tdrag.r && c === tdrag.c) return;
+        if (!tdrag.on) { tdrag.on = true; tcur = { r: tdrag.r, c: tdrag.c }; tanc = null; }
+        try { window.getSelection().removeAllRanges(); } catch (x) { /* egal */ }
+        if (!tcur || tcur.r !== r || tcur.c !== c || !tanc) tableExtend(ti, r, c);
+      }
+    });
+    document.addEventListener('pointerup', function (e) { if (drag && e.pointerId === drag.pid) endDrag(e); if (tdrag && e.pointerId === tdrag.pid) tdrag = null; });
     document.addEventListener('pointercancel', function (e) { if (drag && e.pointerId === drag.pid) endDrag(e, true); });
   }
   function beginDrag(e, mode, arg, wasSelected) {
@@ -1849,6 +1896,7 @@ select.inp { padding-right: 6px; }
     ar2.appendChild(cp); ar2.appendChild(dl); sa.appendChild(ar2);
   }
 
+  function keepFocus(b) { b.addEventListener('pointerdown', function (e) { e.preventDefault(); }); }
   function inspectTable(box, it) {
     B.normTable(it);
     var st = sec(box, 'Tabelle');
@@ -1858,23 +1906,40 @@ select.inp { padding-right: 6px; }
     else { var fb = el('button', 'btn', icon('check') + 'Fertig'); fb.onclick = function () { stopEdit(); drawSelection(); renderInspector(); }; st.appendChild(fb); }
     st.appendChild(el('p', 'hint', 'Tabelle zweimal antippen, dann in eine Zelle tippen und schreiben. Die Tab-Taste springt zur nächsten Zelle. Zeilen wachsen mit dem Text mit; höher ziehen geht am unteren Griff.'));
     if (editing === it.id && tcur) {
-      var r = tcur.r, c = tcur.c, sc = sec(box, 'Zelle: Zeile ' + (r + 1) + ', Spalte ' + (c + 1));
+      var r = tcur.r, c = tcur.c, n = tCount(it), multi = n > 1;
+      var sa = sec(box, multi ? 'Auswahl: ' + n + ' Zellen' : 'Zelle: Zeile ' + (r + 1) + ', Spalte ' + (c + 1));
+      var allU = true; tEach(it, function (x) { if (!x.u) allU = false; });
+      var ub = el('button', 'btn' + (allU ? ' primary' : ''), '<u>U</u>&nbsp; ' + (allU ? 'Strich entfernen' : (multi ? 'Auswahl unterstreichen' : 'Zelle unterstreichen')));
+      ub.id = 'btnCellUnder'; ub.setAttribute('aria-pressed', String(allU));
+      ub.onclick = function () { change(function () { tEach(it, function (x) { if (allU) delete x.u; else x.u = true; }); }); };
+      keepFocus(ub); sa.appendChild(ub);
+      var ga = el('div', 'grid2'); sa.appendChild(ga);
+      [['Ganze Zeile', function () { tanc = { r: r, c: 0 }; tcur = { r: r, c: it.cols - 1 }; }], ['Ganze Spalte', function () { tanc = { r: 0, c: c }; tcur = { r: it.rows - 1, c: c }; }]].forEach(function (a) {
+        var b = el('button', 'btn', a[0] + ' auswählen'); b.onclick = function () { a[1](); textend = false; var d0 = itemEl(it.id); if (d0) markRange(d0, it); focusCell(false); renderInspector(); }; keepFocus(b); ga.appendChild(b);
+      });
+      var xb = el('button', 'btn' + (textend ? ' primary' : ''), textend ? 'Jetzt auf die letzte Zelle tippen' : 'Bis zu einer Zelle auswählen');
+      xb.id = 'btnCellExtend'; xb.setAttribute('aria-pressed', String(textend));
+      xb.onclick = function () { textend = !textend; renderInspector(); };
+      keepFocus(xb); sa.appendChild(xb);
+      if (multi) { var eb = el('button', 'btn', 'Nur diese eine Zelle'); eb.onclick = function () { tanc = null; textend = false; var d0 = itemEl(it.id); if (d0) markRange(d0, it); renderInspector(); }; keepFocus(eb); sa.appendChild(eb); }
+      sa.appendChild(el('p', 'hint', 'Mehrere Zellen: mit dem Finger „Bis zu einer Zelle auswählen“ und dann die letzte Zelle antippen; mit der Maus über die Zellen ziehen oder mit gedrückter Umschalttaste klicken. Der Strich kommt unter jede ausgewählte Zelle.'));
+      var sc = sec(box, multi ? 'Zeilen und Spalten (bei Zeile ' + (r + 1) + ', Spalte ' + (c + 1) + ')' : 'Zeilen und Spalten');
       var g = el('div', 'grid2'); sc.appendChild(g);
       [['Zeile darüber', function () { B.tableInsert(it, 'row', r); }], ['Zeile darunter', function () { B.tableInsert(it, 'row', r + 1); tcur.r = r + 1; }],
         ['Spalte links', function () { B.tableInsert(it, 'col', c); }], ['Spalte rechts', function () { B.tableInsert(it, 'col', c + 1); tcur.c = c + 1; }]].forEach(function (a) {
-        var b = el('button', 'btn', icon('plus') + a[0]); b.onclick = function () { change(a[1]); }; g.appendChild(b);
+        var b = el('button', 'btn', icon('plus') + a[0]); b.onclick = function () { tanc = null; change(a[1]); }; g.appendChild(b);
       });
       var dr = el('button', 'btn danger', icon('trash') + 'Zeile löschen'); dr.disabled = it.rows < 2;
-      dr.onclick = function () { change(function () { B.tableRemove(it, 'row', r); tcur.r = Math.min(r, it.rows - 1); }); };
+      dr.onclick = function () { tanc = null; change(function () { B.tableRemove(it, 'row', r); tcur.r = Math.min(r, it.rows - 1); }); };
       var dc = el('button', 'btn danger', icon('trash') + 'Spalte löschen'); dc.disabled = it.cols < 2;
-      dc.onclick = function () { change(function () { B.tableRemove(it, 'col', c); tcur.c = Math.min(c, it.cols - 1); }); };
+      dc.onclick = function () { tanc = null; change(function () { B.tableRemove(it, 'col', c); tcur.c = Math.min(c, it.cols - 1); }); };
       g.appendChild(dr); g.appendChild(dc);
-      var rl = el('div', 'row'); rl.appendChild(el('label', '', 'Hintergrund der Zelle')); sc.appendChild(rl);
+      var rl = el('div', 'row'); rl.appendChild(el('label', '', multi ? 'Hintergrund der Auswahl' : 'Hintergrund der Zelle')); sc.appendChild(rl);
       var sw = el('div', 'swatches'); sc.appendChild(sw);
       CELL_BG.forEach(function (col) {
         var b = el('button', 'swatch' + (col ? '' : ' none')); b.style.background = col || '#ffffff';
         b.setAttribute('aria-label', col ? 'Hintergrund ' + col : 'Kein Hintergrund'); b.setAttribute('aria-pressed', String((it.cells[r][c].bg || '') === col));
-        b.onclick = function () { change(function () { if (col) it.cells[r][c].bg = col; else delete it.cells[r][c].bg; }); };
+        b.onclick = function () { change(function () { tEach(it, function (x) { if (col) x.bg = col; else delete x.bg; }); }); };
         sw.appendChild(b);
       });
       var rowBg = el('button', 'btn', 'Diese Farbe für die ganze Zeile');
@@ -1993,7 +2058,7 @@ select.inp { padding-right: 6px; }
         d.id = B.uid(); d.updated = Date.now(); delete d.example; d.assets = d.assets || {};
         d.pages.forEach(function (p) { p.id = B.uid(); p.items.forEach(function (it) {
           it.id = B.uid(); if (it.html) it.html = cleanHtml(it.html);
-          if (it.type === 'table') { B.normTable(it); it.cells.forEach(function (row) { row.forEach(function (x) { x.t = cleanHtml(x.t); if (typeof x.bg !== 'string' || !/^#[0-9a-f]{3,8}$/i.test(x.bg)) delete x.bg; }); }); }
+          if (it.type === 'table') { B.normTable(it); it.cells.forEach(function (row) { row.forEach(function (x) { x.t = cleanHtml(x.t); if (typeof x.bg !== 'string' || !/^#[0-9a-f]{3,8}$/i.test(x.bg)) delete x.bg; if (x.u === true) x.u = true; else delete x.u; }); }); }
         }); });
         docs.unshift(d); store.put(d); openDoc(d.id); closeModal('mDocs'); toast('Blatt geöffnet: ' + (d.title || 'Ohne Titel'));
       } catch (e) { toast('Diese Datei ist kein Blattwerk-Blatt.'); }
@@ -2160,7 +2225,8 @@ select.inp { padding-right: 6px; }
       if (!td || editing !== td.closest('.item').dataset.id) return;
       var r = Number(td.dataset.r), c = Number(td.dataset.c);
       if (tcur && tcur.r === r && tcur.c === c) return;
-      tcur = { r: r, c: c }; focusCell(false); renderInspector();
+      if (tdrag && tdrag.on) return;
+      tcur = { r: r, c: c }; tanc = null; focusCell(false); markRange(td.closest('.item'), itemById(Number(td.closest('.item').dataset.pi), td.closest('.item').dataset.id)); renderInspector();
     });
     $('pages').addEventListener('keydown', function (e) {
       if (e.target.dataset && e.target.dataset.role && e.key === 'Enter') { e.preventDefault(); e.target.blur(); return; }
@@ -2168,7 +2234,7 @@ select.inp { padding-right: 6px; }
       if (td && e.key === 'Tab') {
         var tit = itemById(Number(td.closest('.item').dataset.pi), td.closest('.item').dataset.id), k = Number(td.dataset.r) * tit.cols + Number(td.dataset.c) + (e.shiftKey ? -1 : 1);
         e.preventDefault();
-        if (k >= 0 && k < tit.rows * tit.cols) { tcur = { r: Math.floor(k / tit.cols), c: k % tit.cols }; focusCell(true); renderInspector(); }
+        if (k >= 0 && k < tit.rows * tit.cols) { tcur = { r: Math.floor(k / tit.cols), c: k % tit.cols }; tanc = null; markRange(td.closest('.item'), tit); focusCell(true); renderInspector(); }
         return;
       }
       var lr = e.target.closest && e.target.closest('.lrow');
