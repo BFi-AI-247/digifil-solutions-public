@@ -18,7 +18,8 @@ Die Konfiguration (z. B. .github/oeffentlich.json im privaten Repo):
 Einträge mit "geschlossen": true sind eigenständige Veröffentlichungen (z. B. ein Konzept). Für sie prüft das Skript
 zusätzlich: (1) jeder Verweis auf eine Datei – Markdown-Link `](pfad)` oder Pfad in `Backticks` mit Endung .md/.py/.json/.yml
 oder mit ../ – muss auf eine Datei innerhalb des Zielordners zeigen; (2) kein Muster aus "intern_muster" (reguläre Ausdrücke,
-z. B. interne Kennungen wie Postfach-Pfade oder Kartennummern) kommt vor. Beides gilt ohne Ausnahmen.
+z. B. interne Kennungen wie Postfach-Pfade oder Kartennummern) kommt vor. Dateien, die auf ein Muster aus "beispiele"
+des Eintrags passen (z. B. "beispiel-*.md"), sind von (1) ausgenommen – sie dürfen erfundene Dateien nennen; (2) gilt auch für sie.
 
 "ausnahmen" erlaubt je Zieldatei bestimmte Begriffe oder Wendungen (z. B. eine Quellenangabe, die zufällig
 einen verbotenen Vornamen enthält). Sie werden vor der Prüfung aus der Zeile entfernt; alles andere wird weiter geprüft.
@@ -100,7 +101,7 @@ VERWEIS_CODE = re.compile(r"`([^`\s]+)`")
 DATEI_ENDUNG = re.compile(r"\.(md|py|json|ya?ml)(#[\w-]*)?$")
 
 
-def pruefe_geschlossen(ordner: Path, intern: list[str], basis: Path) -> list[str]:
+def pruefe_geschlossen(ordner: Path, intern: list[str], basis: Path, beispiele: list[str] | None = None) -> list[str]:
     """Verweise müssen im Ordner bleiben; interne Kennungen sind verboten (nur für "geschlossen": true)."""
     funde = []
     muster = [re.compile(m) for m in intern]
@@ -112,9 +113,10 @@ def pruefe_geschlossen(ordner: Path, intern: list[str], basis: Path) -> list[str
             text = d.read_text(encoding="utf-8")
         except UnicodeDecodeError:
             continue
+        beispiel = any(fnmatch.fnmatch(d.relative_to(ordner).as_posix(), m) for m in (beispiele or []))
         for nr, zeile in enumerate(text.splitlines(), 1):
             ort = f"{d.relative_to(basis)}:{nr}"
-            kandidaten = VERWEIS_LINK.findall(zeile) + [c for c in VERWEIS_CODE.findall(zeile)
+            kandidaten = [] if beispiel else VERWEIS_LINK.findall(zeile) + [c for c in VERWEIS_CODE.findall(zeile)
                                                         if c.startswith("../") or DATEI_ENDUNG.search(c)]
             for v in kandidaten:
                 if re.match(r"^[a-z]+://|^mailto:|^#", v) or "<" in v:
@@ -145,7 +147,7 @@ def main() -> None:
     funde = pruefe(alle, konfig.get("verboten", []), ziel, konfig.get("ausnahmen"))
     for e in konfig["eintraege"]:
         if e.get("geschlossen"):
-            funde += pruefe_geschlossen(ziel / e["nach"], konfig.get("intern_muster", []), ziel)
+            funde += pruefe_geschlossen(ziel / e["nach"], konfig.get("intern_muster", []), ziel, e.get("beispiele"))
     if funde:
         print("\nNICHT veröffentlicht – Befunde (verbotene Begriffe, Schlüssel, Verweise oder interne Kennungen):")
         print("\n".join("  " + f for f in funde[:50]))
