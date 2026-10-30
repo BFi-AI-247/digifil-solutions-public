@@ -117,13 +117,16 @@ def pruefe_geschlossen(ordner: Path, intern: list[str], basis: Path, beispiele: 
         except UnicodeDecodeError:
             continue
         beispiel = any(fnmatch.fnmatch(d.relative_to(ordner).as_posix(), m) for m in (beispiele or []))
-        im_code = False
+        zaun = ""  # offener Code-Zaun (``` oder länger); ein Block endet erst mit einem gleich langen oder längeren Zaun
         for nr, zeile in enumerate(text.splitlines(), 1):
             ort = f"{d.relative_to(basis)}:{nr}"
             if d.suffix.lower() == ".md":
-                if zeile.lstrip().startswith("```"):
-                    im_code = not im_code
-                elif not im_code:
+                m = re.match(r"^\s*(`{3,})", zeile)
+                if m and not zaun:
+                    zaun = m.group(1)
+                elif m and zaun and len(m.group(1)) >= len(zaun) and zeile.strip() == m.group(1):
+                    zaun = ""
+                elif not zaun:
                     sichtbar = re.sub(r"`[^`]*`", "", re.sub(r"<!--.*?-->", "", zeile))
                     if "<!--" not in sichtbar and "-->" not in sichtbar:
                         for ph in PLATZHALTER.findall(sichtbar):
