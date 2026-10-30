@@ -18,6 +18,10 @@ DW_ADRESSE=https://example.org/digiwort/ python3 tests/smoke.py dist/index.html 
 |---|---|
 | `DW_ADRESSE` | öffentliche Adresse, steht am Ende des geteilten Ergebnisses; Rückmeldungen und Besuchszähler laufen nur auf diesem Host |
 | `DW_BETREIBER` | Name im Rückmelde-Dialog („Max liest jede Rückmeldung.“) |
+| `DW_HEIMAT` | Webseite des Betreibers, z. B. `https://example.org/` – Link unten auf der Seite und unter „Über Digiwort“ |
+| `DW_QUELLCODE` | Adresse des Quellcodes, z. B. dieses Ordners auf GitHub – unter „Über Digiwort“ mit Lizenzhinweis |
+
+Bleiben `DW_HEIMAT` und `DW_QUELLCODE` leer, entfallen Link und Abschnitt „Über Digiwort“.
 
 ## Aufbau
 

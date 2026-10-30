@@ -3,7 +3,7 @@
 #   main      → live:     <WEB>/<PFAD>/ (index.html, feedback.php, zaehler.php, .htaccess, Manifest, Icons)
 #   prototyp  → Vorschau: <WEB>/<PFAD>/vorschau/index.html (eigener Spielstand)
 # Secrets: SFTP_HOST, SFTP_USER, SFTP_PASSWORD, SFTP_KNOWN_HOSTS (empfohlen), DW_GITHUB_TOKEN (optional, Rückmeldungen)
-# Variablen: DW_PFAD (z. B. /digiwort/), DW_ADRESSE (z. B. https://example.org/digiwort/), DW_BETREIBER, DW_REPO (owner/repo)
+# Variablen: DW_PFAD (z. B. /digiwort/), DW_ADRESSE (z. B. https://example.org/digiwort/), DW_BETREIBER, DW_REPO (owner/repo), DW_HEIMAT, DW_QUELLCODE (beide optional)
 
 name: Deploy Digiwort
 
@@ -32,6 +32,8 @@ jobs:
       DW_ADRESSE: ${{ vars.DW_ADRESSE }}
       DW_BETREIBER: ${{ vars.DW_BETREIBER }}
       DW_REPO: ${{ vars.DW_REPO }}
+      DW_HEIMAT: ${{ vars.DW_HEIMAT }}
+      DW_QUELLCODE: ${{ vars.DW_QUELLCODE }}
       ZIEL: ${{ github.ref_name == 'main' && 'live' || 'vorschau' }}
     steps:
       - uses: actions/checkout@v4
