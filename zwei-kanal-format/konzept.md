@@ -1,8 +1,10 @@
-Stand: 2026-10-28a
+Stand: 2026-10-30a
 
 # Zwei-Kanal-Format
 
 *AI-to-AI-and-Human-Messages: ein Text, zwei Leser – Block A für die KI, die handelt, Block B für den Menschen.*
+
+> Verweise auf `../kanon_01_single_agent/`, `../kanon_02_multi_agent/`, `../arbeit/` und `../quelle/` führen in den nicht öffentlichen Teil des Kanons.
 
 Ein Text, nach dem eine KI (oder ein Mensch) handeln soll, besteht aus zwei getrennten Blöcken:
 
@@ -17,7 +19,7 @@ sind verschieden.
 
 **Trennregel.** Quelle wörtlich:
 > „**Block B darf niemals Informationen enthalten, die für die Ausführung notwendig sind — alles Ausführungsrelevante gehört zwingend in Block A.**“
-> (`quelle/kanon-export/v3/tools/auftragsformat.md`, Abschnitt „Block B — Mensch-Kanal (Trennregel)“)
+> (`../quelle/kanon-export/v3/tools/auftragsformat.md`, Abschnitt „Block B — Mensch-Kanal (Trennregel)“)
 
 **Zwei Prüffragen vor dem Abschicken.** Quelle wörtlich:
 > „1. „Ist dieser Kontext-Satz eigentlich eine Anweisung? → nach A verschieben."
@@ -41,8 +43,8 @@ Anlass: Der Betreiber fand Block B der Basis-Anleitung „Kauderwelsch“ – ei
 
 ## Anwendung 1: Aufträge zwischen Agenten
 
-Übernommen aus `quelle/kanon-export/Konzept-2_20261002/ZweiKanal_Kanon.md` (Export-Fassung 1.0) und
-`quelle/kanon-export/v3/tools/auftragsformat.md`; im Produkt als Regel T6 in `../kanon_02_multi_agent/regeln-team.md`, Vorlage in
+Übernommen aus `../quelle/kanon-export/Konzept-2_20261002/ZweiKanal_Kanon.md` (Export-Fassung 1.0) und
+`../quelle/kanon-export/v3/tools/auftragsformat.md`; im Produkt als Regel T6 in `../kanon_02_multi_agent/regeln-team.md`, Vorlage in
 `../kanon_02_multi_agent/vorlagen.md`, Prüfung im Code mit `auftrag_pruefen` (`../kanon_02_multi_agent/kanon_team.py`).
 
 **Wann.** Quelle wörtlich (`ZweiKanal_Kanon.md`, Schritt 1):
@@ -71,8 +73,14 @@ ESKALATION: <wann/an wen bei Blockern>
 **Quittung.** Quelle wörtlich (`auftragsformat.md`, „Mechanik-Regeln“):
 > „Der Empfänger zitiert die Auftrags-Nummer am Anfang seiner Quittierung — nur mit Rückbezug kann abgleichen, ob der Auftrag schon bearbeitet wurde (auch über einen Instanz-Wechsel hinweg).“
 
+Im Postfach-Kopf (claude_1/post/README.md) steht die RUN-ID als Kopffeld und „Antwort auf“ nennt die Datei; das erfüllt die Regel.
+Ebenso ersetzt das Kopffeld „Datum/Uhrzeit (gemessen)“ das Feld DATUM in Block A – ein Datum steht genau einmal (Kanon 01 B34).
+
 **Substanz auslagern.** Quelle wörtlich (ebenda):
 > „Nachrichten-Kerne bleiben kurz; Substanz (Konzepte, Begründungen, Rohfassungen) wird als eigene Datei in der Wissens-Ablage hinterlegt und mit Lese-Auslöser referenziert (Zweck + entscheidungsrelevante Abschnitte).“
+
+Schwelle (seit 2026-10-30, nach Review R036): Block B hat höchstens drei Absätze. Was länger wird, ist Substanz und geht in
+eine eigene Datei mit Lese-Auslöser in Block A (Zweck und was der Leser dort entscheidet).
 
 ---
 
@@ -129,7 +137,7 @@ und einen Fehler im Code, Blindtest 3 fand 11, darunter eine echte Lücke (Konto
 
 ## Herkunft
 
-- `quelle/kanon-export/Konzept-2_20261002/ZweiKanal_Kanon.md` – Verfahrens-Datei, Export-Fassung 1.0
-- `quelle/kanon-export/v3/tools/auftragsformat.md` – Skillbook, Pilot-Verankerung 27.09.2026
-- `quelle/kanon-export/v4/framework-kern.md` – Kurzfassung im Kern
+- `../quelle/kanon-export/Konzept-2_20261002/ZweiKanal_Kanon.md` – Verfahrens-Datei, Export-Fassung 1.0
+- `../quelle/kanon-export/v3/tools/auftragsformat.md` – Skillbook, Pilot-Verankerung 27.09.2026
+- `../quelle/kanon-export/v4/framework-kern.md` – Kurzfassung im Kern
 - Anwendung 2, Klartext-Regel für Block B und Blindtest: Entscheidungen des Betreibers vom 28.10.2026

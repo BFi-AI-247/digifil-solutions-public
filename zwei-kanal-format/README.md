@@ -2,6 +2,8 @@
 
 *AI-to-AI-and-Human-Messages: ein Text, zwei Leser – Block A für die KI, die handelt, Block B für den Menschen.*
 
+> Verweise auf `../kanon_01_single_agent/`, `../kanon_02_multi_agent/`, `../arbeit/` und `../quelle/` führen in den nicht öffentlichen Teil des Kanons.
+
 <!-- Zwei-Kanal-Format (konzept.md, Anwendung 2): BLOCK A muss allein genügen, BLOCK B ist Klartext für Menschen. -->
 
 ## BLOCK A – Auftrag an die schreibende KI
