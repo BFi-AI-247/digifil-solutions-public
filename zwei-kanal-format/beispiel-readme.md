@@ -1,4 +1,4 @@
-# Beispiel: eine Anleitung im Zwei-Kanal-Format 1.1
+# Beispiel: eine Anleitung im Zwei-Kanal-Format 1.2
 
 <!-- Erfundenes Beispiel zu readme-vorlage.md. Das Werkzeug „Termin-Erinnerer“ gibt es nicht; Dateinamen und Befehle
      sind ausgedacht, aber so konkret, wie eine echte Anleitung sie nennen müsste. -->
@@ -35,7 +35,7 @@ VERHALTEN:    Ohne Termine am Tag wird keine E-Mail verschickt, aber eine Protok
 
    | Platzhalter | einsetzen |
    |---|---|
-   | `"an"` | die Empfängeradresse aus dem Auftrag; fehlt sie: die Testadresse (in der Lieferung als offen nennen) |
+   | `"an"` | die Empfängeradresse aus dem Auftrag; fehlt sie: leer lassen und in der Lieferung als offen nennen – keine Vorgabe für Empfänger; Schritt 4 wartet dann |
    | `"von"` | die Absenderadresse des E-Mail-Kontos |
    | `"test_an"` | eine Adresse, die der Auftraggeber liest |
    | `"smtp"` | Server, Port, Benutzer, Passwort aus dem Auftrag; fehlt etwas: Schritt abbrechen, als offen melden |

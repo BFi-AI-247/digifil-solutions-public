@@ -1,4 +1,4 @@
-# Zwei-Kanal-Format 1.1
+# Zwei-Kanal-Format 1.2
 
 *AI-to-AI-and-Human-Messages: ein Text, zwei Leser – Block A für die KI, die handelt, Block B für den Menschen.*
 
@@ -40,7 +40,8 @@ BEGRIFFE:     Ausführungsrelevant = alles, ohne das der Empfänger anders oder 
    Datei, Stelle und Wert und endet mit *Ergebnis:*. Was nur im Code steht (Dateiname, Ablageort, das Wort für eine Rolle
    im Code), auch hier nennen. Dieselbe Sache überall mit demselben Wort bezeichnen. Listenfelder dürfen Punkte mit „·“ trennen,
    jeder Punkt eine vollständige Aussage. Nur bei Anleitungen: Wo ein Wert offen sein kann, Vorgabe daneben und „in der
-   Lieferung als offen nennen“. Nur bei Aufträgen: LEITPLANKEN und ESKALATION ausdrücklich füllen („keine“ ist ein Wert);
+   Lieferung als offen nennen“ – außer für Empfänger, Veröffentlichung, Löschen und Zugangsdaten: dort keine Vorgabe,
+   der Schritt wartet. Nur bei Aufträgen: LEITPLANKEN und ESKALATION ausdrücklich füllen („keine“ ist ein Wert);
    REQUIRE-ACK mindestens RUN-ID und Stand; hast du selbst eine Angabe nicht: nicht raten – vor dem Abschicken beschaffen oder
    in PARAMETER als `offen: … – vor dem Handeln beim Absender erfragen` schreiben, nie in Block B verstecken (was der
    Empfänger dann tut: konzept.md, „Wenn der Verfasser eine Angabe nicht hat“).

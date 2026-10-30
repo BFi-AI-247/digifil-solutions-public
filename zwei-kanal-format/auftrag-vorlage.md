@@ -1,4 +1,4 @@
-# Vorlage: Auftrag im Zwei-Kanal-Format 1.1 (Anwendung 1)
+# Vorlage: Auftrag im Zwei-Kanal-Format 1.2 (Anwendung 1)
 
 <!-- Kopieren, alle Platzhalter in spitzen Klammern ersetzen, diesen Kommentar löschen. Alle zehn Felder von Block A sind Pflicht („keine“ ist ein
      Wert). Block A muss allein genügen; was nicht in Block B darf, steht in konzept.md (Anwendung 1). Erklärung der Felder:

@@ -59,6 +59,8 @@ def main(datei: str, bilder: str | None) -> int:
         pruefe(n5 > 1000 and n6 > 1000, f"genug Lösungswörter ({n5} / {n6})")
         pruefe(pg.evaluate("SOL[5].every(w=>VALID[5].has(w)&&[...w].length===5)&&SOL[6].every(w=>VALID[6].has(w)&&[...w].length===6)"),
                "alle Lösungen sind erlaubte Wörter der richtigen Länge")
+        abstand = pg.evaluate("Math.min(...[5,6].map(l=>{const z={};let m=1e9;SOL[l].forEach((w,i)=>{if(w in z)m=Math.min(m,i-z[w]);z[w]=i;});return m;}))")
+        pruefe(abstand >= 365, f"Lösungswort kommt frühestens nach 365 Tagen wieder (kleinster Abstand {abstand if abstand < 1e9 else 'keiner'})")
         pruefe(pg.evaluate("VALID[5].has('SPASS')&&VALID[5].has('ÄRGER')&&VALID[6].has('GRÖSSE')&&!VALID[5].has('XYZQW')"),
                "Stichproben (SPASS, ÄRGER, GRÖSSE ja, XYZQW nein)")
         pruefe(pg.evaluate("dayIndex(new Date(2026,9,25,0,1))===0&&dayIndex(new Date(2026,9,26,23,59))===1&&dayIndex(new Date(2027,2,30))===156"),
@@ -147,6 +149,25 @@ def main(datei: str, bilder: str | None) -> int:
         pruefe(pg.evaluate("game.status") != "play" and not pg.is_visible("#dStats"), "Wechsel auf fertiges Rätsel öffnet keine Statistik")
         pg.reload(); pg.wait_for_timeout(900)
         pruefe(not pg.is_visible("#dStats"), "Start mit fertigem Rätsel öffnet keine Statistik")
+
+        print("Fenstergrößen (#23)")
+        def mass(w, h):
+            q = b.new_page(viewport={"width": w, "height": h})
+            q.goto(url); q.wait_for_timeout(300); q.keyboard.press("Escape")
+            r = q.evaluate("""()=>{const B=$('board').getBoundingClientRect(),K=$('kb').getBoundingClientRect();
+              return {bw:B.width,kh:document.querySelector('.k').getBoundingClientRect().height,nebeneinander:K.left>=B.right,
+              passt:document.documentElement.scrollHeight<=innerHeight+1}}""")
+            q.close(); return r
+        r = mass(390, 800)
+        # ohne Prüfung „passt“: mit dem Vorschau-Schild war die Seite hochkant schon vor #23 knapp (Schild + feste 380 px)
+        pruefe(round(r["kh"]) == 54 and r["bw"] >= 300 and not r["nebeneinander"],
+               f"Handy hochkant wie bisher (Tasten {r['kh']:.0f} px, Brett {r['bw']:.0f} px, über der Tastatur)")
+        r = mass(560, 692)
+        pruefe(r["bw"] >= 250 and r["kh"] < 54 and not r["nebeneinander"] and r["passt"], "schmaler, flacher Rahmen: Tasten kleiner, Brett größer")
+        r = mass(1525, 640)
+        pruefe(r["nebeneinander"] and r["bw"] >= 320 and r["passt"], "breites, flaches Fenster: Brett und Tastatur nebeneinander")
+        r = mass(844, 390)
+        pruefe(r["nebeneinander"] and r["bw"] >= 150 and r["passt"], "Handy quer: Brett und Tastatur nebeneinander")
 
         pruefe(not js, "keine JavaScript-Fehler" + (f": {js[:3]}" if js else ""))
         b.close()

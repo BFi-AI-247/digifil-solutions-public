@@ -23,6 +23,7 @@ import sys
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 SRC, DATA, DIST = ROOT / "src", ROOT / "data", ROOT / "dist"
+ABSTAND = 365  # kleinster Abstand in Tagen, bis ein Lösungswort wiederkommen darf
 OK = {5: re.compile(r"^[A-ZÄÖÜ]{5}$"), 6: re.compile(r"^[A-ZÄÖÜ]{6}$")}
 
 
@@ -31,6 +32,17 @@ def liste(name: str, n: int) -> list[str]:
     falsch = [w for w in woerter if not OK[n].match(w)]
     if falsch:
         sys.exit(f"{name}: ungültige Einträge (nur Großbuchstaben A–Z, Ä, Ö, Ü; Länge {n}): {falsch[:10]}")
+    if name.startswith("loesungen"):
+        # Tagesplan: Zeile n = Tag n. Eine Lösungsliste darf hinten als Kopie angehängt werden (nächste Runde),
+        # ein Wort darf aber frühestens nach ABSTAND Tagen wiederkommen.
+        zuletzt, zu_frueh = {}, []
+        for i, w in enumerate(woerter):
+            if w in zuletzt and i - zuletzt[w] < ABSTAND:
+                zu_frueh.append(f"{w} (Zeile {zuletzt[w] + 1} und {i + 1})")
+            zuletzt[w] = i
+        if zu_frueh:
+            sys.exit(f"{name}: Wort kommt früher als nach {ABSTAND} Tagen wieder: {zu_frueh[:10]}")
+        return woerter
     doppelt = {w for w in woerter if woerter.count(w) > 1} if len(woerter) < 3000 else set()
     if doppelt:
         sys.exit(f"{name}: doppelte Einträge: {sorted(doppelt)[:10]}")

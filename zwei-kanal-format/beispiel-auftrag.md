@@ -1,4 +1,4 @@
-# Beispiel: ein Auftrag im Zwei-Kanal-Format 1.1
+# Beispiel: ein Auftrag im Zwei-Kanal-Format 1.2
 
 <!-- Erfundenes Beispiel zu auftrag-vorlage.md. Verein, Personen, Dateien und Zeiten sind ausgedacht. -->
 
