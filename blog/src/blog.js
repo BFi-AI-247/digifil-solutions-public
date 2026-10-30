@@ -1,4 +1,4 @@
-// Blog – kleine Helfer auf den Lese-Seiten: Rückmelde-Formular und Wahl der Gestaltung.
+// Blog – kleine Helfer auf den Lese-Seiten: Rückmelde-Formular, Wahl der Gestaltung, Auswahlliste der Serien.
 (function () {
   var html = document.documentElement;
   var basis = (document.querySelector('link[rel=stylesheet][href$="blog.css"]') || {}).getAttribute
@@ -18,6 +18,11 @@
     });
   });
   zeige();
+
+  // Auswahlliste der Serien (ab 5 Serien auf der Startseite): nach der Wahl direkt zur Serienseite
+  document.querySelectorAll('select[data-springe]').forEach(function (s) {
+    s.addEventListener('change', function () { if (s.value) location.href = s.value; });
+  });
 
   // Rückmeldung
   var f = document.getElementById('rm');

@@ -31,7 +31,7 @@ if (!ein('live') && !ist_vorschau()) {
 const TEXTE = [
     'de' => ['neu' => 'Neueste Beiträge', 'serien' => 'Serien', 'teil' => 'Teil %d von %d', 'vor' => 'Vorheriger Teil', 'nach' => 'Nächster Teil',
         'von_vorne' => 'Von vorne lesen', 'alle_teile' => 'Alle Teile der Serie', 'lesezeit' => '%d Min. Lesezeit', 'stichwoerter' => 'Stichwörter',
-        'ursprung' => 'Ursprünglich erschienen auf %s', 'andere' => 'English', 'rm' => 'Rückmeldung geben', 'serie' => 'Serie',
+        'ursprung' => 'Ursprünglich erschienen auf %s', 'andere' => 'English', 'rm' => 'Rückmeldung geben', 'serie' => 'Serie', 'serie_waehlen' => 'Serie wählen …', 'alle_serien' => 'Alle Serien',
         'teile' => '%d Teile', 'ein_teil' => '1 Teil', 'weg' => 'Diese Seite gibt es nicht (mehr).', 'zur_start' => 'Zur Startseite',
         'aeltere' => 'Ältere Beiträge', 'neuere' => 'Neuere Beiträge', 'stichwort' => 'Stichwort', 'feed' => 'Feed abonnieren',
         'leer' => 'Hier erscheinen bald die ersten Beiträge.', 'rm_hilfe' => 'Fehler entdeckt oder ein Gedanke dazu? Schreib es kurz – es geht nur an mich, nichts wird hier veröffentlicht.',
@@ -40,7 +40,7 @@ const TEXTE = [
         'monate' => ['Januar', 'Februar', 'März', 'April', 'Mai', 'Juni', 'Juli', 'August', 'September', 'Oktober', 'November', 'Dezember']],
     'en' => ['neu' => 'Latest posts', 'serien' => 'Series', 'teil' => 'Part %d of %d', 'vor' => 'Previous part', 'nach' => 'Next part',
         'von_vorne' => 'Start from the beginning', 'alle_teile' => 'All parts of the series', 'lesezeit' => '%d min read', 'stichwoerter' => 'Tags',
-        'ursprung' => 'Originally published on %s', 'andere' => 'Deutsch', 'rm' => 'Send feedback', 'serie' => 'Series',
+        'ursprung' => 'Originally published on %s', 'andere' => 'Deutsch', 'rm' => 'Send feedback', 'serie' => 'Series', 'serie_waehlen' => 'Choose a series …', 'alle_serien' => 'All series',
         'teile' => '%d parts', 'ein_teil' => '1 part', 'weg' => 'This page does not exist (any more).', 'zur_start' => 'Back to the start',
         'aeltere' => 'Older posts', 'neuere' => 'Newer posts', 'stichwort' => 'Tag', 'feed' => 'Subscribe (feed)',
         'leer' => 'The first posts will appear here soon.', 'rm_hilfe' => 'Spotted a mistake or have a thought? Write a few words – it only goes to me, nothing is published here.',
@@ -124,15 +124,25 @@ function karte(array $x): string {
     return '<article class="karte"><h2><a href="' . h(link_zu($x['id'] . '/')) . '">' . h(feld($x, 'titel', $L)) . '</a></h2>'
         . meta_zeile($x) . '<p class="anriss">' . h(anriss(feld($x, 'text', $L))) . '</p></article>';
 }
+const BLOG_SERIEN_KNOEPFE = 4; // bis zu so vielen sichtbaren Serien runde Knöpfe, ab einer mehr eine Auswahlliste (#19)
 function serien_liste(): string {
     global $L;
-    $h = '';
+    $sichtbar = [];
     foreach (alle_serien() as $id => $s) {
         $n = count(serien_teile($id, $L));
-        if ($n === 0) continue;
-        $h .= '<li><a href="' . h(link_zu("serie/$id/")) . '">' . h(serien_titel($id, $L)) . '</a> <span class="zahl">' . ($n === 1 ? t('ein_teil') : t('teile', $n)) . '</span></li>';
+        if ($n > 0) $sichtbar[$id] = $n;
     }
-    return $h === '' ? '' : '<ul class="serien">' . $h . '</ul>';
+    if (!$sichtbar) return '';
+    $zahl = fn(int $n): string => $n === 1 ? t('ein_teil') : t('teile', $n);
+    if (count($sichtbar) > BLOG_SERIEN_KNOEPFE) {
+        $o = '<option value="" selected disabled>' . t('serie_waehlen') . '</option>';
+        foreach ($sichtbar as $id => $n) $o .= '<option value="' . h(link_zu("serie/$id/")) . '">' . h(serien_titel($id, $L)) . ' · ' . $zahl($n) . '</option>';
+        return '<div class="serien-wahl"><select data-springe aria-label="' . h(t('serie_waehlen')) . '">' . $o . '</select>'
+            . ' <a href="' . h(link_zu('serien/')) . '">' . t('alle_serien') . ' →</a></div>';
+    }
+    $h = '';
+    foreach ($sichtbar as $id => $n) $h .= '<li><a href="' . h(link_zu("serie/$id/")) . '">' . h(serien_titel($id, $L)) . '</a> <span class="zahl">' . $zahl($n) . '</span></li>';
+    return '<ul class="serien">' . $h . '</ul>';
 }
 function nicht_gefunden(): never {
     seite('404', '<h1>' . t('weg') . '</h1><p><a href="' . h(link_zu()) . '">' . t('zur_start') . '</a></p>', ['code' => 404]);

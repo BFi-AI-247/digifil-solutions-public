@@ -125,6 +125,23 @@ textarea.fb{width:100%;min-height:120px;resize:vertical;border:1px solid var(--l
 .ueber a{color:var(--fg)}
 @media (prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:1ms!important;animation-delay:0ms!important;transition:none!important}}
 @media (max-height:640px){.k{height:46px}.seg button{padding:5px 11px}}
+/* #23 Breite, flache Fenster (Laptop, eingebettet). Handys hochkant (< 500 px breit) bleiben unverändert.
+   1) Ab 500 px Breite und bis 800 px Höhe wächst die Tastenhöhe mit der Fensterhöhe (36–54 px); was die Tastatur
+      dabei abgibt, bekommt das Brett. */
+@media (min-width:500px) and (max-height:800px){
+  .k{height:clamp(36px,6dvh,54px)}
+  .board{width:min(calc(66px * var(--L)),100%,calc((100dvh - 380px + 3 * (54px - clamp(36px,6dvh,54px))) * var(--L) / 6))}
+}
+/* 2) Breiter als hoch und höchstens 800 px hoch: Brett links, Tastatur rechts – dann bestimmt nicht mehr die Höhe allein das Brett. */
+@media (min-aspect-ratio:1/1) and (max-height:800px) and (min-width:640px){
+  .app{max-width:1100px;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);column-gap:28px;
+    grid-template-rows:auto auto auto minmax(0,1fr) auto;grid-template-areas:"kopf kopf" "leiste leiste" "sub sub" "brett tasten" "fuss fuss"}
+  header{grid-area:kopf} .bar2{grid-area:leiste} .sub{grid-area:sub} .boardwrap{grid-area:brett} .visits{grid-area:fuss}
+  .kb{grid-area:tasten;align-self:center;width:100%;max-width:520px;justify-self:start}
+  .k{height:clamp(36px,8dvh,54px)}
+  .board{width:min(calc(66px * var(--L)),100%,calc((100dvh - 190px) * var(--L) / 6))}
+  .boardwrap{justify-content:flex-end}
+}
 </style>
 <div class="vbanner" id="vbanner" hidden>Vorschau – eigener Spielstand, nicht die Live-Fassung</div>
 <div class="app">

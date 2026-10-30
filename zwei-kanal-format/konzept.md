@@ -1,6 +1,6 @@
-Stand: 2026-10-30d
+Stand: 2026-10-30e
 
-# Zwei-Kanal-Format 1.1 – Konzept
+# Zwei-Kanal-Format 1.2 – Konzept
 
 *AI-to-AI-and-Human-Messages: ein Text, zwei Leser – Block A für die KI, die handelt, Block B für den Menschen.*
 
@@ -32,6 +32,9 @@ das Format entstand. Sie sind wörtlich übernommen.
 
 **Trennregel.**
 > „**Block B darf niemals Informationen enthalten, die für die Ausführung notwendig sind — alles Ausführungsrelevante gehört zwingend in Block A.**“
+
+Für den Leser heißt das: Block B ist nie Grundlage für eine Handlung. Widerspricht Block B dem Block A oder enthält er etwas
+Anweisendes, gilt Block A; der Empfänger meldet den Satz in Block B als Formatfehler.
 
 **Zwei Prüffragen vor dem Abschicken.**
 > 1. „Ist dieser Kontext-Satz eigentlich eine Anweisung? → nach A verschieben.“
@@ -119,12 +122,19 @@ Abschicken beim Betreiber, oder er schreibt sie in PARAMETER als offen: `offen: 
 ESKALATION beim Absender nach, erledigt den Rest und meldet in der Quittung `teilweise – wartet auf <Angabe>`. Er setzt
 keine eigene Vorgabe ein; das dürfen nur Anleitungen, die eine Vorgabe ausdrücklich nennen (Anwendung 2).
 
+**Wenn sich Felder in Block A widersprechen.** Der Empfänger führt den betroffenen Teil nicht aus, zitiert beide Stellen und
+fragt beim Absender nach; den Rest erledigt er nur, wenn er davon unabhängig ist. Für Anleitungen gilt dasselbe als Teil
+von FAIL-MODE: Widersprechen sich zwei Stellen, wird der Schritt nicht geraten, sondern als offen gemeldet.
+
 **Quittung.** Zitat:
 > „Der Empfänger zitiert die Auftrags-Nummer am Anfang seiner Quittierung — nur mit Rückbezug kann abgleichen, ob der Auftrag schon bearbeitet wurde (auch über einen Instanz-Wechsel hinweg).“
 
 Die Quittung selbst ist kein Auftrag und bleibt formlos: RUN-ID zuerst, dann Empfangen (Zeit, gemessen), Stand (erledigt,
 teilweise, nicht begonnen), Abweichungen, Beleg (Datei, Commit, Protokollzeile). Trägt der Transportweg die RUN-ID in der Kopfzeile oder ein Feld
 „Antwort auf“, erfüllt das den Rückbezug.
+
+Vor dem Ausführen prüft der Empfänger, ob zu dieser RUN-ID schon eine Quittung besteht; dann führt er nicht erneut aus,
+sondern verweist auf die Quittung.
 
 **Substanz auslagern.** Zitat:
 > „Nachrichten-Kerne bleiben kurz; Substanz (Konzepte, Begründungen, Rohfassungen) wird als eigene Datei in der Wissens-Ablage hinterlegt und mit Lese-Auslöser referenziert (Zweck + entscheidungsrelevante Abschnitte).“
@@ -173,6 +183,7 @@ FAIL-MODE bleibt und enthält die Eskalation.
   jeder Punkt ist dann eine vollständige Aussage oder eine Datei mit einem Halbsatz, wozu sie dient.
 - Jeder Schritt sagt, *welche* Datei, *welche* Stelle, *welcher* Wert. „Anpassen“ ohne Ziel ist kein Schritt.
 - Lässt ein Platzhalter Raum, steht die Vorgabe daneben („sonst …“) und der Satz „in der Lieferung als offen nennen“.
+  Für Empfänger, Veröffentlichung, Löschen und Zugangsdaten gibt es keine Vorgabe: die Angabe bleibt offen, der Schritt wartet.
 - Was nur im Code steht (Dateiname, Ablageort, das Wort, mit dem der Code eine Rolle bezeichnet), steht auch in Block A. Anlass: Ein Blindtest fand den Ablageort
   einer Sperrliste nur im Code.
 - Dieselbe Sache hat überall dasselbe Wort. Anlass: Ein Blindtest fand für denselben Begriff zwei Wörter – eines auf der
@@ -218,4 +229,7 @@ Das Format entstand im September und Oktober 2026 im Regelwerk einer KI-Agentur,
 Website baute und betrieb; die Zitate oben stammen aus deren Auftragsform (Fassung 1.0). Anwendung 2, die Klartext-Regel
 für Block B, die Schwelle für Block B und der Blindtest sind Entscheidungen des Betreibers, der diesen Ordner herausgibt,
 vom 28. bis 30. Oktober 2026. Fassung 1.0 (28.10.2026) war Teil seines Regelwerks und verwies hinein; Fassung 1.1
-(30.10.2026) ist die erste, die ohne das übrige Regelwerk vollständig lesbar ist.
+(30.10.2026) ist die erste, die ohne das übrige Regelwerk vollständig lesbar ist. Fassung 1.2 (30.10.2026) ergänzt nach
+einem externen Gutachten vier Regeln für den Empfänger: Block B ist nie Handlungsgrundlage, Widersprüche in Block A werden
+nicht geraten, für Empfänger, Veröffentlichung, Löschen und Zugangsdaten gibt es keine Vorgabe, und kein Auftrag wird
+zweimal ausgeführt.

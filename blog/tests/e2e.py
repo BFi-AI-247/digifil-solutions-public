@@ -39,6 +39,7 @@ s, t, _ = hole("")
 pruefe(s == 200 and t.count('class="karte"') == 4, "Startseite zeigt 4 veröffentlichte Beiträge")
 pruefe("Noch geheim" not in t, "Entwurf erscheint nicht")
 pruefe("3 Teile" in t and "Leere Serie" not in t, "Serien-Kasten: Garten mit 3 Teilen, leere Serie ausgeblendet")
+pruefe('<ul class="serien">' in t and "data-springe" not in t, "Serien-Kasten: bis 4 Serien runde Knöpfe, keine Auswahlliste (#19)")
 s, t, _ = hole("der-kompost/")
 pruefe("Teil 2 von 3" in t, "Beitrag kennt seinen Platz in der Serie")
 pruefe('href="/tomaten-im-oktober/"' in t and 'href="/schnecken/"' in t, "Vor/Zurück zeigen auf Teil 1 und 3")
@@ -163,6 +164,35 @@ with sync_playwright() as p:
         q.evaluate("localStorage.removeItem('blog-stil')")
         pruefe(not zu_breit, f"Keine waagerechte Scrollleiste bei 360 px, alle Seiten und Entwürfe ({schema})" + (": " + ", ".join(zu_breit) if zu_breit else ""))
         c.close()
+    br.close()
+
+print("Serien-Auswahl ab 5 Serien (#19)")
+# vier weitere Serien mit je einem Teil als Editor-Daten anlegen (nur auf dem Haupt-Testserver, danach nicht mehr gebraucht)
+d = ARBEIT / "privat/daten"; (d / "beitraege").mkdir(parents=True, exist_ok=True)
+sf = d / "serien.json"; serien = json.loads(sf.read_text())["serien"] if sf.exists() else []
+for i, name in enumerate(["Gedanken zum Wetter", "Gedanken zur Küche", "Gedanken zum Wald", "Gedanken zum Meer"], 1):
+    sid = f"test-serie-{i}"
+    serien.append({"id": sid, "titel": name, "einleitung": "", "en": {}})
+    (d / "beitraege" / f"{sid}-teil.json").write_text(json.dumps({"id": f"{sid}-teil", "status": "veroeffentlicht", "datum": f"2025-03-0{i}T10:00:00+01:00",
+        "titel": f"{name}, erster Teil", "text": "Ein kurzer Testtext.", "serie": sid, "stichwoerter": [], "en": {}, "herkunft": {}}))
+sf.write_text(json.dumps({"serien": serien}))
+s, t, _ = hole("")
+pruefe("data-springe" in t and t.count("<option") == 6 and '<ul class="serien">' not in t, "Startseite: ab 5 Serien Auswahlliste mit 5 Serien statt Knöpfen")
+pruefe("Gedanken zum Garten · 4 Teile" in t and 'href="/serien/">Alle Serien' in t, "Auswahlliste nennt Teile-Zahl, Link „Alle Serien“ als Rückfall")
+s, t, _ = hole("en/")
+pruefe("data-springe" not in t, "Englisch: nur Serien mit geprüften Teilen zählen – dort weiter Knöpfe")
+with sync_playwright() as p:
+    br = p.chromium.launch()
+    for schema in ("light", "dark"):
+        q = br.new_page(viewport={"width": 390, "height": 844}, color_scheme=schema, device_scale_factor=2)
+        q.goto(BASIS)
+        q.screenshot(path=str(BILDER / f"serien-auswahl-{schema}.png"), clip={"x": 0, "y": 0, "width": 390, "height": 420})
+        q.set_viewport_size({"width": 360, "height": 780})
+        pruefe(q.evaluate("document.documentElement.scrollWidth") <= 360, f"Auswahlliste: keine waagerechte Scrollleiste bei 360 px ({schema})")
+        q.select_option("select[data-springe]", label="Gedanken zum Wald · 1 Teil")
+        q.wait_for_url("**/serie/test-serie-3/")
+        pruefe("Gedanken zum Wald" in q.inner_text("h1"), f"Auswahl führt direkt zur Serienseite ({schema})")
+        q.close()
     br.close()
 
 print("Vorschau")

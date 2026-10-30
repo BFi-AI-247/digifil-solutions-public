@@ -1,4 +1,4 @@
-# Vorlage: Anleitung im Zwei-Kanal-Format 1.1 (Anwendung 2)
+# Vorlage: Anleitung im Zwei-Kanal-Format 1.2 (Anwendung 2)
 
 Kopiere den Inhalt des Blocks unten in eine neue Datei (zum Beispiel `README.md`), ersetze alle `<…>`, lösche Felder ohne
 Inhalt („wenn nötig“) und die Kommentare. Erklärung der Felder: `konzept.md`, Anwendung 2. Beispiel: `beispiel-readme.md`.
@@ -7,7 +7,7 @@ Der Block ist ein Codeblock, damit die Platzhalter in spitzen Klammern hier sich
 ````markdown
 # <Name> <Version>
 
-<!-- Zwei-Kanal-Format 1.1, Anwendung 2. BLOCK A enthält alles, was zum Ausführen nötig ist, und muss allein genügen.
+<!-- Zwei-Kanal-Format 1.2, Anwendung 2. BLOCK A enthält alles, was zum Ausführen nötig ist, und muss allein genügen.
      BLOCK B ist für Menschen, in Klartext, und enthält nichts Ausführungsrelevantes. Diesen Kommentar löschen. -->
 
 ## BLOCK A – Auftrag an die einrichtende KI
@@ -30,7 +30,7 @@ VERHALTEN:    <Wie das Werkzeug sich heute verhält, je Funktion eine prüfbare 
 
    | Platzhalter | einsetzen |
    |---|---|
-   | `<…>` | <Quelle des Werts>; sonst <Vorgabe> (in der Lieferung als offen nennen) |
+   | `<…>` | <Quelle des Werts>; sonst <Vorgabe> (in der Lieferung als offen nennen) – für Empfänger, Veröffentlichung, Löschen und Zugangsdaten keine Vorgabe: offen lassen, der Schritt wartet |
 
    *Ergebnis:* <…>
 
