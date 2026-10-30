@@ -20,6 +20,8 @@ zusätzlich: (1) jeder Verweis auf eine Datei – Markdown-Link `](pfad)` oder P
 oder mit ../ – muss auf eine Datei innerhalb des Zielordners zeigen; (2) kein Muster aus "intern_muster" (reguläre Ausdrücke,
 z. B. interne Kennungen wie Postfach-Pfade oder Kartennummern) kommt vor. Dateien, die auf ein Muster aus "beispiele"
 des Eintrags passen (z. B. "beispiel-*.md"), sind von (1) ausgenommen – sie dürfen erfundene Dateien nennen; (2) gilt auch für sie.
+(3) In .md-Dateien darf außerhalb von Code (```-Blöcke und `…`) kein Platzhalter in spitzen Klammern stehen (z. B. <Name>):
+GitHub hält ihn für ein HTML-Tag und zeigt ihn nicht an. HTML-Kommentare <!-- … --> sind erlaubt.
 
 "ausnahmen" erlaubt je Zieldatei bestimmte Begriffe oder Wendungen (z. B. eine Quellenangabe, die zufällig
 einen verbotenen Vornamen enthält). Sie werden vor der Prüfung aus der Zeile entfernt; alles andere wird weiter geprüft.
@@ -99,6 +101,7 @@ def pruefe(dateien: list[Path], verboten: list[str], basis: Path, ausnahmen: dic
 VERWEIS_LINK = re.compile(r"\]\(([^)\s]+)\)")
 VERWEIS_CODE = re.compile(r"`([^`\s]+)`")
 DATEI_ENDUNG = re.compile(r"\.(md|py|json|ya?ml)(#[\w-]*)?$")
+PLATZHALTER = re.compile(r"<(?!!--)(?!/?(?:br|sub|sup|details|summary|b|i|code|kbd)\b)[^<>\s][^<>]*>")
 
 
 def pruefe_geschlossen(ordner: Path, intern: list[str], basis: Path, beispiele: list[str] | None = None) -> list[str]:
@@ -114,8 +117,17 @@ def pruefe_geschlossen(ordner: Path, intern: list[str], basis: Path, beispiele: 
         except UnicodeDecodeError:
             continue
         beispiel = any(fnmatch.fnmatch(d.relative_to(ordner).as_posix(), m) for m in (beispiele or []))
+        im_code = False
         for nr, zeile in enumerate(text.splitlines(), 1):
             ort = f"{d.relative_to(basis)}:{nr}"
+            if d.suffix.lower() == ".md":
+                if zeile.lstrip().startswith("```"):
+                    im_code = not im_code
+                elif not im_code:
+                    sichtbar = re.sub(r"`[^`]*`", "", re.sub(r"<!--.*?-->", "", zeile))
+                    if "<!--" not in sichtbar and "-->" not in sichtbar:
+                        for ph in PLATZHALTER.findall(sichtbar):
+                            funde.append(f"{ort}: Platzhalter „{ph}“ außerhalb von Code – auf GitHub unsichtbar")
             kandidaten = [] if beispiel else VERWEIS_LINK.findall(zeile) + [c for c in VERWEIS_CODE.findall(zeile)
                                                         if c.startswith("../") or DATEI_ENDUNG.search(c)]
             for v in kandidaten:
