@@ -1,8 +1,14 @@
+# Vorlage: Anleitung im Zwei-Kanal-Format 1.1 (Anwendung 2)
+
+Kopiere den Inhalt des Blocks unten in eine neue Datei (zum Beispiel `README.md`), ersetze alle `<…>`, lösche Felder ohne
+Inhalt („wenn nötig“) und die Kommentare. Erklärung der Felder: `konzept.md`, Anwendung 2. Beispiel: `beispiel-readme.md`.
+Der Block ist ein Codeblock, damit die Platzhalter in spitzen Klammern hier sichtbar bleiben.
+
+````markdown
 # <Name> <Version>
 
-<!-- Zwei-Kanal-Format (kanon/Zwei-Kanal-Format/konzept.md, Anwendung 2). BLOCK A enthält alles, was zum Ausführen nötig ist,
-     und muss allein genügen. BLOCK B ist für Menschen, in Klartext, und enthält nichts Ausführungsrelevantes.
-     Beim Ausfüllen: alle <…> ersetzen, Felder ohne Inhalt („wenn nötig“) ganz löschen, diese Kommentare löschen. -->
+<!-- Zwei-Kanal-Format 1.1, Anwendung 2. BLOCK A enthält alles, was zum Ausführen nötig ist, und muss allein genügen.
+     BLOCK B ist für Menschen, in Klartext, und enthält nichts Ausführungsrelevantes. Diesen Kommentar löschen. -->
 
 ## BLOCK A – Auftrag an die einrichtende KI
 
@@ -13,7 +19,7 @@ GILT NICHT:   <Was nicht – und wo es stattdessen steht.>
 VORAUSSETZUNG: <Sprache/Version, Zugriffe, Dienste, die vorher da sein müssen.>
 DATEIEN:      <datei> (<wozu>) · <datei> (<wozu>) · …
 BEGRIFFE:     <Begriff> = <genaue Bedeutung, wie die Schritte ihn verwenden>.   ← wenn nötig
-VERHALTEN:    <Wie das Werkzeug sich heute verhält, je Funktion eine prüfbare Aussage.>   ← bei Produkten
+VERHALTEN:    <Wie das Werkzeug sich heute verhält, je Funktion eine prüfbare Aussage.>   ← bei Werkzeugen, die laufen
 ```
 
 ### SCHRITTE (in dieser Reihenfolge; jeder Schritt hat ein prüfbares Ergebnis)
@@ -21,13 +27,15 @@ VERHALTEN:    <Wie das Werkzeug sich heute verhält, je Funktion eine prüfbare 
 1. **<Kurzname>.** <Was genau zu tun ist: welche Datei, welche Stelle, welcher Wert. Ganze Sätze.>
    *Ergebnis:* <Befehl oder Beobachtung, die zeigt, dass der Schritt gelang.>
 2. **<Kurzname>.** <…> Wo etwas einzusetzen ist:
+
    | Platzhalter | einsetzen |
    |---|---|
    | `<…>` | <Quelle des Werts>; sonst <Vorgabe> (in der Lieferung als offen nennen) |
+
    *Ergebnis:* <…>
 
 ```text
-PRÜFUNG:      <Der eine Befehl oder Test, der am Ende alles bestätigt.>
+PRÜFUNG:      <Was am Ende alles bestätigt: ein Befehl oder die Ergebnisse der Schritte, die zusammen gelten müssen.>
 FAIL-MODE:    Ein Schritt geht nicht: nicht improvisieren, abbrechen und melden, welcher Schritt mit welchem Befund
               scheiterte. Teilerfolg ausdrücklich als Teilerfolg melden. Fehlt nur eine Angabe: die Vorgabe aus dem
               Schritt nehmen und sie in der Lieferung als offen nennen. <Projektspezifisches ergänzen.>
@@ -46,8 +54,9 @@ REFERENZ:     <Wo Einzelheiten stehen.>   ← wenn nötig
 
 <Ein echter Vorfall oder ein Beispiel, das zeigt, welches Problem das hier löst.>
 
-<Was es tut, in zwei, drei Absätzen.>
+<Was es tut, in zwei, drei Absätzen – kürzer als Block A.>
 
 ## Was du im Alltag tust
 
 <Was der Mensch selbst tut, wenn es läuft – und woran er erkennt, ob es geklappt hat.>
+````
