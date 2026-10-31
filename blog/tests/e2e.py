@@ -194,6 +194,16 @@ with sync_playwright() as p:
         pruefe("Gedanken zum Wald" in q.inner_text("h1"), f"Auswahl führt direkt zur Serienseite ({schema})")
         q.close()
     br.close()
+print("Adressen im Text klickbar (#22)")
+(ARBEIT / "privat/daten/beitraege").mkdir(parents=True, exist_ok=True)
+(ARBEIT / "privat/daten/beitraege/linkprobe.json").write_text(json.dumps({"id": "linkprobe", "status": "veroeffentlicht",
+    "datum": "2025-02-01T10:00:00+01:00", "titel": "Linkprobe", "serie": None, "stichwoerter": [],
+    "text": "Video: <https://youtu.be/abc123>\n\nSiehe https://example.org/seite. Und [Gartenlink](https://example.org/b) und `https://code.example`"}))
+s, t, _ = hole("linkprobe/")
+pruefe(s == 200 and '<a href="https://youtu.be/abc123" rel="noopener">https://youtu.be/abc123</a>' in t, "Adresse in <…> wird zum Link")
+pruefe('<a href="https://example.org/seite" rel="noopener">https://example.org/seite</a>.' in t, "frei stehende Adresse wird zum Link, Punkt bleibt draußen")
+pruefe('<a href="https://example.org/b" rel="noopener">Gartenlink</a>' in t and "<code>https://code.example</code>" in t, "normale Links und Code bleiben, wie sie sind")
+(ARBEIT / "privat/daten/beitraege/linkprobe.json").unlink()
 
 print("Vorschau")
 W2 = Path(str(ARBEIT) + "-vorschau")
