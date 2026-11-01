@@ -170,6 +170,20 @@ function md_inline(string $s): string {
         $fremd = (bool)preg_match('#^https?://#i', $url);
         return $merke('<a href="' . h($url) . '"' . ($fremd ? ' rel="noopener"' : '') . '>' . $m[1] . '</a>');
     }, $s) ?? $s;
+    // Adressen ohne Link-Schreibweise klickbar machen (#22): <https://…> und frei stehende https://… im Text
+    $auto = function (string $roh) use ($merke): string {
+        $url = html_entity_decode($roh, ENT_QUOTES, 'UTF-8');
+        return $merke('<a href="' . h($url) . '" rel="noopener">' . h(preg_replace('/^mailto:/i', '', $url)) . '</a>');
+    };
+    $s = preg_replace_callback('#&lt;((?:https?://|mailto:)(?:[^\s&]|&amp;)+)&gt;#iu', fn($m) => $auto($m[1]), $s) ?? $s;
+    $s = preg_replace_callback('#(?<![\w/=\x{E001}])https?://(?:[^\s&]|&amp;)+#iu', function ($m) use ($auto) {
+        $url = $m[0]; $rest = '';
+        // Satzzeichen am Ende gehören nicht zur Adresse; eine schließende Klammer nur, wenn keine offene in der Adresse steht
+        while ($url !== '' && (preg_match('/[.,;:!?]$/', $url) || (str_ends_with($url, ')') && substr_count($url, '(') < substr_count($url, ')')))) {
+            $rest = substr($url, -1) . $rest; $url = substr($url, 0, -1);
+        }
+        return $auto($url) . $rest;
+    }, $s) ?? $s;
     $s = preg_replace('/\*\*(.+?)\*\*/u', '<strong>$1</strong>', $s) ?? $s;
     $s = preg_replace('/(?<![\w*])\*(?!\s)(.+?)(?<!\s)\*(?![\w*])/u', '<em>$1</em>', $s) ?? $s;
     $s = preg_replace('/(?<![\w_])_(?!\s)(.+?)(?<!\s)_(?![\w_])/u', '<em>$1</em>', $s) ?? $s;
