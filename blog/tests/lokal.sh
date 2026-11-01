@@ -14,7 +14,7 @@ LIVE="${BLOG_LIVE:-1}"
 python3 - "$W/privat/zugang.php" "$LIVE" <<'P'
 import hashlib,sys
 h=hashlib.sha256(b"testschluessel").hexdigest()
-open(sys.argv[1],"w").write("<?php return ['mistral'=>'x','gh'=>'','zugaenge'=>['"+h+"'=>'Testautorin'],'einstellungen'=>['live'=>"+("true" if sys.argv[2]=="1" else "false")+",'name'=>'Testblog','untertitel'=>'Nur zum Testen.','autor'=>'Testautorin','stil'=>'a','quellen_namen'=>['blogspot'=>'Altes Blog']]];")
+open(sys.argv[1],"w").write("<?php return ['mistral'=>'x','gh'=>'','zugaenge'=>['"+h+"'=>'Testautorin'],'einstellungen'=>['live'=>"+("true" if sys.argv[2]=="1" else "false")+",'name'=>'Testblog','untertitel'=>'Nur zum Testen.','autor'=>'Testautorin','stil'=>'a','fusszeile'=>[['text'=>'Impressum','url'=>'https://example.org/impressum']],'quellen_namen'=>['blogspot'=>'Altes Blog']]];")
 P
 cd "$W/web"
 BLOG_PRIVAT="$W/privat" BLOG_KI_ATTRAPPE=1 BLOG_VORSCHAU="${BLOG_VORSCHAU:-0}" php -S 127.0.0.1:$PORT index.php >"$W/server.log" 2>&1 &

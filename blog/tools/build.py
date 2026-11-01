@@ -37,7 +37,7 @@ if sf.exists():
 for f in sorted((quelle / "beitraege").glob("*.json")) if (quelle / "beitraege").exists() else []:
     b = json.loads(f.read_text(encoding="utf-8"))
     i = b.get("id", "")
-    if not re.fullmatch(r"[a-z0-9-]{1,90}", i): fehler.append(f"{f.name}: ungültige id {i!r}")
+    if not re.fullmatch(r"[a-z0-9_-]{1,90}", i): fehler.append(f"{f.name}: ungültige id {i!r}")
     if i in ids: fehler.append(f"{f.name}: id {i} doppelt")
     if f.stem != i: fehler.append(f"{f.name}: Dateiname passt nicht zur id {i}")
     if b.get("serie") and b["serie"] not in serien: fehler.append(f"{f.name}: Serie {b['serie']} fehlt in serien.json")

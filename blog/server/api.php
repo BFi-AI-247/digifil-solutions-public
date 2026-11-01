@@ -106,7 +106,8 @@ if ($a === 'speichern') {
     $titel = text($in['titel'] ?? '', 200);
     if ($titel === '') json_antwort(400, ['fehler' => 'Bitte einen Titel eingeben.']);
     if ($neu) {
-        $id = slug($titel);
+        // Neue Beiträge: Adresse JJJJMMTT_titel (Tag des ersten Speicherns); alte Adressen bleiben, wie sie sind (#21)
+        $id = date('Ymd') . '_' . slug($titel);
         if (in_array($id, BLOG_RESERVIERT, true)) $id .= '-beitrag';
         $i = 2; $grund = $id; while (isset($alle[$id])) $id = substr($grund, 0, 75) . '-' . $i++;
     }

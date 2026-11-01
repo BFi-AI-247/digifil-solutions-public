@@ -83,7 +83,7 @@ function alle_beitraege(): array {
     foreach (['startbestand', 'daten'] as $ordner) {
         foreach (glob(privat() . "/$ordner/beitraege/*.json") ?: [] as $f) {
             $b = lies_json($f);
-            if (!$b || !preg_match('/^[a-z0-9-]{1,90}$/', (string)($b['id'] ?? ''))) continue;
+            if (!$b || !preg_match('/^[a-z0-9_-]{1,90}$/', (string)($b['id'] ?? ''))) continue;
             $b['quelle_ordner'] = $ordner;
             $alle[$b['id']] = normal($b);
         }
@@ -165,7 +165,7 @@ function md_inline(string $s): string {
     }, $s) ?? $s;
     $s = preg_replace_callback('/\[([^\]]+)\]\(([^)\s]+)\)/u', function ($m) use ($merke) {
         $url = html_entity_decode($m[2], ENT_QUOTES, 'UTF-8');
-        if (preg_match('/^beitrag:([a-z0-9-]{1,90})$/', $url, $k)) return $merke('<a href="' . h(basis() . $k[1] . '/') . '">' . $m[1] . '</a>');
+        if (preg_match('/^beitrag:([a-z0-9_-]{1,90})$/', $url, $k)) return $merke('<a href="' . h(basis() . $k[1] . '/') . '">' . $m[1] . '</a>');
         if (!preg_match('#^(https?://|mailto:|/|\#)#i', $url)) return $m[0];
         $fremd = (bool)preg_match('#^https?://#i', $url);
         return $merke('<a href="' . h($url) . '"' . ($fremd ? ' rel="noopener"' : '') . '>' . $m[1] . '</a>');
