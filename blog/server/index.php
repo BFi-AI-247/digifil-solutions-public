@@ -34,18 +34,18 @@ const TEXTE = [
         'ursprung' => 'Ursprünglich erschienen auf %s', 'andere' => 'English', 'rm' => 'Rückmeldung geben', 'serie' => 'Serie', 'serie_waehlen' => 'Serie wählen …', 'alle_serien' => 'Alle Serien',
         'teile' => '%d Teile', 'ein_teil' => '1 Teil', 'weg' => 'Diese Seite gibt es nicht (mehr).', 'zur_start' => 'Zur Startseite',
         'aeltere' => 'Ältere Beiträge', 'neuere' => 'Neuere Beiträge', 'stichwort' => 'Stichwort', 'feed' => 'Feed abonnieren',
-        'leer' => 'Hier erscheinen bald die ersten Beiträge.', 'rm_hilfe' => 'Fehler entdeckt oder ein Gedanke dazu? Schreib es kurz – es geht nur an mich, nichts wird hier veröffentlicht.',
+        'leer' => 'Hier erscheinen bald die ersten Beiträge.', 'rm_hilfe' => 'Fehler entdeckt oder ein Gedanke dazu? Schreib es kurz. Deine Nachricht wird als öffentlicher Eintrag auf GitHub angelegt; nach Name oder E-Mail wird nicht gefragt.',
         'fehler' => 'Fehler', 'wunsch' => 'Idee', 'sonstiges' => 'Sonstiges', 'senden' => 'Senden', 'danke' => 'Danke! Ist angekommen.',
-        'gestaltung' => 'Gestaltung:', 'stil_a' => 'Kaffeehaus', 'stil_c' => 'digifil',
+        'gestaltung' => 'Gestaltung', 'stil_a' => 'Kaffeehaus', 'stil_c' => 'digifil', 'sprache' => 'Sprache', 'schliessen' => 'Schließen',
         'monate' => ['Januar', 'Februar', 'März', 'April', 'Mai', 'Juni', 'Juli', 'August', 'September', 'Oktober', 'November', 'Dezember']],
     'en' => ['neu' => 'Latest posts', 'serien' => 'Series', 'teil' => 'Part %d of %d', 'vor' => 'Previous part', 'nach' => 'Next part',
         'von_vorne' => 'Start from the beginning', 'alle_teile' => 'All parts of the series', 'lesezeit' => '%d min read', 'stichwoerter' => 'Tags',
         'ursprung' => 'Originally published on %s', 'andere' => 'Deutsch', 'rm' => 'Send feedback', 'serie' => 'Series', 'serie_waehlen' => 'Choose a series …', 'alle_serien' => 'All series',
         'teile' => '%d parts', 'ein_teil' => '1 part', 'weg' => 'This page does not exist (any more).', 'zur_start' => 'Back to the start',
         'aeltere' => 'Older posts', 'neuere' => 'Newer posts', 'stichwort' => 'Tag', 'feed' => 'Subscribe (feed)',
-        'leer' => 'The first posts will appear here soon.', 'rm_hilfe' => 'Spotted a mistake or have a thought? Write a few words – it only goes to me, nothing is published here.',
+        'leer' => 'The first posts will appear here soon.', 'rm_hilfe' => 'Spotted a mistake or have a thought? Write a few words. Your message is posted as a public entry on GitHub; you are not asked for your name or e-mail.',
         'fehler' => 'Mistake', 'wunsch' => 'Idea', 'sonstiges' => 'Other', 'senden' => 'Send', 'danke' => 'Thank you! Received.',
-        'gestaltung' => 'Look:', 'stil_a' => 'Coffee house', 'stil_c' => 'digifil',
+        'gestaltung' => 'Look', 'stil_a' => 'Coffee house', 'stil_c' => 'digifil', 'sprache' => 'Language', 'schliessen' => 'Close',
         'monate' => ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']],
 ];
 $L = 'de';
@@ -74,8 +74,24 @@ function seite(string $titel, string $inhalt, array $opt = []): never {
     http_response_code($opt['code'] ?? 200);
     header('Content-Type: text/html; charset=utf-8');
     $vorschau = ist_vorschau();
-    $fuss = '';
-    foreach ((array)ein('fusszeile') as $f) if (is_array($f) && !empty($f['url'])) $fuss .= ' · <a href="' . h($f['url']) . '">' . h($f['text'] ?? $f['url']) . '</a>';
+    // Obere Zeile (#20): Sprache ▾ · Serien ▾ · Gestaltung ▾ · 💬 Rückmeldung · Links aus der Einstellung fusszeile (z. B. Impressum)
+    $links = '';
+    foreach ((array)ein('fusszeile') as $f) if (is_array($f) && !empty($f['url'])) $links .= '<a class="z-link" href="' . h($f['url']) . '">' . h($f['text'] ?? $f['url']) . '</a>';
+    $sprache = '<span class="z-text" title="' . t('sprache') . '">' . strtoupper($L) . '</span>';
+    if ($andere) {
+        $sprache = '<select class="z-wahl" data-springe aria-label="' . t('sprache') . '">';
+        foreach (['de' => 'DE', 'en' => 'EN'] as $sp => $kurz) $sprache .= '<option value="' . ($sp === $L ? '' : h($andere)) . '"' . ($sp === $L ? ' selected' : '') . ' lang="' . $sp . '">' . $kurz . '</option>';
+        $sprache .= '</select>';
+    }
+    $so = '<option value="" selected disabled hidden>' . t('serien') . '</option><option value="' . h(link_zu('serien/')) . '">' . t('alle_serien') . '</option>';
+    foreach (alle_serien() as $sid => $sx) if (serien_teile($sid, $L)) $so .= '<option value="' . h(link_zu("serie/$sid/")) . '">' . h(serien_titel($sid, $L)) . '</option>';
+    $zeile = '<nav class="leiste" aria-label="' . ($L === 'en' ? 'Menu' : 'Menü') . '">' . $sprache
+        . '<select class="z-wahl" data-springe aria-label="' . t('serien') . '">' . $so . '</select>'
+        . '<noscript><a href="' . h(link_zu('serien/')) . '">' . t('serien') . '</a></noscript>'
+        . '<select class="z-wahl" data-stilwahl aria-label="' . t('gestaltung') . '"><option value="a">' . t('stil_a') . '</option><option value="c">' . t('stil_c') . '</option>'
+        . ($vorschau ? '<option value="b">B Klar</option>' : '') . '</select>'
+        . '<button type="button" class="z-rm" data-rm-auf aria-haspopup="dialog" title="' . t('rm') . '">💬<span class="z-rm-wort"> ' . t('rm') . '</span></button>'
+        . $links . '</nav>';
     $vt = $titel === $name ? $name : "$titel · $name";
     echo '<!doctype html><html lang="' . $L . '" data-stil="' . $stil . '"><head><meta charset="utf-8">'
         . '<meta name="viewport" content="width=device-width, initial-scale=1">'
@@ -91,23 +107,21 @@ function seite(string $titel, string $inhalt, array $opt = []): never {
         . '<script data-stilwahl>try{var s=localStorage.getItem("blog-stil");if(s&&/^[' . ($vorschau ? 'abc' : 'ac') . ']$/.test(s))document.documentElement.dataset.stil=s}catch(e){}</script>'
         . '</head><body>'
         . ($vorschau ? '<div class="vorschau-schild">VORSCHAU · Gestaltung: <button data-s="a">A Kaffeehaus</button> <button data-s="b">B Klar</button> <button data-s="c">C digifil</button></div>' : '')
-        . '<header class="kopf"><div class="breit"><a class="marke" href="' . h(link_zu()) . '">' . h($name) . '</a>'
+        . '<header class="kopf"><div class="breit">' . $zeile . '<a class="marke" href="' . h(link_zu()) . '">' . h($name) . '</a>'
         . ($unter !== '' ? '<p class="unter">' . h($unter) . '</p>' : '')
-        . '<nav class="leiste"><a href="' . h(link_zu('serien/')) . '">' . t('serien') . '</a>'
-        . ($andere ? '<a href="' . h($andere) . '" hreflang="' . ($L === 'en' ? 'de' : 'en') . '">' . t('andere') . '</a>' : '')
-        . '</nav></div></header>'
+        . '</div></header>'
         . '<main class="breit">' . $inhalt . '</main>'
         . '<footer class="fuss"><div class="breit">'
-        . '<details class="rm"><summary>' . t('rm') . '</summary><form id="rm"><p class="klein">' . t('rm_hilfe') . '</p>'
+        . '<dialog class="rm" id="rm-fenster" aria-labelledby="rm-titel"><form id="rm"><h2 id="rm-titel">' . t('rm') . '</h2><p class="klein">' . t('rm_hilfe') . '</p>'
         . '<div class="arten" role="radiogroup">'
         . '<label><input type="radio" name="art" value="fehler"> ' . t('fehler') . '</label>'
         . '<label><input type="radio" name="art" value="wunsch"> ' . t('wunsch') . '</label>'
         . '<label><input type="radio" name="art" value="sonstiges" checked> ' . t('sonstiges') . '</label></div>'
         . '<textarea name="text" rows="4" maxlength="1000" required></textarea>'
         . '<input name="web" tabindex="-1" autocomplete="off" class="versteckt" aria-hidden="true">'
-        . '<button type="submit">' . t('senden') . '</button> <span class="rm-status" aria-live="polite" data-danke="' . h(t('danke')) . '"></span></form></details>'
-        . '<p class="klein"><a href="' . h(link_zu('feed.xml')) . '">' . t('feed') . '</a>' . $fuss . '</p>'
-        . '<p class="klein stilwahl">' . t('gestaltung') . ' <button type="button" data-s="a">' . t('stil_a') . '</button> <button type="button" data-s="c">' . t('stil_c') . '</button></p>'
+        . '<button type="submit">' . t('senden') . '</button> <button type="button" class="rm-zu" data-rm-zu>' . t('schliessen') . '</button>'
+        . ' <span class="rm-status" aria-live="polite" data-danke="' . h(t('danke')) . '"></span></form></dialog>'
+        . '<p class="klein"><a href="' . h(link_zu('feed.xml')) . '">' . t('feed') . '</a></p>'
         . '</div></footer>'
         . '<script src="' . h(basis()) . 'blog.js" defer></script>'
         . '</body></html>';
@@ -242,7 +256,7 @@ if ($was === 'stichwort' && count($teile) === 2) {
         ['andere' => link_zu('stichwort/' . $teile[1] . '/', $L === 'de' ? 'en' : 'de')]);
 }
 
-if (count($teile) === 1 && preg_match('/^[a-z0-9-]{1,90}$/', $was)) {
+if (count($teile) === 1 && preg_match('/^[a-z0-9_-]{1,90}$/', $was)) {
     $x = alle_beitraege()[$was] ?? null;
     if (!$x || $x['status'] !== 'veroeffentlicht' || strtotime($x['datum']) > time() + 60) nicht_gefunden();
     if ($L === 'en' && !en_sichtbar($x)) { header('Location: ' . link_zu($x['id'] . '/', 'de'), true, 302); exit; }

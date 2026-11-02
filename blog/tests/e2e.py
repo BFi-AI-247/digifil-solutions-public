@@ -5,7 +5,9 @@ Aufruf:  bash tests/lokal.sh /tmp/blog && python3 tests/e2e.py /tmp/blog-bilder 
 Endet mit „ALLES OK“. Bildschirmfotos (Handy 390×844, hell und dunkel, Entwürfe A/B/C) landen im angegebenen Ordner.
 """
 import json, os, subprocess, sys, time, urllib.error, urllib.request, xml.etree.ElementTree as ET
+from datetime import datetime
 from pathlib import Path
+from zoneinfo import ZoneInfo
 from playwright.sync_api import sync_playwright
 
 PORT = int(os.environ.get("BLOG_TESTPORT", "8770"))          # lokal.sh mit demselben Port starten; Vorschau und Start-Test: PORT+1, PORT+2
@@ -39,7 +41,7 @@ s, t, _ = hole("")
 pruefe(s == 200 and t.count('class="karte"') == 4, "Startseite zeigt 4 veröffentlichte Beiträge")
 pruefe("Noch geheim" not in t, "Entwurf erscheint nicht")
 pruefe("3 Teile" in t and "Leere Serie" not in t, "Serien-Kasten: Garten mit 3 Teilen, leere Serie ausgeblendet")
-pruefe('<ul class="serien">' in t and "data-springe" not in t, "Serien-Kasten: bis 4 Serien runde Knöpfe, keine Auswahlliste (#19)")
+pruefe('<ul class="serien">' in t and 'class="serien-wahl"' not in t, "Serien-Kasten: bis 4 Serien runde Knöpfe, keine Auswahlliste (#19)")
 s, t, _ = hole("der-kompost/")
 pruefe("Teil 2 von 3" in t, "Beitrag kennt seinen Platz in der Serie")
 pruefe('href="/tomaten-im-oktober/"' in t and 'href="/schnecken/"' in t, "Vor/Zurück zeigen auf Teil 1 und 3")
@@ -56,6 +58,45 @@ pruefe(s == 200 and t.count('class="karte"') == 2, "Stichwort-Seite zeigt 2 Beit
 pruefe(hole("noch-geheim/")[0] == 404 and hole("gibt-es-nicht/")[0] == 404, "Entwurf und Unbekanntes geben 404")
 s, t, _ = hole("<script>/")
 pruefe(s == 404 and "<script>" not in t, "Seltsame Adressen werden nicht ausgegeben")
+
+print("Obere Zeile (#20)")
+s, t, _ = hole("tomaten-im-oktober/")
+zeile = t.split('<nav class="leiste"', 1)[1].split("</nav>", 1)[0] if '<nav class="leiste"' in t else ""
+pruefe(t.index('<nav class="leiste"') < t.index('class="marke"'), "Obere Zeile steht über dem Blognamen")
+pruefe('data-springe aria-label="Sprache"' in zeile and '>DE</option>' in zeile and 'value="/en/tomaten-im-oktober/"' in zeile, "Sprache als Auswahl DE/EN, EN führt zur englischen Fassung")
+pruefe(">Alle Serien</option>" in zeile and ">Gedanken zum Garten</option>" in zeile and "Leere Serie" not in zeile, "Serien als Auswahl mit „Alle Serien“, leere Serie fehlt")
+pruefe("data-stilwahl" in zeile and "data-rm-auf" in zeile and 'href="https://example.org/impressum">Impressum</a>' in zeile, "Gestaltung, 💬 Rückmeldung und Impressum-Link (aus fusszeile) in der Zeile")
+pruefe("<details" not in t and 'class="stilwahl"' not in t and '<dialog class="rm"' in t, "Fuß ohne Rückmelde-Bereich und Gestaltungs-Knöpfe; Rückmeldung als Fenster")
+pruefe("öffentlicher Eintrag auf GitHub" in t and "nur an mich" not in t, "Hilfetext sagt ehrlich, dass die Rückmeldung öffentlich ist")
+s, t, _ = hole("der-kompost/")
+pruefe('<span class="z-text" title="Sprache">DE</span>' in t, "Ohne englische Fassung: nur „DE“, keine Auswahl")
+with sync_playwright() as p:
+    br = p.chromium.launch()
+    for schema in ("light", "dark"):
+        q = br.new_page(viewport={"width": 390, "height": 844}, color_scheme=schema, device_scale_factor=2)
+        q.goto(BASIS + "tomaten-im-oktober/")
+        q.screenshot(path=str(BILDER / f"zeile-{schema}.png"), clip={"x": 0, "y": 0, "width": 390, "height": 330})
+        hoehe = q.evaluate("document.querySelector('.leiste').getBoundingClientRect().height")
+        q.set_viewport_size({"width": 360, "height": 780})
+        pruefe(q.evaluate("document.documentElement.scrollWidth") <= 360 and q.evaluate("document.querySelector('.leiste').getBoundingClientRect().height") < 90, f"Obere Zeile: höchstens zwei Zeilen, keine Scrollleiste bei 360 px ({schema})")
+        q.set_viewport_size({"width": 390, "height": 844})
+        q.click("[data-rm-auf]")
+        pruefe(q.evaluate("document.getElementById('rm-fenster').open"), f"💬 öffnet das Rückmelde-Fenster ({schema})")
+        q.fill("#rm textarea", "Test über das Fenster")
+        q.click("#rm button[type=submit]")
+        q.wait_for_function("document.querySelector('.rm-status').textContent.length > 2")
+        pruefe("nicht eingerichtet" in q.inner_text(".rm-status"), f"Fenster schickt die Rückmeldung ab und zeigt die Antwort ({schema})")
+        q.screenshot(path=str(BILDER / f"rueckmeldung-fenster-{schema}.png"))
+        q.click("[data-rm-zu]")
+        pruefe(not q.evaluate("document.getElementById('rm-fenster').open"), f"„Schließen“ schließt das Fenster ({schema})")
+        q.select_option("select[aria-label=Sprache]", label="EN")
+        q.wait_for_url("**/en/tomaten-im-oktober/")
+        pruefe("Tomatoes in October" in q.inner_text("h1"), f"Sprachwahl EN führt zur englischen Fassung ({schema})")
+        q.select_option("select[aria-label=Series]", label="All series")
+        q.wait_for_url("**/en/serien/")
+        pruefe(True, f"Serien-Auswahl „All series“ führt zur Serien-Übersicht ({schema})")
+        q.close()
+    br.close()
 
 print("Englisch")
 s, t, _ = hole("en/")
@@ -112,15 +153,19 @@ with sync_playwright() as p:
     pg.click("#speichern")
     pg.wait_for_function("document.querySelector('#en-titel') && document.querySelector('#en-titel').value.startsWith('[EN]')", timeout=8000)
     pruefe(pg.input_value("#en-titel") == "[EN] Der erste Frost", "Nach dem Speichern wird automatisch übersetzt")
-    gespeichert = json.loads((ARBEIT / "privat/daten/beitraege/der-erste-frost.json").read_text())["datum"]
+    FROST = datetime.now(ZoneInfo("Europe/Berlin")).strftime("%Y%m%d") + "_der-erste-frost"
+    pruefe((ARBEIT / f"privat/daten/beitraege/{FROST}.json").exists(), f"Neuer Beitrag bekommt die Adresse JJJJMMTT_titel ({FROST})")
+    gespeichert = json.loads((ARBEIT / f"privat/daten/beitraege/{FROST}.json").read_text())["datum"]
     pruefe(pg.evaluate(f"(function(d){{return d.getHours()===0&&d.getMinutes()===1}})(new Date({json.dumps(gespeichert)}))"), "Editor: gewählte Zeit wird gespeichert")
     pg.screenshot(path=str(BILDER / "editor-beitrag.png"), full_page=True)
+    pg.locator("p.klein:has-text('Adresse:')").scroll_into_view_if_needed()
+    pg.screenshot(path=str(BILDER / "editor-adresse.png"))
     pg.check("#en-geprueft")
     pg.click("#speichern"); pg.wait_for_timeout(500)
     pg.click("#veroeff"); pg.wait_for_selector("#zurueckziehen", timeout=8000)
-    s, t, _ = hole("der-erste-frost/")
+    s, t, _ = hole(f"{FROST}/")
     pruefe(s == 200 and "Teil 4 von 4" in t and "<strong>Frost</strong>" in t, "Veröffentlichter Beitrag ist sofort online, als Teil 4 von 4")
-    s, t, _ = hole("en/der-erste-frost/")
+    s, t, _ = hole(f"en/{FROST}/")
     pruefe(s == 200 and "[EN] Der erste Frost" in t, "Geprüftes Englisch erscheint unter en/")
     pruefe(len(ET.fromstring(hole("feed.xml")[1]).findall("a:entry", ns)) == 5, "Neuer Beitrag steht im Feed")
     # importierten Beitrag bearbeiten: eigene Fassung, Startbestand bleibt
@@ -156,11 +201,12 @@ with sync_playwright() as p:
                 if w > 360: zu_breit.append(f"{name}/{stil}: {w}px")
         q.set_viewport_size({"width": 390, "height": 844})
         q.goto(BASIS); q.evaluate("localStorage.removeItem('blog-stil')"); q.goto(BASIS)
-        pruefe(q.locator(".stilwahl button").count() == 2 and q.locator(".stilwahl button[data-s=b]").count() == 0, f"Leser: Umschalter Kaffeehaus/digifil im Fuß ({schema})")
-        q.click(".stilwahl button[data-s=c]"); q.goto(BASIS + "der-kompost/")
+        pruefe(q.locator("select[data-stilwahl] option").count() == 2 and q.locator("select[data-stilwahl] option[value=b]").count() == 0, f"Leser: Gestaltung Kaffeehaus/digifil als Auswahl oben ({schema})")
+        q.select_option("select[data-stilwahl]", "c"); q.goto(BASIS + "der-kompost/")
         hell = q.evaluate("(function(){var m=getComputedStyle(document.body).backgroundColor.match(/\\d+/g).map(Number);return m[0]+m[1]+m[2]>384})()")
         pruefe(q.evaluate("document.documentElement.dataset.stil") == "c" and hell == (schema == "light"), f"Leser: digifil bleibt gewählt und folgt dem Gerät ({schema})")
         pruefe("serif" in q.evaluate("getComputedStyle(document.querySelector('.text')).fontFamily") and "sans-serif" not in q.evaluate("getComputedStyle(document.querySelector('.text')).fontFamily"), f"digifil: Text mit Serifen ({schema})")
+        pruefe(q.input_value("select[data-stilwahl]") == "c", f"Auswahl Gestaltung zeigt die gemerkte Wahl ({schema})")
         q.evaluate("localStorage.removeItem('blog-stil')")
         pruefe(not zu_breit, f"Keine waagerechte Scrollleiste bei 360 px, alle Seiten und Entwürfe ({schema})" + (": " + ", ".join(zu_breit) if zu_breit else ""))
         c.close()
@@ -177,10 +223,11 @@ for i, name in enumerate(["Gedanken zum Wetter", "Gedanken zur Küche", "Gedanke
         "titel": f"{name}, erster Teil", "text": "Ein kurzer Testtext.", "serie": sid, "stichwoerter": [], "en": {}, "herkunft": {}}))
 sf.write_text(json.dumps({"serien": serien}))
 s, t, _ = hole("")
-pruefe("data-springe" in t and t.count("<option") == 6 and '<ul class="serien">' not in t, "Startseite: ab 5 Serien Auswahlliste mit 5 Serien statt Knöpfen")
+kasten = t.split('class="serien-wahl"', 1)[1].split("</select>", 1)[0] if 'class="serien-wahl"' in t else ""
+pruefe(kasten.count("<option") == 6 and '<ul class="serien">' not in t, "Startseite: ab 5 Serien Auswahlliste mit 5 Serien statt Knöpfen")
 pruefe("Gedanken zum Garten · 4 Teile" in t and 'href="/serien/">Alle Serien' in t, "Auswahlliste nennt Teile-Zahl, Link „Alle Serien“ als Rückfall")
 s, t, _ = hole("en/")
-pruefe("data-springe" not in t, "Englisch: nur Serien mit geprüften Teilen zählen – dort weiter Knöpfe")
+pruefe('class="serien-wahl"' not in t, "Englisch: nur Serien mit geprüften Teilen zählen – dort weiter Knöpfe")
 with sync_playwright() as p:
     br = p.chromium.launch()
     for schema in ("light", "dark"):
@@ -189,7 +236,7 @@ with sync_playwright() as p:
         q.screenshot(path=str(BILDER / f"serien-auswahl-{schema}.png"), clip={"x": 0, "y": 0, "width": 390, "height": 420})
         q.set_viewport_size({"width": 360, "height": 780})
         pruefe(q.evaluate("document.documentElement.scrollWidth") <= 360, f"Auswahlliste: keine waagerechte Scrollleiste bei 360 px ({schema})")
-        q.select_option("select[data-springe]", label="Gedanken zum Wald · 1 Teil")
+        q.select_option(".serien-wahl select", label="Gedanken zum Wald · 1 Teil")
         q.wait_for_url("**/serie/test-serie-3/")
         pruefe("Gedanken zum Wald" in q.inner_text("h1"), f"Auswahl führt direkt zur Serienseite ({schema})")
         q.close()

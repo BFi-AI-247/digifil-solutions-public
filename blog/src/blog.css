@@ -53,12 +53,20 @@ a { color: var(--akzent); text-underline-offset: .18em; }
 .vorschau-schild button { font: inherit; border: 1px solid #2a2200; background: transparent; color: inherit; border-radius: 999px; padding: 3px 10px; cursor: pointer; }
 .vorschau-schild button[aria-pressed="true"] { background: #2a2200; color: #f6d743; }
 
-.kopf { padding: 28px 0 18px; border-bottom: 1px solid var(--linie); margin-bottom: 8px; }
+.kopf { padding: 14px 0 18px; border-bottom: 1px solid var(--linie); margin-bottom: 8px; }
 .marke { font: var(--titel-gewicht) 1.55rem/1.15 var(--schrift-titel); color: var(--text); text-decoration: none; letter-spacing: -.01em; }
 .unter { margin: 6px 0 0; color: var(--leise); font-size: .92rem; font-style: italic; }
 [data-stil="b"] .unter { font-style: normal; }
-.leiste { display: flex; gap: 16px; margin-top: 12px; font-size: .92rem; font-weight: 600; }
-.leiste a { text-decoration: none; }
+.kopf .leiste { margin: 0 0 16px; }
+/* Obere Zeile (#20): Sprache, Serien, Gestaltung als Auswahl, Rückmeldung, Impressum – darf auf dem Handy in zwei Zeilen umbrechen */
+.leiste { display: flex; flex-wrap: wrap; gap: 6px 8px; align-items: center; font: 600 .88rem/1.2 var(--schrift-ui); }
+.leiste a { text-decoration: none; padding: 5px 2px; }
+.z-wahl, .z-rm { font: inherit; color: var(--akzent); background: var(--chip); border: 1px solid var(--linie); border-radius: 999px;
+  padding: 5px 10px; min-height: 32px; max-width: 11rem; cursor: pointer; }
+.z-wahl { padding-right: 6px; }
+.z-text { color: var(--leise); padding: 5px 4px; }
+.z-rm-wort { display: none; }
+@media (min-width: 560px) { .z-rm-wort { display: inline; } }
 
 main { padding-bottom: 40px; }
 .abschnitt { font: 700 .78rem/1 var(--schrift-ui); text-transform: uppercase; letter-spacing: .12em; color: var(--leise); margin: 28px 0 10px; }
@@ -121,18 +129,17 @@ main { padding-bottom: 40px; }
 .teile a { font-weight: 600; text-decoration: none; color: var(--text); font-family: var(--schrift-titel); font-size: 1.08rem; }
 .teile .zahl { display: block; }
 
-/* Fuß und Rückmeldung */
+/* Fuß und Rückmelde-Fenster */
 .fuss { border-top: 1px solid var(--linie); padding: 18px 0 30px; }
-.rm summary { cursor: pointer; font-weight: 600; color: var(--akzent); }
-.rm form { margin-top: 10px; }
+dialog.rm { width: min(32rem, calc(100vw - 24px)); border: 1px solid var(--linie); border-radius: var(--radius); background: var(--flaeche);
+  color: var(--text); padding: 18px 16px; font: 1rem/1.5 var(--schrift-ui); }
+dialog.rm::backdrop { background: rgba(0, 0, 0, .45); }
+dialog.rm h2 { font: 700 1.1rem/1.3 var(--schrift-ui); margin: 0 0 4px; }
+.rm .rm-zu { background: transparent; color: var(--akzent); border: 1px solid var(--linie); }
 .arten { display: flex; flex-wrap: wrap; gap: 12px; margin: 8px 0; font-size: .92rem; }
 .rm textarea { width: 100%; font: 1rem/1.45 var(--schrift-ui); padding: 10px; border-radius: 10px; border: 1px solid var(--linie); background: var(--flaeche); color: var(--text); }
 .rm button { margin-top: 8px; font: 700 .95rem var(--schrift-ui); background: var(--akzent); color: var(--akzent-text); border: 0; border-radius: 10px; padding: 9px 16px; cursor: pointer; }
 .rm-status { font-size: .9rem; color: var(--leise); }
-/* Wahl der Gestaltung im Fuß (Leser: Kaffeehaus / digifil, im Browser gemerkt) */
-.stilwahl { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
-.stilwahl button { font: 600 .82rem/1.2 var(--schrift-ui); border: 1px solid var(--linie); background: transparent; color: var(--leise); border-radius: 999px; padding: 3px 10px; cursor: pointer; }
-.stilwahl button[aria-pressed="true"] { background: var(--chip); color: var(--text); border-color: var(--akzent); }
 
 /* B: Kopf mit Farbband, mittig, Großbuchstaben; Karten mit Farbkante; Serien-Navigation als Farbfläche */
 [data-stil="b"] .kopf { border-top: 6px solid var(--akzent); text-align: center; padding-top: 22px; }
@@ -151,7 +158,7 @@ main { padding-bottom: 40px; }
 [data-stil="c"] .marke::before { content: "☕ "; }
 
 @media (min-width: 720px) {
-  .kopf { padding-top: 44px; }
+  .kopf { padding-top: 22px; }
   .marke { font-size: 1.9rem; }
   .karte h2 { font-size: 1.45rem; }
   .teile .zahl { display: inline; margin-left: 6px; }
