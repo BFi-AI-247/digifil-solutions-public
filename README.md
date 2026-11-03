@@ -16,7 +16,6 @@ Jedes Werkzeug läuft auf einfachem PHP-Webspace, braucht keine Datenbank und sp
 
 - **Ein Ordner = ein Werkzeug**, mit `src/` (Oberfläche), `server/` (PHP), `tools/` (Bauen, Zugang erzeugen), `tests/` (Browser-Tests mit Playwright).
   Ausnahme: `zwei-kanal-format/` besteht nur aus Markdown-Dateien und ist in sich abgeschlossen.
-  `kanon-01/` legt Regeln, Prüfbausteine, Beispiel und Tests flach in einen Ordner.
 - **Geheimes liegt nie im Repo.** Passwörter, API-Schlüssel und persönliche Zugänge erzeugt `tools/make_zugang.py` beim Upload als `zugang.php` in einem Ordner außerhalb des Web-Verzeichnisses.
 - **Rückmeldungen als Issues (optional).** Alle Werkzeuge haben einen Rückmelde-Knopf, der Issues in einem Repo deiner Wahl anlegt.
 - **Upload per GitHub Actions.** Unter `beispiele/deploy.yml` liegt je ein Workflow für SFTP-Webspace; er ist nicht aktiv, bis du ihn nach `.github/workflows/` kopierst.
