@@ -9,6 +9,7 @@ Jedes Werkzeug läuft auf einfachem PHP-Webspace, braucht keine Datenbank und sp
 | [`blog/`](blog/) | Kleines Blog-Werkzeug: Beiträge mit Serien, Deutsch und Englisch, Editor im Browser, Feeds, Import aus einem bestehenden Blog. |
 | [`digiwort/`](digiwort/) | Deutsches Wortspiel: jeden Tag ein Wort mit 5 und eins mit 6 Buchstaben, sechs Versuche. Eine einzige HTML-Datei, kein Tracking. |
 | [`doko-block/`](doko-block/) | Ergebnisliste für eine feste Doppelkopf-Runde: Foto vom Block → KI liest die Spiele aus → prüfen → speichern. Statistik, Kasse, Termine. |
+| [`kanon-01/`](kanon-01/) | Kanon 01 Single Agent 3.1 – Regeln für einen einzelnen KI-Worker oder -Agenten (42 Regeln in sieben Paragraphen, je Gebot – Grund – Verboten), dazu Antwortschema, Prüfbausteine Python/PHP, Beispiel-Worker und Tests. |
 | [`zwei-kanal-format/`](zwei-kanal-format/) | Kein Programm, sondern ein Schreibformat für Texte, nach denen eine KI handeln soll (Aufträge zwischen KI-Agenten, Anleitungen): Block A für die KI, Block B für den Menschen. Mit Konzept, zwei Vorlagen und zwei Beispielen. |
 
 ## Gemeinsame Bauweise
