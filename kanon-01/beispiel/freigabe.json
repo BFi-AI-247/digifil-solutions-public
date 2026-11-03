@@ -1,0 +1,15 @@
+{
+ "regelstand": "2026-10-28a",
+ "erfahrungsstand": "E-000",
+ "antwort": "Dann übernehme ich genau diesen Text.",
+ "unsicher": [],
+ "aenderungen": [
+  {
+   "datei": "dateien/notiz.md",
+   "aktion": "anhaengen",
+   "alt": "",
+   "neu": "- Neue Zeile aus dem Kommentar."
+  }
+ ],
+ "erfahrung": null
+}
