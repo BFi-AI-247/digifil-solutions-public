@@ -1,0 +1,106 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Kanon 01 Single Agent 3.1 – Antwort eines Workers",
+  "description": "Grundgerüst. Je Worker Felder ergänzen; regelstand, erfahrungsstand, antwort und unsicher bleiben Pflicht (§1.3; dieselben Felder nennt das Antwortformat, das der Worker im Prompt bekommt). Geprüft mit kanon_basis.schema_fehler (Teilmenge von JSON Schema).",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "regelstand",
+    "erfahrungsstand",
+    "antwort",
+    "unsicher"
+  ],
+  "properties": {
+    "regelstand": {
+      "type": "string",
+      "minLength": 3,
+      "maxLength": 40,
+      "description": "Regelstand der Regeldatei, wörtlich (B1)"
+    },
+    "erfahrungsstand": {
+      "type": "string",
+      "pattern": "^E-\\d{3,}$",
+      "description": "Nummer des neuesten Eintrags der Erfahrungen, wörtlich; „E-000“, wenn es noch keine gibt (B25)"
+    },
+    "antwort": {
+      "type": "string",
+      "maxLength": 6000,
+      "description": "Text für den Menschen. Keine Erfolgsbehauptungen (B5)."
+    },
+    "unsicher": {
+      "type": "array",
+      "maxItems": 20,
+      "items": {
+        "type": "string",
+        "maxLength": 300
+      },
+      "description": "Was unsicher gelesen oder nicht belegt ist (B6, B9)"
+    },
+    "aenderungen": {
+      "type": "array",
+      "maxItems": 5,
+      "description": "Nur nach Freigabe des gezeigten Textes (B4); sonst leer",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "datei",
+          "aktion",
+          "neu"
+        ],
+        "properties": {
+          "datei": {
+            "type": "string",
+            "maxLength": 200
+          },
+          "aktion": {
+            "enum": [
+              "ersetzen",
+              "einfuegen_nach",
+              "anhaengen",
+              "neu"
+            ]
+          },
+          "alt": {
+            "type": "string",
+            "description": "Pflicht bei ersetzen und einfuegen_nach (prüft der Worker): exakt und genau einmal in der Datei (B12)"
+          },
+          "neu": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "erfahrung": {
+      "type": [
+        "object",
+        "null"
+      ],
+      "additionalProperties": false,
+      "required": [
+        "art",
+        "was",
+        "warum"
+      ],
+      "description": "Höchstens eine neue Erfahrung je Lauf, sonst null (B24). Das Programm prüft und hängt an.",
+      "properties": {
+        "art": {
+          "enum": [
+            "Werkzeug",
+            "Format",
+            "Fehlervermeidung",
+            "Ablauf"
+          ]
+        },
+        "was": {
+          "type": "string",
+          "maxLength": 300
+        },
+        "warum": {
+          "type": "string",
+          "maxLength": 300
+        }
+      }
+    }
+  }
+}
