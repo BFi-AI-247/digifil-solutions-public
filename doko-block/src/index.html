@@ -423,7 +423,7 @@ function zeigeStatistik() {
   const farben = ['var(--p1)', 'var(--p2)', 'var(--p3)', 'var(--p4)'];
   $('#stat').innerHTML = `<p class="leise" style="margin:0 0 8px">${sel.value === 'alle' ? '' : (seit ? 'Seit ' + sel.value + ': ' : sel.value + ': ')}${auswahl.length} Abende · ${euro(auswahl.length * 10 * D.euro_pro_platz)} in die Kasse</p>
     <div class="rollen"><table><thead><tr><th>Spieler</th><th class="z">Ø Platz</th>${[1, 2, 3, 4].map(p => `<th class="platzzahl">${p}.</th>`).join('')}<th class="z">Kasse</th></tr></thead><tbody>
-    ${S.map(s => `<tr><td><b>${esc(s)}</b></td><td class="z">${zahl(r[s].schnitt)}</td>
+    ${S.map(s => `<tr><td><span class="chip" data-p="${esc(s)}">${esc(s)}</span></td><td class="z">${zahl(r[s].schnitt)}</td>
       ${r[s].verteilung.map((v, k) => `<td class="platzzahl"><span class="pl${k + 1}">${v}</span></td>`).join('')}
       <td class="z">${euro(r[s].euro)}</td></tr>`).join('')}</tbody></table></div>`;
   // Jahr für Jahr
@@ -450,7 +450,7 @@ function zeigeStatistik() {
   });
   det.innerHTML = `<h3>Details aus den Zetteln · ${mitSpielen.length === 1 ? '1 Abend' : mitSpielen.length + ' Abende'}</h3><p class="leise" style="margin:0 0 8px">Pflicht- und Lustsolo: gewonnen / gespielt</p>
     <div class="rollen"><table><thead><tr><th>Spieler</th><th class="z">Pkt</th><th class="z">Im Plus</th><th class="z">Pflicht&shy;solo</th><th class="z">Lust&shy;solo</th></tr></thead><tbody>
-    ${D.spieler.map(s => `<tr><td><b>${esc(s)}</b></td><td class="z">${z[s].punkte}</td><td class="z">${z[s].spiele ? Math.round(100 * z[s].plus / z[s].spiele) : 0} %</td><td class="z">${z[s].pflichtGew} / ${z[s].pflicht}</td><td class="z">${z[s].lustGew} / ${z[s].lust}</td></tr>`).join('')}</tbody></table></div>`;
+    ${D.spieler.map(s => `<tr><td><span class="chip" data-p="${esc(s)}">${esc(s)}</span></td><td class="z">${z[s].punkte}</td><td class="z">${z[s].spiele ? Math.round(100 * z[s].plus / z[s].spiele) : 0} %</td><td class="z">${z[s].pflichtGew} / ${z[s].pflicht}</td><td class="z">${z[s].lustGew} / ${z[s].lust}</td></tr>`).join('')}</tbody></table></div>`;
 }
 $('#stat-jahr').onchange = zeigeStatistik;
 const statArt = () => $('#stat-seit').checked ? 'seit' : 'nur';
