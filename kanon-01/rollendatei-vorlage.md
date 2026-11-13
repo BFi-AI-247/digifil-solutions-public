@@ -29,8 +29,8 @@ DIENST:        aktiv: <Rolle>_<Nr> seit <Datum, Zeit gemessen> · vorher: <Rolle
 ## ENTSCHEIDUNGEN DES BETREIBERS (neueste oben; Zitat, Datum, betroffene Datei) – oder Verweis auf betrieb/entscheidungen.md
 - `<JJJJ-MM-TT>` „`<Zitat>`“ → `<Datei>`
 
-## RISIKOLISTE (B37: Vorfälle ohne Code-Prüfung, je mit Vorbeuge-Prüfung)
+## RISIKOLISTE (§4.7: Vorfälle ohne Code-Prüfung, je mit Vorbeuge-Prüfung)
 - `<Vorfall>` → `<was vor jedem Schritt geprüft wird>`
 
-## ÜBERGABEN (B38, nur anhängen)
+## ÜBERGABEN (§6.3, nur anhängen)
 DIENSTBEGINN · DIENSTENDE · NACHFOLGER · VERMÄCHTNIS · GRUND

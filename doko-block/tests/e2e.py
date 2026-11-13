@@ -100,6 +100,19 @@ with sync_playwright() as pw:
     pg.click("nav.unten button[data-s=abende]")
     bg = pg.eval_on_selector('.chip[data-p="Clara"]', "e => getComputedStyle(e).backgroundColor")
     assert bg == "rgb(217, 76, 61)", bg
+    # Statistik: Namen oben und unten in der Personenfarbe, ohne Scrollbalken bei 360–412 px
+    pg.click("nav.unten button[data-s=statistik]"); pg.select_option("#stat-jahr", "2026")
+    for sel in ['#stat .chip[data-p="Clara"]', '#stat-details .chip[data-p="Clara"]']:
+        bg = pg.eval_on_selector(sel, "e => getComputedStyle(e).backgroundColor")
+        if bg != "rgb(217, 76, 61)": fehler.append(f"Statistik {sel}: Farbe {bg}")
+    for b in (360, 390, 412):
+        pg.set_viewport_size({"width": b, "height": 844})
+        m = pg.evaluate("['#stat', '#stat-details'].map(s => { const e = document.querySelector(s + ' .rollen'); return s + ' ' + e.scrollWidth + '/' + e.clientWidth; })")
+        for x in m:
+            w, c = map(int, x.split()[1].split("/"))
+            if w > c: fehler.append(f"Statistik bei {b} px zu breit: {x}")
+        if b == 390: pg.screenshot(path=OUT / "5b-statistik-farben.png", full_page=True)
+    pg.set_viewport_size({"width": 390, "height": 844})
     # Personenwechsel per Link wird gemeldet; ohne gültigen Schlüssel gesperrt
     pg.goto("about:blank"); pg.goto(URL + "#k=falsch"); pg.wait_for_selector("text=Kein Zugang")
     assert pg.evaluate("localStorage.getItem('doko-k')") is None, "falscher Schlüssel bleibt gespeichert"
