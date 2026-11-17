@@ -1,78 +1,73 @@
-# Zwei-Kanal-Format 1.2
+# Zwei-Kanal-Format 1.3
 
 *AI-to-AI-and-Human-Messages: ein Text, zwei Leser – Block A für die KI, die handelt, Block B für den Menschen.*
-
-<!-- Diese Anleitung ist selbst im Zwei-Kanal-Format geschrieben (konzept.md, Anwendung 2): BLOCK A muss allein genügen,
-     BLOCK B ist Klartext für Menschen. -->
 
 ## BLOCK A – Auftrag an die schreibende KI
 
 ```text
-ZWECK:        Einen Text im Zwei-Kanal-Format schreiben: Block A enthält alles, was der Empfänger zum Handeln braucht,
-              Block B erklärt Menschen in Klartext, wozu das Ganze gut ist. Ergebnis: Der Empfänger kann allein mit
-              Block A richtig handeln.
-GILT FÜR:     (1) Aufträge eines Agenten an einen anderen, die etwas bewirken (Dateien, Abläufe, Begrenzungen).
-              (2) Anleitungen (README), nach denen eine KI etwas einrichtet oder benutzt.
-GILT NICHT:   Quittungen und kurze Rückfragen – die bleiben kurz und formlos. Aufträge ohne Wirkung, mit einem Empfänger
-              in einem Strang (einer Unterhaltung) und ohne Begrenzung dürfen Klartext bleiben (konzept.md, Anwendung 1, „Wann“).
-VORAUSSETZUNG: Zum Schreiben: keine, die sechs Dateien dieses Ordners genügen. Für Schritt 5 (Blindtest einer Anleitung):
-              eine frische KI oder eine neue Sitzung ohne Verlauf; ist beides nicht möglich, siehe Schritt 5.
-DATEIEN:      konzept.md (Grundsatz, Felder beider Anwendungen, Schreibregeln, Prüfungen, Herkunft) ·
-              auftrag-vorlage.md (Vorlage für Anwendung 1) · readme-vorlage.md (Vorlage für Anwendung 2) ·
-              beispiel-auftrag.md (ein vollständiger, erfundener Auftrag) · beispiel-readme.md (eine vollständige,
-              erfundene Anleitung) · README.md (diese Datei).
-BEGRIFFE:     Ausführungsrelevant = alles, ohne das der Empfänger anders oder falsch handeln würde: Fristen, Pfade, Werte,
-              Schwellen, Freigaben, Beteiligte, Verweise.
-              Begrenzung = eine Grenze, die der Empfänger kennt und nicht überschreiten darf (im Feld LEITPLANKEN).
-              Blindtest = eine frische KI ohne Vorwissen bekommt nur Block A und einen erfundenen Auftrag und meldet,
-              wo sie raten musste (konzept.md, „Prüfungen“).
-              Betreiber = der Mensch, dem das Vorhaben gehört; Auftraggeber = wer den konkreten Auftrag gibt;
-              Instanz = eine laufende KI mit Kennung (konzept.md, „Drei Begriffe“).
+ZWECK:        Du schreibst einen Text im Zwei-Kanal-Format. Block A enthält alles, was der Empfänger zum Handeln braucht.
+              Block B erklärt Menschen in Klartext, wozu der Text gut ist. Das Ziel ist erreicht, wenn der Empfänger
+              allein mit Block A richtig handeln kann.
+GILT FÜR:     Aufträge von einer KI an eine andere, die etwas bewirken · Anleitungen, nach denen eine KI etwas
+              einrichtet oder benutzt.
+GILT NICHT:   Quittungen und kurze Rückfragen bleiben kurzer Klartext. Ob ein Text im Format stehen muss, legt das
+              Regelwerk fest, nach dem du arbeitest. Dieses Format legt nur fest, wie der Text dann aussieht.
+VORAUSSETZUNG: Zum Schreiben genügen die sechs Dateien dieses Ordners. Für Schritt 5 brauchst du eine frische KI oder
+              eine neue Sitzung ohne Verlauf.
+DATEIEN:      README.md (diese Anleitung) · konzept.md (Grundsatz und Herkunft: warum das Format so ist) ·
+              auftrag-vorlage.md (Form eines Auftrags und seiner Quittung) · readme-vorlage.md (Form einer Anleitung) ·
+              beispiel-auftrag.md (ein fertiger, erfundener Auftrag) · beispiel-readme.md (eine fertige, erfundene
+              Anleitung).
+BEGRIFFE:     Empfänger = die KI, die nach dem Text handelt.
+              Ausführungsrelevant = alles, ohne das der Empfänger anders oder falsch handeln würde: Fristen, Pfade,
+              Werte, Schwellen, Freigaben, Beteiligte, Verweise.
+              Grenze = etwas, das der Empfänger lässt. Aufträge nennen Grenzen im Feld LEITPLANKEN, Anleitungen im
+              Feld NICHT TUN.
+              Frische KI = eine KI, die weder den Text noch das Projekt kennt.
+              Ratestelle = eine Stelle, an der die frische KI raten musste.
 ```
 
 ### SCHRITTE (in dieser Reihenfolge; jeder Schritt hat ein prüfbares Ergebnis)
 
-1. **Anwendung wählen.** Ist der Text eine Nachricht an einen Agenten, die etwas bewirkt: Anwendung 1, Vorlage
-   `auftrag-vorlage.md`. Ist er eine Anleitung, die dauerhaft im Repo liegt: Anwendung 2, Vorlage `readme-vorlage.md`.
-   *Ergebnis:* Die Vorlage ist kopiert; ihre Felder stehen in der Reihenfolge aus `konzept.md`.
-2. **Block A füllen.** Jedes Pflichtfeld füllen, in ganzen Sätzen mit Verb – bei Aufträgen alle zehn Felder der Vorlage, bei
-   Anleitungen die Felder mit „ja“ in der Tabelle in `konzept.md`. Jeder Schritt einer Anleitung nennt
-   Datei, Stelle und Wert und endet mit *Ergebnis:*. Was nur im Code steht (Dateiname, Ablageort, das Wort für eine Rolle
-   im Code), auch hier nennen. Dieselbe Sache überall mit demselben Wort bezeichnen. Listenfelder dürfen Punkte mit „·“ trennen,
-   jeder Punkt eine vollständige Aussage. Nur bei Anleitungen: Wo ein Wert offen sein kann, Vorgabe daneben und „in der
-   Lieferung als offen nennen“ – außer für Empfänger, Veröffentlichung, Löschen und Zugangsdaten: dort keine Vorgabe,
-   der Schritt wartet. Nur bei Aufträgen: LEITPLANKEN und ESKALATION ausdrücklich füllen („keine“ ist ein Wert);
-   REQUIRE-ACK mindestens RUN-ID und Stand; hast du selbst eine Angabe nicht: nicht raten – vor dem Abschicken beschaffen oder
-   in PARAMETER als `offen: … – vor dem Handeln beim Absender erfragen` schreiben, nie in Block B verstecken (was der
-   Empfänger dann tut: konzept.md, „Wenn der Verfasser eine Angabe nicht hat“).
-   *Ergebnis:* `grep -n '<' <datei>` zeigt nur noch absichtliche Zeichen (z. B. in Befehlen), keine Platzhalter.
-3. **Die zwei Prüffragen.** Jeden Satz in Block B fragen: „Ist das eigentlich eine Anweisung?“ – ja → nach Block A. Dann:
-   „Könnte der Empfänger ohne Block B korrekt ausführen?“ – nein → in Block A fehlt etwas.
-   *Ergebnis:* Block B enthält nichts aus der Liste „Was nicht in Block B darf“ in `konzept.md` (Anwendung 1); eine Zahl nur,
-   wenn der Empfänger sie nicht zum Handeln braucht.
-4. **Block B in Klartext.** Einstieg mit einem echten Vorfall oder Beispiel; dann, was es tut; bei Anleitungen zusätzlich der
-   Abschnitt „Was du im Alltag tust“. Keine Funktions-, Datei- oder Feldnamen, keine Abkürzungen ohne Erklärung. Bei Aufträgen
-   höchstens drei Absätze; Längeres in eine eigene Datei, die Block A mit Zweck nennt.
-   *Ergebnis:* Block B enthält keine Zeichen in `Backticks` und keine Kürzel ohne erklärenden Satz.
-5. **Blindtest (jede Anleitung, Anwendung 2).** Eine frische KI – ohne die Anleitung und das Projekt zu kennen – bekommt nur
-   Block A und einen erfundenen, kleinen Auftrag, der zu GILT FÜR passt. Ihre Liste der geratenen Stellen in Block A (oder im
-   Code) beheben. Mit einem anderen erfundenen Auftrag wiederholen, bis nur noch Kleinigkeiten kommen. Gibt es keine frische KI:
-   dieselbe KI in einer neuen Sitzung ohne Verlauf, und das in der Lieferung so nennen. Geht auch das nicht: Schritt auslassen
-   und die Anleitung in der Lieferung als „ungeprüft (Blindtest offen)“ kennzeichnen.
-   *Ergebnis:* Der letzte Blindtest fand keine echte Lücke; Auftrag, Ratestellen und Behebung sind dort abgelegt, wo das
+1. **Vorlage wählen.** Wenn der Text eine Nachricht an eine andere KI ist, die etwas bewirkt, dann kopiere
+   `auftrag-vorlage.md`. Wenn der Text eine Anleitung ist, die dauerhaft im Repo liegt, dann kopiere `readme-vorlage.md`.
+   Namen und Reihenfolge der Felder lässt du, wie sie sind.
+   *Ergebnis:* Die Kopie enthält die Felder der Vorlage in derselben Reihenfolge.
+2. **Block A füllen.** Ersetze jeden Platzhalter; der Platzhalter sagt, was in das Feld gehört. Schreib so:
+   - Schreib ganze Sätze mit Verb.
+   - Nenne die Bedingung vor der Handlung: „Wenn X, dann tu Y.“
+   - Nenne bei jeder Grenze zuerst, was richtig ist, und dann, was der Empfänger lässt: „Schreib nur auf Branch X.
+     Main fasst du nicht an.“
+   - Nenne in jedem Schritt einer Anleitung die Datei, die Stelle und den Wert.
+   - Nenne auch, was sonst nur im Code steht: Dateinamen, Ablageorte und das Wort, mit dem der Code eine Rolle
+     bezeichnet.
+   - Bezeichne dieselbe Sache überall mit demselben Wort.
+   - Trenne die Punkte eines Listenfelds mit „·“ oder je Zeile. Jeder Punkt ist eine vollständige Aussage.
+
+   *Ergebnis:* `grep -n '<' <datei>` zeigt nur noch absichtliche Zeichen und keinen Platzhalter.
+3. **Die zwei Prüffragen.** Frag jeden Satz in Block B: „Ist das eigentlich eine Anweisung?“ Wenn ja, dann verschiebe
+   ihn nach Block A. Frag danach: „Könnte der Empfänger ohne Block B richtig handeln?“ Wenn nein, dann ergänze in
+   Block A, was fehlt.
+   *Ergebnis:* Alles Ausführungsrelevante steht in Block A.
+4. **Block B schreiben.** Schreib für einen Menschen ohne Fachwissen: ganze Sätze, keine Funktions-, Datei- oder
+   Feldnamen, jede Abkürzung erklärt. Folge dem Aufbau, den die Vorlage für Block B zeigt.
+   *Ergebnis:* Block B enthält keine Zeichen in Backticks und kein Kürzel ohne erklärenden Satz.
+5. **Blindtest (nur bei Anleitungen).** Gib einer frischen KI nur Block A und eine kleine, erfundene Probeaufgabe, die
+   zu GILT FÜR passt. Lass sie die Schritte ausführen und jede Ratestelle nennen. Behebe jede Ratestelle in Block A
+   oder im Code. Wiederhole den Test mit einer anderen Probeaufgabe, bis er nur noch Kleinigkeiten findet. Wenn du
+   keine frische KI hast, dann nimm dieselbe KI in einer neuen Sitzung ohne Verlauf und nenne das in der Lieferung.
+   Wenn auch das nicht geht, dann kennzeichne die Anleitung in der Lieferung als „ungeprüft (Blindtest offen)“.
+   *Ergebnis:* Der letzte Blindtest fand keine echte Lücke. Probeaufgabe, Ratestellen und Behebung liegen dort, wo das
    Projekt seine Prüfungen aufbewahrt, und die Lieferung nennt den Ort.
 
 ```text
-PRÜFUNG:      Die drei Ergebnisse zusammen: Schritt 3 (beide Prüffragen) · Schritt 4 (Block B ohne Backticks) · bei Anleitungen
-              Schritt 5 (kein Blindtest-Befund mit echter Lücke).
-FAIL-MODE:    Lässt sich etwas Ausführungsrelevantes nicht in ein Feld bringen: als eigenen Schritt in Block A aufnehmen,
-              nie in Block B. Fehlt dir beim Ausführen dieser Anleitung eine Angabe, die nur der Auftraggeber kennt: nicht
-              raten, als offen in die Lieferung. (Schreibst du selbst einen Auftrag und dir fehlt eine Angabe: Schritt 2.)
-NICHT TUN:    Anweisungen in Block B · Stichwort-Telegramm in Block A · Block B aus Funktionsnamen und Kürzeln ·
-              Regeln des Empfängers durch das Format lockern (Vorrang der Regeln, konzept.md).
-LIEFERUNG:    der Text · Ergebnis der Prüffragen · bei Anleitungen die Blindtest-Läufe mit Befund ·
-              jede Stelle, an der diese Anleitung nicht reichte (mit Zitat).
-REFERENZ:     konzept.md (Zitate der Herkunft, Felder, Prüfungen) · beispiel-auftrag.md und beispiel-readme.md (fertige Texte).
+PRÜFUNG:      Die Ergebnisse der Schritte 2, 3 und 4 gelten zusammen. Bei einer Anleitung gilt zusätzlich das Ergebnis
+              von Schritt 5.
+FAIL-MODE:    Wenn etwas Ausführungsrelevantes in kein Feld passt, dann nimm es als eigenen Punkt in PARAMETER oder als
+              eigenen Schritt in Block A auf. Wenn dir eine Angabe fehlt, die du nicht beschaffen kannst, dann schreib
+              sie in Block A als „offen: …“ mit dem, was der Empfänger damit tut, und nenne sie in der Lieferung.
+LIEFERUNG:    der Text · das Ergebnis der zwei Prüffragen · bei Anleitungen jeder Blindtest mit Befund · offene
+              Angaben · jede Stelle, an der diese Anleitung nicht reichte, mit Zitat.
 ```
 
 ---
@@ -88,6 +83,9 @@ Das Zwei-Kanal-Format trennt deshalb jeden solchen Text in zwei Teile. Der erste
 Felder, vollständig, nichts zwischen den Zeilen. Der zweite Teil ist für Menschen: warum es das gibt, was es löst –
 in normaler Sprache. Die Probe ist einfach: Streicht man den zweiten Teil, muss der Empfänger trotzdem richtig handeln
 können.
+
+Das Format ist ein Werkzeug. Es sagt, wie ein solcher Text gebaut ist. Was eine KI darf und was sie lassen muss, steht
+in den Regeln, nach denen sie arbeitet, nicht hier.
 
 Ursprünglich galt das nur für Aufträge zwischen KI-Agenten. Seit Oktober 2026 gilt es auch für Anleitungen, denn auch die
 lesen heute meist KIs. Ob eine Anleitung taugt, zeigt ein Blindtest: Eine KI, die nichts davon kennt, richtet damit etwas
