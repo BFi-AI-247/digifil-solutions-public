@@ -379,12 +379,44 @@
 
   function esc(s) { return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;'); }
 
+  // ---------- PDF aus Seitenbildern (JPEG), je Bild eine A4-Seite; ohne Fremdbibliothek ----------
+  // pages: [{ w, h, jpeg: Uint8Array }], Ergebnis: Array von Uint8Array (für new Blob(...))
+  function pdfFromJpegs(pages, title, now) {
+    function bytes(s) { var b = new Uint8Array(s.length); for (var i = 0; i < s.length; i++) b[i] = s.charCodeAt(i) & 255; return b; }
+    function hex16(s) { var h = 'FEFF'; for (var i = 0; i < s.length; i++) h += ('000' + s.charCodeAt(i).toString(16).toUpperCase()).slice(-4); return '<' + h + '>'; }
+    function pad(n, l) { n = String(n); while (n.length < l) n = '0' + n; return n; }
+    var parts = [], pos = 0, offs = [];
+    function add(x) { var b = typeof x === 'string' ? bytes(x) : x; parts.push(b); pos += b.length; }
+    function obj(n, body) { offs[n] = pos; add(n + ' 0 obj\n' + body + '\nendobj\n'); }
+    var W = 595.28, H = 841.89, n = pages.length, kids = [];
+    for (var i = 0; i < n; i++) kids.push((4 + 3 * i) + ' 0 R');
+    var d = now || new Date();
+    var date = 'D:' + d.getFullYear() + pad(d.getMonth() + 1, 2) + pad(d.getDate(), 2) + pad(d.getHours(), 2) + pad(d.getMinutes(), 2) + pad(d.getSeconds(), 2);
+    add('%PDF-1.4\n%\xE2\xE3\xCF\xD3\n');
+    obj(1, '<< /Type /Catalog /Pages 2 0 R >>');
+    obj(2, '<< /Type /Pages /Kids [' + kids.join(' ') + '] /Count ' + n + ' >>');
+    obj(3, '<< /Title ' + hex16(String(title || 'Arbeitsblatt')) + ' /Producer (Blattwerk) /CreationDate (' + date + ') >>');
+    pages.forEach(function (p, i) {
+      var po = 4 + 3 * i, co = po + 1, io = po + 2, c = 'q ' + W + ' 0 0 ' + H + ' 0 0 cm /Im' + i + ' Do Q';
+      obj(po, '<< /Type /Page /Parent 2 0 R /MediaBox [0 0 ' + W + ' ' + H + '] /Resources << /XObject << /Im' + i + ' ' + io + ' 0 R >> >> /Contents ' + co + ' 0 R >>');
+      obj(co, '<< /Length ' + c.length + ' >>\nstream\n' + c + '\nendstream');
+      offs[io] = pos;
+      add(io + ' 0 obj\n<< /Type /XObject /Subtype /Image /Width ' + p.w + ' /Height ' + p.h + ' /ColorSpace /DeviceRGB /BitsPerComponent 8 /Filter /DCTDecode /Length ' + p.jpeg.length + ' >>\nstream\n');
+      add(p.jpeg); add('\nendstream\nendobj\n');
+    });
+    var count = 4 + 3 * n, xref = pos, x = 'xref\n0 ' + count + '\n0000000000 65535 f \n';
+    for (var k = 1; k < count; k++) x += pad(offs[k], 10) + ' 00000 n \n';
+    add(x + 'trailer\n<< /Size ' + count + ' /Root 1 0 R /Info 3 0 R >>\nstartxref\n' + xref + '\n%%EOF\n');
+    return parts;
+  }
+
   var api = {
     PAGE: PAGE, LINEATUREN: LINEATUREN, HEADER_FIELDS: HEADER_FIELDS, SUM_H: SUM_H, GRADE_H: GRADE_H, POINTS_W: POINTS_W,
     uid: uid, clone: clone, esc: esc, newDoc: newDoc, newPage: newPage, newFrame: newFrame, newItem: newItem, exampleDoc: exampleDoc,
     frameLayout: frameLayout, blockSlots: blockSlots, frameSvg: frameSvg, linePath: linePath, circlePath: circlePath,
     lineaturRows: lineaturRows, lineaturTextRows: lineaturTextRows, karoSize: karoSize, normTable: normTable, tableEdges: tableEdges, tableInsert: tableInsert, tableRemove: tableRemove, INK: INK, INK_TRACE: INK_TRACE, lineaturHeightFor: lineaturHeightFor, lineaturSvg: lineaturSvg, karoSvg: karoSvg,
-    numberItems: numberItems, totalPoints: totalPoints, fmtPts: fmtPts, gradeRanges: gradeRanges, rangeTxt: rangeTxt
+    numberItems: numberItems, totalPoints: totalPoints, fmtPts: fmtPts, gradeRanges: gradeRanges, rangeTxt: rangeTxt,
+    pdfFromJpegs: pdfFromJpegs
   };
   if (typeof module !== 'undefined' && module.exports) module.exports = api;
   else root.BW = api;

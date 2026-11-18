@@ -132,6 +132,21 @@
   </div>
 </div>
 
+<div class="modal" id="mPrint" hidden>
+  <div class="dialog" role="dialog" aria-modal="true" aria-labelledby="mPrintT">
+    <header><h2 id="mPrintT">Drucken oder PDF</h2><button class="btn icon ghost" data-close aria-label="Schließen"><svg><use href="#i-x"/></svg></button></header>
+    <div class="row">
+      <button class="btn primary" id="btnPdf">Als PDF sichern</button>
+      <button class="btn" id="btnDoPrint"><svg><use href="#i-print"/></svg>Drucken</button>
+    </div>
+    <p class="hint" id="pdfState" aria-live="polite">Das PDF enthält jede Seite des Blatts als A4-Seite.</p>
+    <div class="row" id="pdfReady" hidden>
+      <button class="btn primary" id="btnPdfShare">Teilen oder in Dateien sichern</button>
+      <button class="btn" id="btnPdfSave">Herunterladen</button>
+    </div>
+  </div>
+</div>
+
 <div class="modal" id="mFeedback" hidden>
   <div class="dialog" role="dialog" aria-modal="true" aria-labelledby="mFeedbackT">
     <header><h2 id="mFeedbackT">Rückmeldung</h2><button class="btn icon ghost" data-close aria-label="Schließen"><svg><use href="#i-x"/></svg></button></header>

@@ -1200,6 +1200,235 @@
     lsSet('blattwerk.current', D.id); render(); $('desk').scrollTop = 0;
   }
 
+  // ---------- PDF: jede Seite wird aus der Bildschirmdarstellung auf ein Bild gemalt (A4, etwa 240 dpi) ----------
+  // Gemalt wird ohne foreignObject (Safari): Kästen, Rahmen und Text aus dem Layout des Browsers, SVG über Path2D.
+  var PDF_W = 2000, SVGNS = 'http://www.w3.org/2000/svg';
+  var PDF_SKIP = '.divider, svg.guides, .selbox, .handle, .sel-layer, .kin, .ph, .page-label, .float';
+  var pdfFile = null;
+  function cssColorVisible(c) { return c && c !== 'transparent' && !/rgba\([^)]*,\s*0\)$/.test(c); }
+  function paintPage(pg) {
+    var pr = pg.getBoundingClientRect(), K = PDF_W / pr.width, H = Math.round(PDF_W * 297 / 210);
+    var cv = document.createElement('canvas'); cv.width = PDF_W; cv.height = H;
+    var ctx = cv.getContext('2d');
+    ctx.fillStyle = '#ffffff'; ctx.fillRect(0, 0, PDF_W, H);
+    var P = { ctx: ctx, ox: pr.left, oy: pr.top, K: K, F: PDF_W / pg.offsetWidth, rg: document.createRange() };
+    paintEl(P, pg, 1);
+    var url = cv.toDataURL('image/jpeg', 0.92), b64 = atob(url.slice(url.indexOf(',') + 1)), jpeg = new Uint8Array(b64.length);
+    for (var i = 0; i < b64.length; i++) jpeg[i] = b64.charCodeAt(i);
+    cv.width = cv.height = 1; // Speicher auf dem iPad sofort freigeben
+    if (jpeg[0] !== 0xFF || jpeg[1] !== 0xD8) throw new Error('kein JPEG');
+    return { w: PDF_W, h: H, jpeg: jpeg };
+  }
+  function boxOf(P, e) {
+    var r = e.getBoundingClientRect();
+    return { x: (r.left - P.ox) * P.K, y: (r.top - P.oy) * P.K, w: r.width * P.K, h: r.height * P.K };
+  }
+  function paintEl(P, e, alpha) {
+    if (e.matches(PDF_SKIP)) return;
+    var cs = getComputedStyle(e);
+    if (cs.display === 'none' || cs.visibility === 'hidden') return;
+    alpha *= Number(cs.opacity); if (!(alpha > 0)) return;
+    if (e.namespaceURI === SVGNS) { if (e.tagName.toLowerCase() === 'svg') paintSvg(P, e, alpha); return; }
+    var b = boxOf(P, e), ctx = P.ctx;
+    paintBox(P, e, cs, b, alpha);
+    if (e.tagName === 'TABLE') P.later = [];
+    if (e.tagName === 'IMG') { if (e.complete && e.naturalWidth) { ctx.globalAlpha = alpha; ctx.drawImage(e, b.x, b.y, b.w, b.h); ctx.globalAlpha = 1; } return; }
+    var clip = /hidden|clip|auto|scroll/.test(cs.overflowX + ' ' + cs.overflowY);
+    if (clip) { ctx.save(); ctx.beginPath(); ctx.rect(b.x, b.y, b.w, b.h); ctx.clip(); }
+    for (var c = e.firstChild; c; c = c.nextSibling) {
+      if (c.nodeType === 1) paintEl(P, c, alpha); else if (c.nodeType === 3) paintText(P, c, cs, alpha);
+    }
+    if (clip) ctx.restore();
+    // Zusammengefasste Tabellenränder erst nach allen Zellflächen malen, sonst überdeckt die Nachbarzelle den halben Strich
+    if (e.tagName === 'TABLE' && P.later) { P.later.forEach(function (f) { f(); }); P.later = null; }
+  }
+  function roundRect(ctx, x, y, w, h, r) {
+    r = Math.max(0, Math.min(r, w / 2, h / 2));
+    ctx.beginPath(); ctx.moveTo(x + r, y); ctx.lineTo(x + w - r, y); ctx.arcTo(x + w, y, x + w, y + r, r); ctx.lineTo(x + w, y + h - r);
+    ctx.arcTo(x + w, y + h, x + w - r, y + h, r); ctx.lineTo(x + r, y + h); ctx.arcTo(x, y + h, x, y + h - r, r); ctx.lineTo(x, y + r); ctx.arcTo(x, y, x + r, y, r); ctx.closePath();
+  }
+  function paintBox(P, e, cs, b, alpha) {
+    var ctx = P.ctx, rad = parseFloat(cs.borderTopLeftRadius) * P.F || 0;
+    ctx.globalAlpha = alpha;
+    if (cssColorVisible(cs.backgroundColor)) {
+      ctx.fillStyle = cs.backgroundColor;
+      if (rad) { roundRect(ctx, b.x, b.y, b.w, b.h, rad); ctx.fill(); } else ctx.fillRect(b.x, b.y, b.w, b.h);
+    }
+    // Ränder: in Tabellen mit border-collapse liegt der Strich mittig auf der Zellkante, sonst innen
+    var collapsed = e.tagName === 'TD' && e.closest('table') && getComputedStyle(e.closest('table')).borderCollapse === 'collapse';
+    var sides = ['Top', 'Right', 'Bottom', 'Left'].map(function (s) {
+      // Breiten aus dem Inline-Stil in mm sind genauer als der berechnete Wert (Browser runden auf ganze Pixel)
+      var mmW = /^([\d.]+)mm$/.exec(e.style['border' + s + 'Width'] || '');
+      return { w: mmW ? Number(mmW[1]) * PX_MM * P.F : parseFloat(cs['border' + s + 'Width']) * P.F || 0, st: cs['border' + s + 'Style'], c: cs['border' + s + 'Color'] };
+    });
+    if (collapsed && P.later) { P.later.push(function () { strokeSides(P, sides, b, alpha, true, 0); }); return void (ctx.globalAlpha = 1); }
+    strokeSides(P, sides, b, alpha, collapsed, rad);
+  }
+  function strokeSides(P, sides, b, alpha, collapsed, rad) {
+    var ctx = P.ctx; ctx.globalAlpha = alpha;
+    function vis(s) { return s.w > 0 && s.st !== 'none' && s.st !== 'hidden' && cssColorVisible(s.c); }
+    function dash(s) {
+      ctx.lineCap = s.st === 'dotted' ? 'round' : 'butt';
+      ctx.setLineDash(s.st === 'dashed' ? [s.w * 3, s.w * 2] : s.st === 'dotted' ? [0.01, s.w * 2] : []);
+    }
+    var same = sides.every(function (s) { return vis(s) && s.w === sides[0].w && s.c === sides[0].c && s.st === sides[0].st; });
+    if (same && rad) {
+      var s0 = sides[0]; dash(s0); ctx.lineWidth = s0.w; ctx.strokeStyle = s0.c;
+      roundRect(ctx, b.x + s0.w / 2, b.y + s0.w / 2, b.w - s0.w, b.h - s0.w, Math.max(0, rad - s0.w / 2)); ctx.stroke();
+    } else {
+      sides.forEach(function (s, i) {
+        if (!vis(s)) return;
+        var o = collapsed ? 0 : s.w / 2, x0 = b.x, y0 = b.y, x1 = b.x + b.w, y1 = b.y + b.h;
+        dash(s); ctx.lineWidth = s.w; ctx.strokeStyle = s.c; ctx.beginPath();
+        if (i === 0) { ctx.moveTo(x0, y0 + o); ctx.lineTo(x1, y0 + o); }
+        else if (i === 1) { ctx.moveTo(x1 - o, y0); ctx.lineTo(x1 - o, y1); }
+        else if (i === 2) { ctx.moveTo(x0, y1 - o); ctx.lineTo(x1, y1 - o); }
+        else { ctx.moveTo(x0 + o, y0); ctx.lineTo(x0 + o, y1); }
+        ctx.stroke();
+      });
+    }
+    ctx.setLineDash([]); ctx.lineCap = 'butt'; ctx.globalAlpha = 1;
+  }
+  function fontMetrics(ctx, px) {
+    var m = ctx.measureText('Hg'), a = m.fontBoundingBoxAscent, d = m.fontBoundingBoxDescent;
+    if (!(a > 0)) { a = px * 0.92; d = px * 0.26; }
+    return { a: a, d: d };
+  }
+  function sameRect(a, b) { return Math.abs(a.left - b.left) < 0.5 && Math.abs(a.top - b.top) < 0.5 && Math.abs(a.width - b.width) < 0.5; }
+  function decoOf(e) {
+    var u = null;
+    for (var x = e; x && !x.classList.contains('page'); x = x.parentElement) {
+      var cs = getComputedStyle(x), l = cs.textDecorationLine || cs.textDecoration || '';
+      if (/underline|line-through/.test(l)) { u = { under: /underline/.test(l), strike: /line-through/.test(l), c: cs.textDecorationColor || cs.color }; break; }
+    }
+    return u;
+  }
+  function paintText(P, tn, cs, alpha) {
+    var s = tn.nodeValue; if (!s || !/\S/.test(s)) return;
+    var ctx = P.ctx, px = parseFloat(cs.fontSize) * P.F, rg = P.rg, re = /\S+/g, mm, rs, i, k;
+    ctx.font = cs.fontStyle + ' ' + cs.fontWeight + ' ' + px + 'px ' + cs.fontFamily;
+    ctx.fillStyle = cs.color; ctx.globalAlpha = alpha; ctx.textBaseline = 'alphabetic'; ctx.textAlign = 'left';
+    var fm = fontMetrics(ctx, px);
+    function base(r) { var h = r.height * P.K; return (r.top - P.oy) * P.K + (h - fm.a - fm.d) / 2 + fm.a; }
+    while ((mm = re.exec(s))) {
+      rg.setStart(tn, mm.index); rg.setEnd(tn, mm.index + mm[0].length); rs = rg.getClientRects();
+      if (rs.length === 1) { ctx.fillText(mm[0], (rs[0].left - P.ox) * P.K, base(rs[0])); continue; }
+      // Wort über zwei Zeilen: Zeichen einzeln setzen. Ein Trennstrich der Silbentrennung erscheint als Rechteck,
+      // das zwei benachbarte Zeichen gemeinsam haben – dort kommt ein „-“ hin.
+      var lists = [], hy = [];
+      for (i = 0; i < mm[0].length; i++) { k = mm.index + i; rg.setStart(tn, k); rg.setEnd(tn, k + 1); lists.push(Array.prototype.slice.call(rg.getClientRects())); }
+      lists.forEach(function (L, j) {
+        var nb = (lists[j - 1] || []).concat(lists[j + 1] || []);
+        var own = L.filter(function (r) { return !nb.some(function (q) { return sameRect(q, r); }); });
+        L.forEach(function (r) { if (own.indexOf(r) < 0 && !hy.some(function (q) { return sameRect(q, r); })) hy.push(r); });
+        var rc = own[own.length - 1] || L[L.length - 1];
+        if (rc) ctx.fillText(mm[0].charAt(j), (rc.left - P.ox) * P.K, base(rc));
+      });
+      hy.forEach(function (r) { ctx.fillText('-', (r.left - P.ox) * P.K, base(r)); });
+    }
+    var dc = decoOf(tn.parentElement);
+    if (dc) {
+      var start = s.search(/\S/), end = s.length - (s.match(/\s*$/)[0].length);
+      rg.setStart(tn, start); rg.setEnd(tn, end); rs = rg.getClientRects();
+      ctx.strokeStyle = dc.c; ctx.lineWidth = Math.max(1, px / 14);
+      for (i = 0; i < rs.length; i++) {
+        var bl = base(rs[i]), x0 = (rs[i].left - P.ox) * P.K, x1 = (rs[i].right - P.ox) * P.K;
+        ctx.beginPath();
+        if (dc.under) { ctx.moveTo(x0, bl + fm.d * 0.45); ctx.lineTo(x1, bl + fm.d * 0.45); }
+        if (dc.strike) { ctx.moveTo(x0, bl - fm.a * 0.3); ctx.lineTo(x1, bl - fm.a * 0.3); }
+        ctx.stroke();
+      }
+    }
+    ctx.globalAlpha = 1;
+  }
+  function paintSvg(P, svg, alpha) {
+    var b = boxOf(P, svg), vb = svg.viewBox && svg.viewBox.baseVal, ctx = P.ctx;
+    var vw = vb && vb.width ? vb.width : b.w / P.F, vh = vb && vb.height ? vb.height : b.h / P.F, vx = vb && vb.width ? vb.x : 0, vy = vb && vb.width ? vb.y : 0;
+    var sx = b.w / vw, sy = b.h / vh, tx = b.x, ty = b.y;
+    if ((svg.getAttribute('preserveAspectRatio') || '') !== 'none') {
+      var sc = Math.min(sx, sy); tx += (b.w - vw * sc) / 2; ty += (b.h - vh * sc) / 2; sx = sy = sc;
+    }
+    ctx.save();
+    paintSvgKids(P, svg, { sx: sx, sy: sy, tx: tx - vx * sx, ty: ty - vy * sy }, alpha);
+    ctx.restore();
+    ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.globalAlpha = 1;
+  }
+  function paintSvgKids(P, node, M, alpha) {
+    var ctx = P.ctx;
+    for (var e = node.firstElementChild; e; e = e.nextElementSibling) {
+      var cs = getComputedStyle(e), tag = e.tagName.toLowerCase();
+      if (cs.display === 'none' || cs.visibility === 'hidden') continue;
+      var a = alpha * Number(cs.opacity === '' ? 1 : cs.opacity);
+      if (tag === 'g') { paintSvgKids(P, e, M, a); continue; }
+      if (tag === 'text') {
+        var fs = parseFloat(cs.fontSize) * Math.min(M.sx, M.sy), x = e.x.baseVal.length ? e.x.baseVal[0].value : 0, y = e.y.baseVal.length ? e.y.baseVal[0].value : 0;
+        ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.globalAlpha = a * Number(cs.fillOpacity || 1);
+        ctx.font = cs.fontStyle + ' ' + cs.fontWeight + ' ' + fs + 'px ' + cs.fontFamily; ctx.fillStyle = cs.fill;
+        ctx.textAlign = cs.textAnchor === 'middle' ? 'center' : cs.textAnchor === 'end' ? 'right' : 'left';
+        var db = cs.dominantBaseline;
+        if (db === 'central' || db === 'middle') { ctx.textBaseline = 'alphabetic'; var fm = fontMetrics(ctx, fs); ctx.fillText(e.textContent, M.tx + x * M.sx, M.ty + y * M.sy + (fm.a - fm.d) / 2); }
+        else { ctx.textBaseline = 'alphabetic'; ctx.fillText(e.textContent, M.tx + x * M.sx, M.ty + y * M.sy); }
+        ctx.textAlign = 'left';
+        continue;
+      }
+      var p = null;
+      if (tag === 'path') p = new Path2D(e.getAttribute('d') || '');
+      else if (tag === 'rect') { p = new Path2D(); p.rect(e.x.baseVal.value, e.y.baseVal.value, e.width.baseVal.value, e.height.baseVal.value); }
+      else if (tag === 'line') { p = new Path2D(); p.moveTo(e.x1.baseVal.value, e.y1.baseVal.value); p.lineTo(e.x2.baseVal.value, e.y2.baseVal.value); }
+      else if (tag === 'circle') { p = new Path2D(); p.arc(e.cx.baseVal.value, e.cy.baseVal.value, e.r.baseVal.value, 0, Math.PI * 2); }
+      if (!p) continue;
+      ctx.setTransform(M.sx, 0, 0, M.sy, M.tx, M.ty);
+      if (cs.fill && cs.fill !== 'none' && cs.fill.indexOf('url(') < 0) {
+        ctx.globalAlpha = a * Number(cs.fillOpacity || 1); ctx.fillStyle = cs.fill; ctx.fill(p, cs.fillRule === 'evenodd' ? 'evenodd' : 'nonzero');
+      }
+      var sw = parseFloat(cs.strokeWidth);
+      if (cs.stroke && cs.stroke !== 'none' && sw > 0) {
+        ctx.globalAlpha = a * Number(cs.strokeOpacity || 1); ctx.strokeStyle = cs.stroke; ctx.lineWidth = sw;
+        ctx.lineCap = cs.strokeLinecap || 'butt'; ctx.lineJoin = cs.strokeLinejoin || 'miter';
+        var da = cs.strokeDasharray && cs.strokeDasharray !== 'none' ? cs.strokeDasharray.split(/[\s,]+/).map(parseFloat).filter(function (v) { return v >= 0; }) : [];
+        ctx.setLineDash(da); ctx.stroke(p); ctx.setLineDash([]);
+      }
+    }
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
+  }
+  function pdfName() { return fileSafe(D.title) + '.pdf'; }
+  function makePdf() {
+    stopEdit(); select(null);
+    pdfFile = null; $('pdfReady').hidden = true; $('btnPdf').disabled = true; $('btnDoPrint').disabled = true;
+    $('pdfState').textContent = 'PDF wird erstellt …';
+    var fonts = document.fonts && document.fonts.ready ? document.fonts.ready : Promise.resolve();
+    function imagesReady() {
+      return Promise.all(Array.prototype.map.call(document.querySelectorAll('#pages img'), function (im) {
+        if (im.complete && im.naturalWidth) return null;
+        return new Promise(function (res) { im.onload = im.onerror = res; setTimeout(res, 3000); });
+      }));
+    }
+    return fonts.then(imagesReady).then(function () { return new Promise(function (res) { setTimeout(res, 60); }); }).then(function () {
+      var pages = Array.prototype.map.call(document.querySelectorAll('#pages .page'), paintPage);
+      var blob = new Blob(B.pdfFromJpegs(pages, D.title || 'Arbeitsblatt'), { type: 'application/pdf' });
+      try { pdfFile = new File([blob], pdfName(), { type: 'application/pdf' }); } catch (e) { pdfFile = blob; pdfFile.name = pdfName(); }
+      var share = !!(navigator.canShare && window.File && pdfFile instanceof File && navigator.canShare({ files: [pdfFile] }));
+      $('btnPdfShare').hidden = !share;
+      $('pdfState').textContent = 'Fertig: ' + pdfName() + ' (' + pages.length + (pages.length === 1 ? ' Seite, ' : ' Seiten, ') + Math.max(1, Math.round(blob.size / 1024)) + ' KB).' +
+        (share ? ' Über „Teilen“ kannst du es in Dateien sichern, per Mail schicken oder drucken.' : '');
+      $('pdfReady').hidden = false;
+    }).catch(function (err) {
+      if (window.console) console.warn('PDF:', err);
+      $('pdfState').textContent = 'Das PDF ließ sich auf diesem Gerät nicht erstellen. Ausweg: „Drucken“ wählen und im Druckdialog über „Teilen“ als PDF sichern.';
+    }).then(function () { $('btnPdf').disabled = false; $('btnDoPrint').disabled = false; });
+  }
+  function sharePdf() {
+    if (!pdfFile) return;
+    navigator.share({ files: [pdfFile], title: D.title || 'Arbeitsblatt' }).catch(function (err) {
+      if (!err || err.name !== 'AbortError') { toast('Teilen hat nicht geklappt – bitte „Herunterladen“ nehmen.'); }
+    });
+  }
+  function downloadPdf() {
+    if (!pdfFile) return;
+    var a = document.createElement('a'); a.href = URL.createObjectURL(pdfFile); a.download = pdfName();
+    document.body.appendChild(a); a.click(); setTimeout(function () { URL.revokeObjectURL(a.href); a.remove(); }, 10000);
+  }
+
   // ---------- Dateien ----------
   function offerFile(name, data, mime) {
     if (ENV === 'artifact') {
@@ -1294,7 +1523,15 @@
       var b = e.target.closest('button'); if (!b) return; fbArt = b.dataset.v;
       Array.prototype.forEach.call($('fbArt').children, function (x) { x.setAttribute('aria-pressed', String(x === b)); });
     };
-    $('btnPrint').onclick = function () { stopEdit(); select(null); setTimeout(function () { window.print(); }, 60); };
+    $('btnPrint').onclick = function () {
+      stopEdit(); select(null);
+      pdfFile = null; $('pdfReady').hidden = true; $('pdfState').textContent = 'Das PDF enthält jede Seite des Blatts als A4-Seite.';
+      openModal('mPrint');
+    };
+    $('btnDoPrint').onclick = function () { closeModal('mPrint'); setTimeout(function () { window.print(); }, 60); };
+    $('btnPdf').onclick = makePdf;
+    $('btnPdfShare').onclick = sharePdf;
+    $('btnPdfSave').onclick = downloadPdf;
     $('btnInsp').onclick = function () { $('insp').classList.toggle('open'); };
     $('fProps').onclick = function () { $('insp').classList.add('open'); };
     $('fCopy').onclick = duplicate; $('fDel').onclick = removeSel;

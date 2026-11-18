@@ -25,7 +25,7 @@ async def main(datei: str, bilder: str | None) -> int:
     url = pathlib.Path(datei).resolve().as_uri()
     async with async_playwright() as p:
         b = await p.chromium.launch()
-        ctx = await b.new_context(viewport={"width": 1180, "height": 820}, has_touch=True)
+        ctx = await b.new_context(viewport={"width": 1180, "height": 820}, has_touch=True, accept_downloads=True)
         pg = await ctx.new_page()
         js_fehler = []
         pg.on("pageerror", lambda e: js_fehler.append(str(e)))
@@ -180,6 +180,20 @@ async def main(datei: str, bilder: str | None) -> int:
         pdf = await pg.pdf(format="A4", print_background=True, prefer_css_page_size=True)
         await pg.emulate_media(media="screen")
         pruefe(pdf.count(b"/Type /Page") - pdf.count(b"/Type /Pages") == 1, "Druck ergibt genau eine A4-Seite")
+
+        print("PDF sichern")
+        await pg.click("#btnPrint")
+        pruefe(await pg.locator("#mPrint").is_visible(), "Knopf Drucken / PDF öffnet die Auswahl")
+        await pg.click("#btnPdf")
+        await pg.wait_for_selector("#pdfReady:not([hidden])", timeout=30000)
+        async with pg.expect_download() as dl:
+            await pg.click("#btnPdfSave")
+        datei_pdf = await (await dl.value).path()
+        daten = pathlib.Path(datei_pdf).read_bytes() if datei_pdf else b""
+        pruefe(daten.startswith(b"%PDF-1.4") and daten.rstrip().endswith(b"%%EOF"), "PDF-Datei ist vollständig")
+        pruefe(daten.count(b"/Type /Page ") == 1 and b"/MediaBox [0 0 595.28 841.89]" in daten, "PDF: eine A4-Seite je Blattseite")
+        pruefe(b"/Filter /DCTDecode" in daten and b"/Width 2000" in daten, "PDF: Seitenbild in voller Auflösung")
+        await pg.click("#mPrint [data-close]")
 
         if bilder:
             ctx2 = await b.new_context(viewport={"width": 820, "height": 1180}, has_touch=True)
