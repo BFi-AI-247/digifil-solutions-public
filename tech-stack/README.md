@@ -14,7 +14,8 @@ GILT NICHT:   Die Bauvorgabe selbst mit ihren Bausteinen und Grenzen (steht in T
 VORAUSSETZUNG: Lesezugriff auf diesen Ordner (BELEGE.md nur für die pflegende Rolle; in einer öffentlichen Fassung
               fehlt sie). Wer ein Werkzeug bauen lassen will, braucht eine bauende KI und einen Auftrag für sie.
 DATEIEN:      README.md (dieser Einstieg) · TECH-STACK.md (Bauvorgabe für lokale Werkzeuge in zwei Blöcken; die
-              Fassung steht in der Überschrift) · BELEGE.md (Beleg je Vorgabe; nicht öffentlich) · blindtest/
+              Fassung steht in der Überschrift) · TECH-STACK-2.md (Bauvorgabe für Web-Werkzeuge, ebenso) · BELEGE.md
+              und BELEGE-2.md (Beleg je Vorgabe; nicht öffentlich) · blindtest/
               (Verfahren und Berichte der Prüflesungen der Bauvorgabe).
 BEGRIFFE:     pflegende Rolle = die Rolle, die TECH-STACK.md führt; welche das ist, steht in der Rollendatei des
               Projekts. Gibt es keine, dann ist es der Mensch, der diesen Ordner verantwortet.
@@ -22,10 +23,10 @@ BEGRIFFE:     pflegende Rolle = die Rolle, die TECH-STACK.md führt; welche das 
 
 ### SCHRITTE (Schritt 1 oder 2, je nach Fall; Schritt 3, wenn etwas auffällt; jeder Schritt hat ein prüfbares Ergebnis)
 
-1. **Neues Werkzeug bauen lassen.** Gib einer bauenden KI die Datei TECH-STACK.md aus diesem Ordner und den Auftrag
-   für das Werkzeug, sonst nichts aus diesem Ordner. Die KI arbeitet danach das Startpaket ab, das in dieser Datei
-   steht.
-   *Ergebnis:* Der Bau nennt das Startpaket in TECH-STACK.md als Grundlage und beginnt mit dessen erstem Schritt.
+1. **Neues Werkzeug bauen lassen.** Gib einer bauenden KI die passende Bauvorgabe – TECH-STACK.md für ein Werkzeug auf
+   dem eigenen Rechner, TECH-STACK-2.md für ein Web-Werkzeug – und den Auftrag für das Werkzeug, sonst nichts aus
+   diesem Ordner. Die KI arbeitet danach das Startpaket dieser Bauvorgabe ab.
+   *Ergebnis:* Der Bau nennt das Startpaket der Bauvorgabe als Grundlage und beginnt mit dessen erstem Schritt.
 2. **Bestehendes Werkzeug prüfen lassen.** Gib einer prüfenden KI die Datei TECH-STACK.md und das Werkzeug, das zu
    prüfen ist. Die KI gleicht das Werkzeug mit den Bausteinen der Datei ab.
    *Ergebnis:* Die Prüfung nennt je Baustein, ob das Werkzeug der Vorgabe folgt.
