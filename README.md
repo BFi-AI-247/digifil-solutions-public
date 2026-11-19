@@ -25,9 +25,8 @@ GILT NICHT:   Einrichtung und Bedienung eines einzelnen Ordners (steht in dessen
 VORAUSSETZUNG: Lesezugriff auf dieses Repo. Die Spalte „Voraussetzungen“ der Tabelle oben ist eine Kurzfassung;
               vollständig stehen sie in der Anleitung des Ordners.
 DATEIEN:      README.md (dieser Einstieg) · LICENSE (EUPL-1.2) · werkzeug/spiegel.py (übernimmt neue Stände aus den
-              privaten Repos und prüft sie) · Anleitung je Ordner der Tabelle: dessen README.md; für blog/ (noch
-              ohne README) die Köpfe von tools/build.py (Bauen) und tools/make_zugang.py (Zugänge und Schlüssel);
-              für skills/ die SKILL.md des Skills.
+              privaten Repos und prüft sie) · Anleitung je Ordner der Tabelle: dessen README.md; für skills/ die
+              SKILL.md des Skills.
 BEGRIFFE:     passt = die Aufgabe ist das, wofür der Ordner laut Spalte „Was es ist“ gebaut ist; ein ähnlicher
               Ordner für einen anderen Zweck passt nicht.
               unbekannt = aus Aufgabe und Umgebung nicht erkennbar; zählt wie „fehlt“, bis es geklärt ist.

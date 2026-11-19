@@ -1,4 +1,4 @@
-# Blog (Stand 2026-11-19)
+# Blog 1.0
 
 <!-- Zwei-Kanal-Format 1.3 (../zwei-kanal-format/): BLOCK A muss allein genügen, BLOCK B ist Klartext für Menschen. -->
 
