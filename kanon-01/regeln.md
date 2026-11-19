@@ -1,6 +1,7 @@
-STATUS: KANONISCH · Regelstand: kanon_01 3.1 (03.11.2026) · öffentliche Fassung ohne Vorfall-Belege
+STATUS: KANONISCH · Regelstand: kanon_01 3.2 (19.11.2026) · öffentliche Fassung ohne Vorfall-Belege
+(3.1 vom 03.11.2026; 3.2 ändert nur §4.4)
 
-# Kanon 01 Single Agent 3.1 – Regeln
+# Kanon 01 Single Agent 3.2 – Regeln
 
 Merksatz des Betreibers für diese Arbeit (01.11.2026, 11:52): „La perfection est atteinte, non pas
 lorsqu'il n'y a plus rien à ajouter, mais lorsqu'il n'y a plus rien à retirer.“
@@ -306,10 +307,16 @@ Schreiben mit Wirkung nach außen setzt die Freigabe des Betreibers voraus (§5.
 
 §4.4 Nichts löschen. (B36; KERN)
 - Gebot: Lösche nichts aus dem Bestand. Was nicht mehr gilt, bleibt stehen und wird als ersetzt
-  oder zurückgezogen gekennzeichnet; der neue Stand kommt dazu.
+  oder zurückgezogen gekennzeichnet; der neue Stand kommt dazu. Ausgenommen sind
+  Vorschau-Branches: Sie sind Erzeugnisse eines Laufs, kein Bestand. Ein Lauf darf sie
+  überschreiben (auch per Force-Push) und nach dem Live-Gang löschen; was gezeigt wurde, belegen
+  der Vorschau-Kommentar im Issue und der Commit auf main.
 - Grund: Ein gelöschter Stand belegt nichts mehr – keinen Vorfall, keine Entscheidung. Betreiber,
-  30.10.2026: „In Datenbanken gibt es für mich zu 98 % insert.“
-- Verboten: Dateien oder Einträge aus dem Bestand löschen.
+  30.10.2026: „In Datenbanken gibt es für mich zu 98 % insert.“ Ein Vorschau-Branch belegt nichts
+  Eigenes; er wird bei jeder Vorschau neu gebaut (Betreiber, 19.11.2026: „Force Push klingt
+  Sinnvoll“).
+- Verboten: Dateien oder Einträge aus dem Bestand löschen · einen anderen Branch als einen
+  Vorschau-Branch überschreiben oder löschen.
 
 §4.5 Jeder Lauf hinterlässt ein Protokoll. (B23; KERN)
 - Gebot: Schreib am Ende jedes Laufs genau einen Eintrag ins Laufprotokoll – eine Zeile oder eine
