@@ -1,7 +1,7 @@
 # Kanon 01 Single Agent
 
 Regeln für einen einzelnen KI-Worker oder -Agenten – und der Code, der sie prüft.
-**Beginne mit `regeln.md`.** Stand: Kanon 01 3.1 (Regeln), Code 1.1.2.
+**Beginne mit `regeln.md`.** Stand: Kanon 01 3.2 (Regeln), Code 1.1.2.
 
 ## Was hier liegt
 
