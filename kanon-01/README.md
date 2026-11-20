@@ -1,13 +1,13 @@
 # Kanon 01 Single Agent
 
 Regeln für einen einzelnen KI-Worker oder -Agenten – und der Code, der sie prüft.
-**Beginne mit `regeln.md`.** Stand: Kanon 01 3.2 (Regeln), Code 1.1.2.
+**Beginne mit `regeln.md`.** Stand: Kanon 01 3.3 (Regeln), Code 1.1.2.
 
 ## Was hier liegt
 
 | Datei | Was es ist |
 |---|---|
-| `regeln.md` | Die Regeln: sieben Paragraphen, 42 Regeln, je Gebot – Grund – Verboten. Vorn ein Glossar und die Rangfolge Regeln > Rollen > Werkzeuge > Logs. Erste Zeile: Status und Regelstand. |
+| `regeln.md` | Die Regeln: sieben Paragraphen, 45 Regeln, je Gebot – Grund – Verboten. Vorn ein Glossar und die Rangfolge Regeln > Rollen > Werkzeuge > Logs. Erste Zeile: Status und Regelstand. |
 | `antwortschema.json` | JSON-Schema für die Antwort eines Workers: Felder `regelstand`, `erfahrungsstand`, `antwort`, `unsicher`, dazu `aenderungen` (nur nach Freigabe) und `erfahrung` (höchstens eine je Lauf). |
 | `kanon_basis.py`, `kanon_basis.php` | Prüfbausteine ohne Abhängigkeiten: Regelstand lesen und abgleichen, Schema prüfen, Freigabe-Wort erkennen, gezeigten Text mit geschriebenem vergleichen, Rücklese nach dem Schreiben, Sperrliste, Laufzeile, Erfahrungen laden und anhängen. Jede Funktion nennt die Regel, die sie absichert. |
 | `beispiel_worker.py` | Ein vollständiger Worker als Vorlage: liest Regeln und Erfahrungen, baut den Prompt, prüft die Antwort, schreibt nur nach Freigabe, liest zurück, schreibt die Laufzeile. Läuft auch ohne Modell (Trockenlauf). |
