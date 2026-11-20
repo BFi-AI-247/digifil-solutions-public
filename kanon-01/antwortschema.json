@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "title": "Kanon 01 Single Agent 3.2 – Antwort eines Workers",
+  "title": "Kanon 01 Single Agent 3.3 – Antwort eines Workers",
   "description": "Grundgerüst. Je Worker Felder ergänzen; regelstand, erfahrungsstand, antwort und unsicher bleiben Pflicht (§1.3; dieselben Felder nennt das Antwortformat, das der Worker im Prompt bekommt). Geprüft mit kanon_basis.schema_fehler (Teilmenge von JSON Schema).",
   "type": "object",
   "additionalProperties": false,
