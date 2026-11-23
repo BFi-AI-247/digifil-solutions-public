@@ -1,12 +1,12 @@
-Stand: 2026-11-17
+Stand: 2026-11-23
 
 # Zwei-Kanal-Format – Konzept
 
 Das Zwei-Kanal-Format ist ein Werkzeug. Es legt fest, wie ein Text gebaut ist, nach dem eine KI handeln soll. Was eine KI
 darf und muss, regelt das Regelwerk, nach dem sie arbeitet; das Format ersetzt und lockert davon nichts.
 
-Wie man einen Text im Format schreibt, steht in `README.md`. Wie die Felder aussehen, steht in `auftrag-vorlage.md` und
-`readme-vorlage.md`. Hier steht, warum das Format so ist.
+Wie man einen Text im Format schreibt, steht in `README.md`. Wie die Felder aussehen, steht in `auftrag-vorlage.md`,
+`readme-vorlage.md` und `testprotokoll-vorlage.md`. Hier steht, warum das Format so ist.
 
 ## Grundsatz
 
@@ -77,6 +77,44 @@ Verstehen braucht, und bleibt kürzer als Block A.
 VERHALTEN gibt es, damit eine KI, die Rückmeldungen zu einem Werkzeug beantwortet, „so ist es heute“ aus der Anleitung
 sagen kann, ohne den Code zu lesen.
 
+## Anwendung 3: Testprotokolle
+
+Form: `testprotokoll-vorlage.md` (Fassung 1.0 vom 23.11.2026). Beispiel: `beispiel-testprotokoll.md`.
+
+Diese Anwendung ist eine Erweiterung vom 23.11.2026. Anlass: Der Betreiber ließ mehrere Werkzeuge am Firmenrechner testen
+und mehrere KIs je ein Protokoll dazu schreiben. Er verlangte, dass die Protokolle gemeinsam lesbar sind, und nannte das
+Zwei-Kanal-Format als Hilfe. Die ersten drei Protokolle entstanden noch nach einem gemeinsamen Gerüst; die Vorlage baut darauf
+auf und macht aus dem Gerüst feste Felder.
+
+Ein Testprotokoll ist ein Bericht, kein Auftrag: Der Leser soll nichts ausführen, sondern dem Ergebnis trauen und damit
+weiterarbeiten können. Block A trägt deshalb alles, was dafür nötig ist: Stand, Quelle, Schritte mit Urteil, Abweichungen
+mit Ursache, Bewertung und was offen blieb. Block B ist für den Betreiber und hat höchstens acht Zeilen. Die Trennregel
+gilt unverändert.
+
+Warum die Vorlage so ist:
+
+- **Der Kopf steht als Felder in Block A** (`VORLAGE`, `VON`, `DATUM`, `STAND`, `ANLEITUNG`, `DURCHGEFÜHRT`, `QUELLE`,
+  `GELESEN`). Im Gerüst stand er als Aufzählung vor Block A. Wird nur Block A weitergegeben, fehlen dann Stand und Quelle –
+  derselbe Anlass wie bei DATUM und RUN-ID in Anwendung 1.
+- **`DURCHGEFÜHRT` und `DATUM` sind zwei Felder:** Die Zeit des Tests ist nicht die Zeit des Schreibens.
+- **`QUELLE` sagt, ob der Verfasser selbst erhoben hat.** Anlass: Ein Protokoll stützte sich auf Ergebnisse, die der Betreiber
+  nur abgehakt hatte; der Verfasser hatte nichts selbst erhoben und wollte keinen Wortlaut erfinden. Die Vorlage nennt
+  dafür die Formel „abgehakt, keine Notiz“ und den Satz „Ich habe nichts selbst erhoben.“
+- **Drei Urteilswörter je Schritt (ok, abweichend, nicht geprüft) und drei Bewertungen (bestanden, bestanden mit Auflagen,
+  nicht bestanden), jeweils mit fester Bedeutung.** Ohne feste Bedeutung läse jeder Verfasser die Wörter anders, und die
+  Protokolle ließen sich nicht nebeneinander lesen.
+- **Ursachen sind belegt oder eine ⟦Deutung⟧.** Die ersten Protokolle trennten beides schon; die Vorlage macht es zur
+  Pflicht, weil ein geratener Grund im Gewand einer Tatsache schlimmer ist als eine Lücke.
+- **`NACHGERECHNET` hat ein eigenes Feld.** Die ersten Protokolle rechneten Summen und Anteile nach; im eigenen Feld findet
+  jeder Leser, welche Zahlen geprüft sind.
+- **`REGELN` nennt drei Vorgaben:** keine Firmendaten (Zählwerte ja), keine Bildtests und Abhilfen nur als Vorschlag. Die
+  ersten beiden sind Vorgaben des Betreibers vom 23.11.2026 (Bildtests kosten Tokens, und Tokens sind knapp); die dritte
+  stammt aus dem Gerüst.
+- **Block B hat vier feste Zeilen** (Ergebnis, Abweichungen, Nicht getestet, Zu entscheiden) und spricht den Betreiber nicht
+  an, damit alle Protokolle gleich klingen.
+- **Ein Test, ein Protokoll.** Ein wiederholter Test bekommt ein neues Protokoll; das alte bleibt unverändert und belegt
+  den früheren Stand.
+
 ## Anlässe der Schreibweise
 
 Die Schreibweise steht in `README.md`, Schritt 2, und in den Vorlagen. Hier steht je Punkt, woher er kommt.
@@ -133,3 +171,6 @@ Fassungen:
   „Fragen“ in der Quittung und der Hinweis in PARAMETER, wo das Format steht; ESKALATION gilt nur noch für Blocker.
   „siehe Kopf“ entfällt. Jede Angabe steht nur noch an einer Stelle. Fassung 1.2 bleibt in der Historie des Repos
   abrufbar.
+- **Anwendung 3** (23.11.2026) ergänzt die Vorlage für Testprotokolle (Fassung 1.0) und ein Beispiel. Felder, Schreibweise
+  und Wortlaut der Anwendungen 1 und 2 bleiben unverändert; das Format bleibt 1.3. Ob die Ergänzung eine neue Fassung des
+  Formats wird, entscheidet der Betreiber.

@@ -1,7 +1,7 @@
-STATUS: KANONISCH · Regelstand: kanon_01 3.3 (20.11.2026) · öffentliche Fassung ohne Vorfall-Belege
-(3.2 vom 19.11.2026; 3.3 ändert §2.1, §4.1, §5.3, §6.1, §6.2, §7.2, neu §4.8, §4.9, §6.5)
+STATUS: KANONISCH · Regelstand: kanon_01 3.4 (23.11.2026) · öffentliche Fassung ohne Vorfall-Belege
+(3.3 vom 20.11.2026; 3.4 ändert §4.6 und §7.1)
 
-# Kanon 01 Single Agent 3.3 – Regeln
+# Kanon 01 Single Agent 3.4 – Regeln
 
 Merksatz des Betreibers für diese Arbeit (01.11.2026, 11:52): „La perfection est atteinte, non pas
 lorsqu'il n'y a plus rien à ajouter, mais lorsqu'il n'y a plus rien à retirer.“
@@ -335,10 +335,17 @@ Schreiben mit Wirkung nach außen setzt die Freigabe des Betreibers voraus (§5.
 - Gebot: Hast du in diesem Lauf etwas gelernt, das über diesen Fall hinaus gilt, hänge es mit
   laufender Nummer (E-NNN) und Datum an die Erfahrungen deiner Rolle an: Art (Werkzeug | Format |
   Fehlervermeidung | Ablauf), ein Satz „Was“, ein Satz „Warum“. Steht es schon dort, nichts
-  eintragen. Alter Text bleibt unverändert. Prüft ein Programm deine Erfahrungen, gib den Eintrag
-  im Feld „erfahrung“ zurück (sonst null); das Programm hängt ihn an.
+  eintragen. Alter Text bleibt unverändert. Betrifft die Erfahrung ein Werkzeug, auch nur
+  teilweise, und hat deine Rolle ein Postfach, schick sie stattdessen als Nachricht der Art
+  „Werkzeug-Erfahrung“ an die Rolle, die die Werkzeuge steuert; sie führt die Erfahrungen je
+  Werkzeug in einer Datei zusammen. In deine Erfahrungen kommt dann nur ein Verweis (Nummer,
+  Datum, Nachricht). Lies vor der ersten Nutzung eines Werkzeugs in einem Auftrag die
+  Erfahrungsdatei, die sein Steckbrief nennt. Prüft ein Programm deine Erfahrungen, gib den
+  Eintrag im Feld „erfahrung“ zurück (sonst null); das Programm hängt ihn an.
 - Grund: Zusammenfassungen verwässern über Instanz-Wechsel hinweg; eine Erkenntnis nur in der
-  Antwort geht mit dem Lauf verloren.
+  Antwort geht mit dem Lauf verloren. Betreiber, 23.11.2026, 16:00: „Wäre dann nicht eine
+  Erfahrung eine Nachricht an den Pfleger und der konsolidiert die Erfahrungen? So liegt es nicht
+  im Ermessen des Nutzer, was in die Werkzeugerfahrung geht.“
 - Verboten: Zusammenfassungen, Einzelfälle oder Vermutungen als Erfahrung eintragen.
 
 §4.7 Aus einem Vorfall wird eine Prüfung. (B37; KERN)
@@ -522,9 +529,13 @@ entscheiden kann.
   (Änderungslog, Protokolle, Erfahrungen, Risikolisten, Postfächer, Landkarten – nur anhängen).
   Bei Widerspruch gilt die Regel vor allem anderen; eine Rollendatei, ein Werkzeug oder ein Log,
   das einer Regel widerspricht, meldest du als Befund und richtest dich nach der Regel. Kommt der
-  Widerspruch über einen Auftrag, der das Werkzeug nennt, gilt §2.6.
+  Widerspruch über einen Auftrag, der das Werkzeug nennt, gilt §2.6. Den Steckbrief eines
+  Werkzeugs (Zweck, Ort, pflegende Rolle, Fassung, Erfahrungsdatei) schreibt die Rolle, die die
+  Werkzeuge steuert; den ausführbaren Inhalt schreibt die Rolle des Werkzeugs. Steckbrief und
+  Inhalt liegen in getrennten Dateien, jede mit einem Schreiber (§4.1).
 - Grund: Werkzeuge und Projektregeln ändern sich ohne Freigabe des Betreibers (Betreiber,
-  03.11.2026); ohne festen Rang könnte eine solche Änderung den Kanon still aushebeln.
+  03.11.2026); ohne festen Rang könnte eine solche Änderung den Kanon still aushebeln. Betreiber,
+  23.11.2026, 16:28: „Die Definition machst du. Den ausführbaren Inhalt die Rolle des Werkzeugt.“
 - Verboten: ein Werkzeug, eine Projektregel oder eine Rollendatei über eine Regel stellen.
 
 §7.2 Weg zur Regel. (B35; BETRIEB)
