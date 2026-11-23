@@ -9,15 +9,17 @@ ZWECK:        Du schreibst einen Text im Zwei-Kanal-Format. Block A enthält all
               Block B erklärt Menschen in Klartext, wozu der Text gut ist. Das Ziel ist erreicht, wenn der Empfänger
               allein mit Block A richtig handeln kann.
 GILT FÜR:     Aufträge von einer KI an eine andere, die etwas bewirken · Anleitungen, nach denen eine KI etwas
-              einrichtet oder benutzt.
+              einrichtet oder benutzt · Testprotokolle, die mehrere KIs in derselben Form schreiben, damit sich ihre
+              Ergebnisse nebeneinander lesen lassen.
 GILT NICHT:   Quittungen und kurze Rückfragen bleiben kurzer Klartext. Ob ein Text im Format stehen muss, legt das
               Regelwerk fest, nach dem du arbeitest. Dieses Format legt nur fest, wie der Text dann aussieht.
-VORAUSSETZUNG: Zum Schreiben genügen die sechs Dateien dieses Ordners. Für Schritt 5 brauchst du eine frische KI oder
+VORAUSSETZUNG: Zum Schreiben genügen die acht Dateien dieses Ordners. Für Schritt 5 brauchst du eine frische KI oder
               eine neue Sitzung ohne Verlauf.
 DATEIEN:      README.md (diese Anleitung) · konzept.md (Grundsatz und Herkunft: warum das Format so ist) ·
               auftrag-vorlage.md (Form eines Auftrags und seiner Quittung) · readme-vorlage.md (Form einer Anleitung) ·
-              beispiel-auftrag.md (ein fertiger, erfundener Auftrag) · beispiel-readme.md (eine fertige, erfundene
-              Anleitung).
+              testprotokoll-vorlage.md (Form eines Testprotokolls) · beispiel-auftrag.md (ein fertiger, erfundener
+              Auftrag) · beispiel-readme.md (eine fertige, erfundene Anleitung) · beispiel-testprotokoll.md (ein
+              fertiges, erfundenes Testprotokoll).
 BEGRIFFE:     Empfänger = die KI, die nach dem Text handelt.
               Ausführungsrelevant = alles, ohne das der Empfänger anders oder falsch handeln würde: Fristen, Pfade,
               Werte, Schwellen, Freigaben, Beteiligte, Verweise.
@@ -31,6 +33,7 @@ BEGRIFFE:     Empfänger = die KI, die nach dem Text handelt.
 
 1. **Vorlage wählen.** Wenn der Text eine Nachricht an eine andere KI ist, die etwas bewirkt, dann kopiere
    `auftrag-vorlage.md`. Wenn der Text eine Anleitung ist, die dauerhaft im Repo liegt, dann kopiere `readme-vorlage.md`.
+   Wenn der Text über einen Test berichtet, dann kopiere `testprotokoll-vorlage.md`.
    Namen und Reihenfolge der Felder lässt du, wie sie sind.
    *Ergebnis:* Die Kopie enthält die Felder der Vorlage in derselben Reihenfolge.
 2. **Block A füllen.** Ersetze jeden Platzhalter; der Platzhalter sagt, was in das Feld gehört. Schreib so:
@@ -88,7 +91,8 @@ Das Format ist ein Werkzeug. Es sagt, wie ein solcher Text gebaut ist. Was eine 
 in den Regeln, nach denen sie arbeitet, nicht hier.
 
 Ursprünglich galt das nur für Aufträge zwischen KI-Agenten. Seit Oktober 2026 gilt es auch für Anleitungen, denn auch die
-lesen heute meist KIs. Ob eine Anleitung taugt, zeigt ein Blindtest: Eine KI, die nichts davon kennt, richtet damit etwas
+lesen heute meist KIs. Seit November 2026 gilt es außerdem für Testprotokolle, damit mehrere KIs ihre Berichte in
+derselben Form schreiben. Ob eine Anleitung taugt, zeigt ein Blindtest: Eine KI, die nichts davon kennt, richtet damit etwas
 ein und schreibt auf, wo sie raten musste. Bei der ersten Anleitung waren es beim ersten Versuch 22 Stellen, beim dritten
 noch 11, darunter eine echte Lücke, die dann behoben wurde; der vierte Versuch fand nur noch Kleinigkeiten.
 
