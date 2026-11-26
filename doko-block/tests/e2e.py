@@ -10,6 +10,18 @@ URL = "http://127.0.0.1:8765/"
 OUT = Path(sys.argv[1] if len(sys.argv) > 1 else "shots"); OUT.mkdir(parents=True, exist_ok=True)
 fehler = []
 
+# Attrappe der GitHub-Schnittstelle (DOKO_GITHUB_API in tests/lokal.sh): lehnt jeden Schlüssel ab wie ein abgelaufener (#65)
+import json as _json, threading
+from http.server import BaseHTTPRequestHandler, HTTPServer
+class _GH(BaseHTTPRequestHandler):
+    def _nein(self):
+        b = _json.dumps({"message": "Bad credentials", "documentation_url": "https://docs.github.com/rest"}).encode()
+        self.send_response(401); self.send_header("Content-Type", "application/json"); self.send_header("Content-Length", str(len(b))); self.end_headers(); self.wfile.write(b)
+    def do_POST(self): self.rfile.read(int(self.headers.get("Content-Length", 0))); self._nein()
+    def do_GET(self): self._nein()
+    def log_message(self, *a): pass
+threading.Thread(target=HTTPServer(("127.0.0.1", 8766), _GH).serve_forever, daemon=True).start()
+
 def foto():
     im = Image.new("RGB", (1200, 1600), "white"); d = ImageDraw.Draw(im)
     for i in range(22): d.line([(60, 100 + i * 65), (1140, 100 + i * 65)], fill="#99a")
@@ -67,6 +79,9 @@ with sync_playwright() as pw:
     pg.click("[data-v='1:0']"); pg.wait_for_selector("text=✓ übernommen")
     pg.click("[data-v='1:1']"); pg.wait_for_timeout(500)
     pg.screenshot(path=OUT / "6-ki.png", full_page=True)
+    # Rückmeldung, die GitHub ablehnt: Grund und Text landen im Protokoll, ohne Schlüssel (#65)
+    pg.fill("#fb-text", "Test: Rückmeldung bei abgelehntem Schlüssel"); pg.click("#fb-senden")
+    pg.wait_for_selector("text=Der Grund steht im Verlauf unter Protokoll")
     # Löschen
     pg.click("nav.unten button[data-s=abende]"); pg.click(".abend >> nth=0"); pg.wait_for_selector("#d-weg"); pg.click("#d-weg")
     pg.wait_for_timeout(700); assert "204 Abende" in pg.inner_text("#hallo"), pg.inner_text("#hallo")
@@ -75,6 +90,9 @@ with sync_playwright() as pw:
     t = pg.inner_text("main")
     for w in ["Abend erfasst", "Vorschlag aus dem KI-Feld", "Termin eingetragen", "Papierkorb gelegt", "fragte"]:
         if w not in t: fehler.append(f"Verlauf ohne: {w}")
+    for w in ["Rückmeldung nicht abgelegt – GitHub antwortete mit 401: Bad credentials", "Test: Rückmeldung bei abgelehntem Schlüssel"]:
+        if w not in t: fehler.append(f"Verlauf ohne: {w}")
+    if "testgh" in t: fehler.append("Verlauf zeigt den GitHub-Schlüssel")
     pg.screenshot(path=OUT / "7-verlauf.png", full_page=True)
     pg.click("[data-zurueck]"); pg.wait_for_selector("#papierkorb >> text=Leer.")
     # Downloads

@@ -77,9 +77,9 @@ in Klammern, weil Verweise und Code sie nutzen (§7.3: nie umnummerieren).
 | 1 | Regeln und Wissen lesen | 6 | B1, B2, B9, B25, B28 |
 | 2 | Aufträge annehmen | 10 | B3, B8, B31, B10 + B7 (Auftragsteil), B30 (Startauftrag), B15 |
 | 3 | Ehrlich arbeiten | 5 | B5, B6, B7, B10, B8 (Inhaltsteil), B41 |
-| 4 | In den Bestand schreiben | 7 | B11, B12, B13, B14, B23, B24, B27, B36, B37 |
+| 4 | In den Bestand schreiben | 9 | B11, B12, B13, B14, B23, B24, B27, B36, B37; neu §4.8, §4.9 (3.3) |
 | 5 | Kommunikation mit dem Betreiber | 6 | B4, B19, B20, B32, B33 |
-| 6 | Rolle und Instanz | 4 | B26, B29, B38, B34 (Landkarte) |
+| 6 | Rolle und Instanz | 5 | B26, B29, B38, B34 (Landkarte); neu §6.5 (3.3) |
 | 7 | Wie der Kanon sich ändert | 4 | neu (Rangfolge), B35, B34 (Status) |
 
 Gestrichen: B18, B39, B40 (Betreiber); B36 „Abbau mit Partner“ und die Archivierung sind Methode,
