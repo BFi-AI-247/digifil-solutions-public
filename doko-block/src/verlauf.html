@@ -69,8 +69,8 @@ const { api, esc, datum, zeit, toast, chips } = DK;
 const $ = s => document.querySelector(s);
 if (!DK.hatSchluessel()) { DK.sperre('Bitte öffne deinen persönlichen Link (mit dem Schlüssel), den du für eure Runde bekommen hast.'); return; }
 let V, D, filter = 'alle';
-const SYM = { export: ['⬇', ''], farbe: ['🎨', ''], neu: ['🂡', ''], aendern: ['✎', 'gold'], loeschen: ['🗑', 'rot'], wiederherstellen: ['↺', ''], termin: ['📅', ''], auslesen: ['📷', ''], ki: ['💬', 'gold'], feedback: ['✉', 'gold'] };
-const GRUPPE = { export: 'abende', farbe: 'abende', neu: 'abende', aendern: 'abende', loeschen: 'abende', wiederherstellen: 'abende', termin: 'abende', auslesen: 'abende', ki: 'ki', feedback: 'feedback' };
+const SYM = { export: ['⬇', ''], farbe: ['🎨', ''], neu: ['🂡', ''], aendern: ['✎', 'gold'], loeschen: ['🗑', 'rot'], wiederherstellen: ['↺', ''], termin: ['📅', ''], auslesen: ['📷', ''], ki: ['💬', 'gold'], feedback: ['✉', 'gold'], 'feedback-fehler': ['⚠', 'rot'] };
+const GRUPPE = { export: 'abende', farbe: 'abende', neu: 'abende', aendern: 'abende', loeschen: 'abende', wiederherstellen: 'abende', termin: 'abende', auslesen: 'abende', ki: 'ki', feedback: 'feedback', 'feedback-fehler': 'feedback' };
 function standVon(r) {
   if (!r.offen) return r.labels.includes('live') ? ['erledigt ✓', 'zu'] : ['geschlossen', 'zu'];
   if (r.labels.includes('vorschau') || r.labels.includes('freigegeben')) return ['fast fertig', 'arbeit'];
@@ -100,6 +100,7 @@ function zeigeProtokoll() {
     let text = esc(e.text), extra = '';
     if (e.art === 'ki') { text = `<b>${esc(e.wer)} fragte:</b> „${esc(e.text)}“`; extra = e.antwort ? `<div class="ki-antwort">${esc(e.antwort)}${e.vorschlaege ? `\n\n→ ${e.vorschlaege} Vorschlag${e.vorschlaege > 1 ? 'e' : ''}` : ''}</div>` : ''; }
     else if (e.art === 'feedback') text = `<b>${esc(e.wer)}</b> · Rückmeldung Nr. ${e.issue} (${e.typ === 'fehler' ? 'Fehler' : 'Wunsch'}): „${esc(e.text)}“`;
+    else if (e.art === 'feedback-fehler') { text = `<b>${esc(e.wer)}</b> · ${text}`; extra = e.rueckmeldung ? `<div class="ki-antwort">„${esc(e.rueckmeldung)}“</div>` : ''; }
     else text = `<b>${esc(e.wer)}</b> · ${text}`;
     return `<div class="eintrag"><div class="sym ${k}" aria-hidden="true">${s}</div><div class="was">${text}${extra}<div class="wann">${zeit(e.zeit)}${e.modell ? ' · ' + esc(e.modell) : ''}</div></div></div>`; }).join('')
     : '<p class="leise">Noch nichts passiert.</p>';
