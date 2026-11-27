@@ -36,9 +36,21 @@ nav.unten button[aria-current=true]{color:var(--filz)}
 .platz-gitter b{display:block;font-size:.9rem;margin-bottom:4px}
 .platz-gitter select{text-align:center;padding:8px 4px}
 .platz-gitter input{text-align:center;padding:8px 4px}
-.spiele input{min-height:34px;padding:4px;text-align:center;width:58px;border-radius:7px}
-.spiele select{min-height:34px;padding:4px;width:92px;border-radius:7px;font-size:.85rem}
-.spiele td{padding:3px 3px}
+.spalten-kopf div{display:flex;flex-direction:column;gap:4px;min-width:0}.spalten-kopf select,.spalten-kopf input{width:100%;min-width:0}
+.spalten-kopf .gelesen{font-size:.74rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.spalten-kopf select[data-sitz]{padding:8px 0 8px 3px;font-size:.9rem;text-align:left}
+@media (max-width:379px){.spalten-kopf select[data-sitz]{font-size:.82rem}}
+.spiele input{min-height:34px;padding:4px 2px;text-align:center;width:40px;border-radius:7px}
+.spiele td.spiel{min-width:30px;text-align:center;font-size:.8rem;white-space:nowrap;font-variant-numeric:tabular-nums;color:var(--leise)}
+.spiele td.spiel.spiel-falsch{color:var(--rot);font-weight:700}
+.spiele select{min-height:34px;padding:2px;width:62px;border-radius:7px;font-size:.8rem}
+.spiele td{padding:3px 2px}
+.spiele button.streich{min-height:34px;width:22px;padding:0;border-radius:7px;font-size:.8rem;line-height:1}
+.spiele tr.gestrichen input,.spiele tr.gestrichen select{text-decoration:line-through;opacity:.4}
+.spiele tr.gestrichen td.leise,.spiele tr.gestrichen td.spiel{text-decoration:line-through}
+.spiele tr.gestrichen button.streich{background:var(--gold-hell)}
+.spiele tr.zeile-falsch td.leise{color:var(--rot);font-weight:700}
+@media (max-width:379px){.spiele input{width:38px;font-size:.85rem}.spiele td.spiel{min-width:26px;font-size:.74rem}.spiele select{width:56px;font-size:.72rem}.spiele td{padding:3px 1px}.spiele button.streich{width:20px}}
 .abend{display:flex;gap:10px;align-items:center;padding:11px 2px;border-bottom:1px solid var(--linie);cursor:pointer}
 .abend:last-child{border-bottom:0}
 .abend .nr{color:var(--leise);font-size:.8rem;width:34px;text-align:right;font-variant-numeric:tabular-nums}
@@ -74,6 +86,24 @@ nav.unten button[aria-current=true]{color:var(--filz)}
 .kenn{display:flex;justify-content:space-between;gap:10px;padding:6px 0;border-bottom:1px solid var(--linie)}
 .kenn:last-child{border-bottom:0}
 .gross-foto{max-width:100%;border-radius:10px}
+.z-hoch{background:#e6f4e6!important}.z-mittel{background:#fbf0c2!important}.z-niedrig{background:#fbd5ad!important}
+.z-blau{background:#d4e5fb!important;color:#0c3570!important;font-weight:600}.z-gruen{background:#a8e08f!important;color:#123d09!important;font-weight:600}
+.z-rot{border:2px solid var(--rot)!important;background:var(--rot-hell)!important}.z-leer{border:2px solid #e08a2b!important}
+.z-hoch,.z-mittel,.z-niedrig{color:#1d2420!important}
+@media (prefers-color-scheme:dark){.z-hoch{background:#26302a!important}.z-mittel{background:#4a3f12!important}.z-niedrig{background:#5a3714!important}
+.z-hoch,.z-mittel,.z-niedrig{color:#eef1ea!important}.z-blau{background:#1c3e6b!important;color:#d8e8ff!important}.z-gruen{background:#2f6b25!important;color:#e9ffe0!important}}
+.legende{display:flex;flex-wrap:wrap;gap:5px;margin-top:8px}.legende span{font-size:.75rem;padding:2px 7px;border-radius:6px;border:1px solid var(--linie)}
+.spiele input.fraglich,.spiele input.abgeleitet{border-style:dashed;border-color:var(--gold)}
+.spiele input.abgeleitet{background:var(--gold-hell)}
+.spiele input.leer{border-color:var(--rot)}
+[data-end].fraglich,[data-end].abgeleitet{border-style:dashed;border-color:var(--gold)}
+[data-end].abgeleitet{background:var(--gold-hell)}
+#e-pruef{margin-top:12px}
+#e-pruef .ok,#e-pruef .warn,#e-pruef .bad{border-radius:8px;padding:9px 12px;margin:6px 0;font-size:.92rem}
+#e-pruef .ok{background:var(--filz-hell);border-left:4px solid var(--filz)}
+#e-pruef .warn{background:var(--gold-hell);border-left:4px solid var(--gold)}
+#e-pruef .bad{background:var(--rot-hell);border-left:4px solid var(--rot)}
+#e-pruef ul{margin:4px 0 0;padding-left:20px}
 </style>
 </head>
 <body>
@@ -95,13 +125,6 @@ nav.unten button[aria-current=true]{color:var(--filz)}
     </label>
     <img id="foto-vorschau" class="vorschau verdeckt" alt="Ausgewähltes Foto">
     <div class="zeile verdeckt" id="foto-dreh" style="justify-content:center;margin-top:8px"><button type="button" class="zweit klein" id="drehen">↻ Foto drehen</button><span class="leise" style="font-size:.82rem">Schrift sollte waagerecht stehen</span></div>
-    <div class="zeile" style="margin-top:12px">
-      <span class="leise">Auslesen mit</span>
-      <div class="wahl" id="anbieter-wahl">
-        <button type="button" data-a="claude" aria-pressed="true">Claude</button>
-        <button type="button" data-a="mistral" aria-pressed="false">Mistral</button>
-      </div>
-    </div>
     <div class="zeile" style="margin-top:12px">
       <button id="auslesen" class="dehnen" disabled>Zettel auslesen</button>
     </div>
@@ -169,6 +192,7 @@ const $ = s => document.querySelector(s);
 let D = null;              // Daten vom Server
 let fotoBlob = null;       // verkleinertes Foto
 let ENTWURF = null;
+let LETZTE_PRUEFUNG = null;   // Ergebnis der Regel-Prüfung zum Speichern-Warnen
 const chatVerlauf = [];
 const merke = (k, v) => { try { v === undefined ? (v = localStorage.getItem(k)) : localStorage.setItem(k, v); } catch (e) {} return v; };
 
@@ -185,10 +209,9 @@ function wahl(id, cb) {
   return () => el.querySelector('[aria-pressed=true]').dataset.a;
 }
 function setzeWahl(id, wert) { $(id).querySelectorAll('button').forEach(x => x.setAttribute('aria-pressed', x.dataset.a === wert)); }
-const anbieter = wahl('#anbieter-wahl', a => merke('doko-anbieter', a));
+const anbieter = () => 'mistral'; // Ablesen nur mit Mistral (Betreiber, 10.11.2026)
 const kiAnbieter = wahl('#ki-wahl', a => merke('doko-ki', a));
 const fbArt = wahl('#fb-art');
-setzeWahl('#anbieter-wahl', merke('doko-anbieter') || 'claude');
 setzeWahl('#ki-wahl', merke('doko-ki') || 'claude');
 
 // ---------- Daten ----------
@@ -263,7 +286,7 @@ $('#auslesen').onclick = async () => {
   const b = $('#auslesen'); b.disabled = true;
   const wer = anbieter() === 'mistral' ? 'Mistral' : 'Claude';
   b.innerHTML = `<span class="drehen"></span> ${wer} liest den Zettel …`;
-  $('#auslese-status').innerHTML = '<p class="leise">Das dauert meist 15–60 Sekunden.</p>';
+  $('#auslese-status').innerHTML = '<p class="leise">Das dauert meist 15–60 Sekunden. Geht die Rechnung auf dem Zettel nicht auf, liest die KI die Stellen noch einmal nach – dann bis zu zwei Minuten.</p>';
   const fd = new FormData(); fd.append('foto', fotoBlob, 'zettel.jpg'); fd.append('anbieter', anbieter());
   try {
     const r = await api('auslesen', fd);
@@ -276,30 +299,211 @@ $('#auslesen').onclick = async () => {
 $('#hand').onclick = e => { e.preventDefault(); zeigeEntwurf({ datum: null, plaetze: {}, spiele: [], hinweise: [], hand: true }); };
 
 function terminOrt(d) { const t = D.termine.find(t => t.datum === d); return t ? t.ort : ''; }
+
+// ---------- Regel-Prüfung: jede Zeile und jedes Spiel ergibt zusammen 0 ----------
+// Rechnet aus, was sich aus den Regeln ergibt, und füllt NUR leere Zellen:
+// · jede Zeile (Spiel-Punkte oder laufender Stand) ergibt zusammen 0
+// · normales Spiel: zweimal +X, zweimal −X · Solo: Solist dreifach, die anderen je einfach
+// · Solo-Notiz „3/-1 S“: Solist +3, die anderen je −1
+// · Endstand: letzte Zeile (laufend) bzw. Summe (einzeln) muss dazu passen
+// Für die Tests freigelegt (window.regelwerk), rührt nichts am Bildschirm an.
+function regelwerk(o) {
+  const S = o.spieler, n = o.spiele.length;
+  const zahl = v => (typeof v === 'number' && Number.isFinite(v)) || (typeof v === 'string' && v.trim() !== '' && Number.isFinite(+v)) ? +v : null;
+  const z = o.spiele.map(q => ({ werte: Object.fromEntries(S.map(s => [s, zahl(q.werte?.[s])])), solo: q.solo || null, notiz: q.notiz || '' }));
+  const fehlt = q => S.filter(s => q.werte[s] === null);
+  const soloNotiz = q => { const m = (q.notiz || '').match(/(-?\d+)\s*\/\s*(-?\d+)/); return m ? [+m[1], +m[2]] : null; };
+  const abg = new Set();
+  for (let r = 0; r <= n + 2; r++) {                      // so lange ergänzen, bis nichts mehr geht
+    let neu = false;
+    for (let i = 0; i < n; i++) {                         // eine leere Zelle je Zeile: Rest ergibt sie
+      const l = fehlt(z[i]);
+      if (l.length === 1) { z[i].werte[l[0]] = -S.reduce((a, s) => a + z[i].werte[s], 0); abg.add(i + '|' + l[0]); neu = true; }
+    }
+    for (let i = 0; i < n; i++) {                         // Solo-Notiz kennt alle vier Werte
+      const sn = z[i].solo && soloNotiz(z[i]);
+      if (!sn) continue;
+      const weg = s => (s === z[i].solo ? sn[0] : sn[1]);
+      if (o.format !== 'laufend') {
+        for (const s of S) if (z[i].werte[s] === null) { z[i].werte[s] = weg(s); abg.add(i + '|' + s); neu = true; }
+      } else if (i > 0) {                                       // laufende Summe: Nachbarzeile komplett → Zeile ergibt sich
+        if (!fehlt(z[i - 1]).length) for (const s of S) if (z[i].werte[s] === null) { z[i].werte[s] = z[i - 1].werte[s] + weg(s); abg.add(i + '|' + s); neu = true; }
+        if (!fehlt(z[i]).length) for (const s of S) if (z[i - 1].werte[s] === null) { z[i - 1].werte[s] = z[i].werte[s] - weg(s); abg.add((i - 1) + '|' + s); neu = true; }
+      }
+    }
+    if (!neu) break;
+  }
+  // Punkte je Spiel (bei laufender Summe die Differenz zur Zeile davor)
+  const punkte = z.map((q, i) => { const p = {}; S.forEach(s => { const v = q.werte[s]; p[s] = v === null ? null : (o.format === 'laufend' && i > 0 ? v - z[i - 1].werte[s] : v); }); return p; });
+  const fehler = [], hinweise = [], offen = [];
+  for (let i = 0; i < n; i++) {
+    fehlt(z[i]).forEach(s => offen.push(i + '|' + s));
+    if (!fehlt(z[i]).length) { const sum = S.reduce((a, s) => a + z[i].werte[s], 0);
+      if (sum !== 0) fehler.push((o.format === 'laufend' ? `Zeile ${i + 1}` : `Spiel ${i + 1}`) + ` ergibt zusammen ${sum} statt 0.`); }
+    const p = punkte[i];
+    if (S.some(s => p[s] === null)) continue;
+    const betrag = S.map(s => Math.abs(p[s])).sort((a, b) => a - b);
+    if (!z[i].solo) {                                     // normales Spiel: zweimal +X, zweimal −X
+      const w = S.map(s => p[s]).sort((a, b) => b - a);
+      if (!(w[0] >= 0 && w[1] >= 0 && w[2] <= 0 && w[3] <= 0 && betrag[0] === betrag[3]))
+        if (betrag[0] === betrag[1] && betrag[1] === betrag[2] && S.some(s => Math.abs(p[s]) === 3 * betrag[0])) {
+          const wer = S.find(s => Math.abs(p[s]) === 3 * betrag[0]);
+          hinweise.push(`Spiel ${i + 1} sieht wie ein Solo von ${wer} aus – bitte im Feld Solo eintragen.`);
+        } else fehler.push(`Spiel ${i + 1} passt nicht zu einem normalen Spiel (zweimal +X, zweimal −X).`);
+    } else {                                              // Solo: Solist dreifach, die anderen je einfach
+      const e = S.filter(s => s !== z[i].solo).map(s => p[s]);
+      if (!(e.every(v => v === e[0]) && p[z[i].solo] === -3 * e[0]))
+        fehler.push(`Spiel ${i + 1} passt nicht zum Solo von ${z[i].solo} (Solist dreifach, die anderen je einfach).`);
+    }
+  }
+  const rech = {};
+  S.forEach(s => { const w = z.map(q => q.werte[s]); rech[s] = w.includes(null) ? null : (o.format === 'laufend' ? w[n - 1] : w.reduce((a, v) => a + v, 0)); });
+  S.forEach(s => { const v = zahl(o.endstand?.[s]); if (rech[s] !== null && v !== null && v !== rech[s]) fehler.push(`${s}: Endstand laut Zettel ${v}, aus den Spielen ergibt sich ${rech[s]}.`); });
+  const alles = !fehler.length && !offen.length && S.every(s => { const v = zahl(o.endstand?.[s]); return v === null || v === rech[s]; });
+  return { spiele: z, punkte, abgeleitet: [...abg], offen, fehler, hinweise, endstand: rech, allesOK: alles };
+}
+window.regelwerk = regelwerk;
+
+// ---------- Auflösen wie ein Sudoku (#38): was folgt zwingend aus den bestätigten Werten? ----------
+// Eingabe: nur bestätigte Werte (sonst null). Regeln: jede Zeile ergibt 0; Spiel = Unterschied zur Zeile davor (laufend)
+// bzw. die Zeile selbst (einzeln); normales Spiel zweimal +w, zweimal −w; Solo: Solist ±3x, die anderen ∓x (Notiz „3/-1“);
+// Endstand = letzte Zeile (laufend) bzw. Summe der Spalte (einzeln). Ergebnis: folgt[„i|Name“ bzw. „E|Name“] und Widersprüche.
+// Für die Tests freigelegt (window.aufloesen); rührt nichts am Bildschirm an.
+function aufloesen(o) {
+  const S = o.spieler, n = o.zeilen.length, laufend = o.format === 'laufend';
+  const K = o.zeilen.map(q => Object.fromEntries(S.map(s => [s, Number.isFinite(q.werte[s]) ? q.werte[s] : null])));
+  const E = Object.fromEntries(S.map(s => [s, Number.isFinite(o.endstand?.[s]) ? o.endstand[s] : null]));
+  const folgt = {}, widerspruch = [];
+  let neu = true;
+  const setz = (i, s, v) => {
+    if (!Number.isFinite(v)) return;
+    if (i === 'E') { if (E[s] === null) { E[s] = v; folgt['E|' + s] = v; neu = true; } else if (E[s] !== v) widerspruch.push(`Endstand ${s}: ${E[s]} oder ${v}`); return; }
+    if (K[i][s] === null) { K[i][s] = v; folgt[i + '|' + s] = v; neu = true; }
+    else if (K[i][s] !== v) widerspruch.push(`Spiel ${i + 1}, ${s}: ${K[i][s]} oder ${v}`);
+  };
+  const vor = (i, s) => (!laufend || i === 0) ? 0 : K[i - 1][s];
+  const notiz = q => { const m = (q.notiz || '').match(/(-?\d+)\s*\/\s*(-?\d+)/); return m ? [+m[1], +m[2]] : null; };
+  for (let runde = 0; neu && runde < 4 * n + 20; runde++) {
+    neu = false;
+    for (let i = 0; i < n; i++) {
+      // Zeile ergibt 0: drei bekannt → der vierte
+      const fehlt = S.filter(s => K[i][s] === null);
+      if (!fehlt.length && S.reduce((a, s) => a + K[i][s], 0) !== 0) widerspruch.push(`${laufend ? 'Zeile' : 'Spiel'} ${i + 1} ergibt zusammen ${S.reduce((a, s) => a + K[i][s], 0)} statt 0`);
+      if (fehlt.length === 1) setz(i, fehlt[0], -S.reduce((a, s) => a + (K[i][s] ?? 0), 0));
+      // Punkte dieses Spiels, soweit bekannt
+      const d = {}; S.forEach(s => { const a = vor(i, s), b = K[i][s]; d[s] = a === null || b === null ? null : b - a; });
+      const q = o.zeilen[i]; let soll = null; // bekannte Punkte je Spieler
+      if (q.solo) {
+        const nz = notiz(q); let x = nz ? nz[1] : null;
+        if (x === null) { const anderer = S.find(s => s !== q.solo && d[s] !== null); if (anderer) x = d[anderer]; else if (d[q.solo] !== null && d[q.solo] % 3 === 0) x = -d[q.solo] / 3; }
+        if (x !== null) soll = Object.fromEntries(S.map(s => [s, s === q.solo ? -3 * x : x]));
+      } else {
+        const bek = S.filter(s => d[s] !== null), w = q.wert ?? (bek.length ? Math.abs(d[bek[0]]) : null);
+        if (w !== null && bek.length >= 2) {
+          const plus = bek.filter(s => d[s] > 0), minus = bek.filter(s => d[s] < 0);
+          if (plus.length === 2 || minus.length === 2) soll = Object.fromEntries(S.map(s => [s, (plus.length === 2 ? plus : minus).includes(s) === (plus.length === 2) ? w : -w]));
+        }
+      }
+      if (soll) S.forEach(s => {
+        const a = vor(i, s), b = K[i][s];
+        if (a !== null && b === null) setz(i, s, a + soll[s]);
+        else if (laufend && i > 0 && a === null && b !== null) setz(i - 1, s, b - soll[s]);
+      });
+    }
+    // Endstand ↔ Tabelle
+    S.forEach(s => {
+      if (laufend) { if (K[n - 1][s] !== null) setz('E', s, K[n - 1][s]); else if (E[s] !== null) setz(n - 1, s, E[s]); }
+      else {
+        const offen = K.map((z, i) => z[s] === null ? i : -1).filter(i => i >= 0), summe = K.reduce((a, z) => a + (z[s] ?? 0), 0);
+        if (!offen.length) setz('E', s, summe); else if (offen.length === 1 && E[s] !== null) setz(offen[0], s, E[s] - summe);
+      }
+    });
+  }
+  return { folgt, widerspruch: [...new Set(widerspruch)] };
+}
+window.aufloesen = aufloesen;
+
+// ---------- Plätze aus den Zeilen (#70): Endstand nachrechnen und mit den eingetragenen Plätzen vergleichen ----------
+// Laufende Summe: letzte Zeile; Punkte je Spiel: Summe der Spalte. Gleichstand entscheidet das Stechen – dann keine Warnung.
+// Ergebnis: null (nicht prüfbar oder passt) oder der Text der Warnung. Für die Tests freigelegt (window.plaetzeAusZeilen).
+function plaetzeAusZeilen(o) {
+  const S = o.spieler, z = o.spiele || [];
+  if (!z.length) return null;
+  const pkt = {};
+  for (const s of S) {
+    const w = z.map(q => q.werte?.[s]);
+    if (w.some(v => !Number.isFinite(v))) return null;
+    pkt[s] = o.format === 'laufend' ? w[w.length - 1] : w.reduce((a, v) => a + v, 0);
+  }
+  const pl = o.plaetze || {};
+  const falsch = S.some(a => S.some(b => pkt[a] > pkt[b] && pl[a] > pl[b]));
+  if (!falsch) return null;
+  const folge = [...S].sort((a, b) => pkt[b] - pkt[a]);
+  return 'Die Zeilen ergeben andere Plätze.\n\nAus den Zeilen: ' + folge.map(s => `${s} ${pkt[s]}`).join(' · ')
+    + '\nEingetragen: ' + [...S].sort((a, b) => pl[a] - pl[b]).map(s => `${pl[s]}. ${s}`).join(' · ') + '\n\nTrotzdem speichern?';
+}
+window.plaetzeAusZeilen = plaetzeAusZeilen;
+
+// ---------- Spalte „Spiel“ (#66): der Wert des Spiels in Punkten, von der App gerechnet, nicht getippt ----------
+// Laufende Summe: Zeile minus Zeile darüber, Spalte für Spalte (erste Zeile minus 0); Punkte je Spiel: die Zeile selbst.
+// Normales Spiel: eine Zahl (0, 1, 2 …, der Gewinn je Gewinner); Solo: Solist/Gegenspieler wie „3/-1“, „-6/2“.
+// falsch = die Zeile ergibt zusammen nicht 0 oder passt nicht zum Spiel (zweimal +x, zweimal −x · Solist ±3x, die anderen ∓x) –
+// nur eine Warnung (rot), die App ändert keine Zahl. wert = Betrag je Gegenspieler (wird mit dem Spiel gespeichert).
+// Für die Tests freigelegt (window.spielwerte); rührt nichts am Bildschirm an.
+function spielwerte(o) {
+  const S = o.spieler, laufend = o.format === 'laufend';
+  const zahl = v => (typeof v === 'number' && Number.isFinite(v)) || (typeof v === 'string' && v.trim() !== '' && Number.isFinite(+v)) ? +v : null;
+  const W = o.zeilen.map(q => Object.fromEntries(S.map(s => [s, zahl(q.werte?.[s])])));
+  return o.zeilen.map((q, i) => {
+    const d = {};
+    for (const s of S) { const b = W[i][s], a = laufend && i > 0 ? W[i - 1][s] : 0; d[s] = a === null || b === null ? null : b - a; }
+    if (S.some(s => d[s] === null)) return { text: '', wert: null, falsch: false };
+    const summe = S.reduce((x, s) => x + d[s], 0);
+    const istSolo = s => { const g = S.filter(t => t !== s).map(t => d[t]); return g.every(v => v === g[0]) && g[0] !== 0 && d[s] === -3 * g[0]; };
+    const solist = S.includes(q.solo) ? q.solo : (S.find(istSolo) || null);
+    if (solist) {
+      const gegner = d[S.find(t => t !== solist)];
+      return { text: `${d[solist]}/${gegner}`, wert: istSolo(solist) ? Math.abs(gegner) : null, falsch: summe !== 0 || !istSolo(solist) };
+    }
+    const w = S.map(s => d[s]).sort((x, y) => y - x), betrag = S.map(s => Math.abs(d[s]));
+    const normal = w[0] >= 0 && w[1] >= 0 && w[2] <= 0 && w[3] <= 0 && betrag.every(v => v === betrag[0]);
+    return { text: String(normal ? w[0] : Math.max(...betrag)), wert: normal ? w[0] : null, falsch: !normal };
+  });
+}
+window.spielwerte = spielwerte;
+
 function zeigeEntwurf(e) {
   ENTWURF = e;
   const S = D.spieler;
   const d = e.datum && /^\d{4}-\d{2}-\d{2}$/.test(e.datum) ? e.datum : heute();
   const ort = terminOrt(d) || terminOrt(heute());
-  const auswahl = s => `<select data-platz="${esc(s)}">${[1, 2, 3, 4].map(p => `<option ${e.plaetze[s] === p ? 'selected' : ''}>${p}</option>`).join('')}</select>`;
+  const auswahl = s => `<select data-platz="${esc(s)}" aria-label="Platz">${[1, 2, 3, 4].map(p => `<option ${e.plaetze[s] === p ? 'selected' : ''}>${p}</option>`).join('')}</select>`;
   const spiele = e.spiele || [];
+  // Spalten der Spielzeilen in Sitzordnung wie auf dem Zettel (#70); gespeichert wird weiter je Name
+  const istSitz = so => Array.isArray(so) && so.length === S.length && new Set(so).size === S.length && so.every(s => S.includes(s));
+  const SO = !e.hand && istSitz(e.sitzordnung) ? e.sitzordnung : S;
   $('#entwurf').innerHTML = `<div class="karte">
     <h2>${e.hand ? 'Abend von Hand eintragen' : 'Bitte prüfen'}</h2>
-    ${e.hand ? '' : `<p class="leise" style="margin-top:-6px">Ausgelesen mit ${esc(e.modell)}. Der Zettel gilt – korrigiert nur, wo die KI sich verlesen hat.</p>`}
-    ${(e.hinweise || []).map(h => `<div class="hinweis">${esc(h)}</div>`).join('')}
+    ${e.hand ? '' : `<p class="leise" style="margin-top:-6px">Abgeschrieben von ${esc(e.modell)}. Prüfe die Werte wie ein Sudoku: Was du bestätigst, wird blau; was daraus folgt, grasgrün.</p>`}
+    ${e.nachgelesen ? `<p class="leise" id="e-nachgelesen">Beim ersten Lesen ging die Rechnung an ${e.nachgelesen.vorher} Stelle${e.nachgelesen.vorher === 1 ? '' : 'n'} nicht auf – die KI hat noch einmal nachgelesen${e.nachgelesen.nachher ? ` (offen: ${e.nachgelesen.nachher})` : ', jetzt geht alles auf'}.</p>` : ''}
+    ${(e.hinweise || []).filter(h => !/^Unsicher:|ergeben zusammen nicht 0|passt nicht zu den Punkten|Endstand auf dem Zettel/.test(h)).map(h => `<div class="hinweis">${esc(h)}</div>`).join('')}
     <div class="gitter2"><div><label>Datum</label><input type="date" id="e-datum" value="${d}"></div>
       <div><label>Ort / Bemerkung</label><input id="e-ort" value="${esc(ort)}" placeholder="z. B. bei Anna"></div></div>
-    ${e.hand ? '' : `<label>Sitzordnung (wie auf dem Zettel, links = erster Geber)</label>
-    <div class="platz-gitter">${S.map((_, i) => `<div><select data-sitz="${i}">${S.map(s => `<option ${(e.sitzordnung || S)[i] === s ? 'selected' : ''}>${esc(s)}</option>`).join('')}</select></div>`).join('')}</div>`}
-    <label>Plätze</label>
-    <div class="platz-gitter">${S.map(s => `<div><b>${esc(s)}</b>${auswahl(s)}</div>`).join('')}</div>
-    ${e.hand ? '' : `<label>Endstand laut Zettel</label>
-    <div class="platz-gitter">${S.map(s => `<div><input inputmode="numeric" data-end="${esc(s)}" value="${e.endstand?.[s] ?? ''}" aria-label="Endstand ${esc(s)}"></div>`).join('')}</div>`}
+    ${e.hand ? `<label>Plätze</label>
+    <div class="platz-gitter">${S.map(s => `<div><b>${esc(s)}</b>${auswahl(s)}</div>`).join('')}</div>` : `<label>Spalten wie auf dem Zettel (links = erster Geber): Name, Endstand, Platz</label>
+    <div class="platz-gitter spalten-kopf">${SO.map((s, i) => { const sk = (e.spalten || [])[i]; return `<div data-kopfzelle="${i}">
+      <select data-sitz="${i}" class="${sk?.geraten ? 'z-niedrig' : ''}" aria-label="Name der Spalte ${i + 1}" title="${sk?.geraten ? 'Überschrift nicht erkannt – bitte den Namen wählen' : 'Name dieser Spalte – ändern, wenn falsch gelesen'}">${S.map(n => `<option ${n === s ? 'selected' : ''}>${esc(n)}</option>`).join('')}</select>
+      ${sk ? `<span class="leise gelesen" title="So steht die Überschrift auf dem Zettel">Zettel: ${esc(sk.kopf || '–')}</span>` : ''}
+      <input inputmode="numeric" data-end="${esc(s)}" value="${e.endstand?.[s] ?? ''}" aria-label="Endstand Spalte ${i + 1}" placeholder="Endstand">
+      ${auswahl(s)}</div>`; }).join('')}</div>`}
     <p class="leise" id="e-kasse" style="margin:10px 0 0"></p>
+    ${spiele.length ? '<div id="e-pruef" aria-live="polite"></div>' : ''}
     ${spiele.length ? `<details style="margin-top:12px"><summary><b>${spiele.length} Spiele</b> <span class="leise">(${e.format === 'laufend' ? 'laufende Summe' : 'Punkte je Spiel'}) – antippen zum Prüfen</span></summary>
-      <div class="rollen" style="margin-top:8px"><table class="spiele"><thead><tr><th>#</th>${S.map(s => `<th>${esc(s.slice(0, 3))}</th>`).join('')}<th>Solo</th></tr></thead><tbody>
-      ${spiele.map((z, i) => `<tr><td class="leise">${i + 1}</td>${S.map(s => `<td><input inputmode="numeric" data-sp="${i}" data-s="${esc(s)}" value="${z.werte[s] ?? ''}"></td>`).join('')}
-        <td><select data-solo="${i}"><option value="">–</option>${S.map(s => `<option value="${esc(s)}|p" ${z.solo === s && z.pflicht ? 'selected' : ''}>${esc(s)} S</option><option value="${esc(s)}|l" ${z.solo === s && !z.pflicht ? 'selected' : ''}>${esc(s)} Lust</option>`).join('')}</select></td></tr>`).join('')}
+      <div class="rollen" style="margin-top:8px"><table class="spiele"><thead><tr><th>#</th>${SO.map(s => `<th data-kopf="${esc(s)}">${esc(s.slice(0, 3))}</th>`).join('')}<th title="Wert des Spiels: Unterschied zur Zeile darüber – rechnet die App">Spiel</th><th>Solo</th><th aria-label="Spiel streichen"></th></tr></thead><tbody>
+      ${spiele.map((z, i) => `<tr data-zeile="${i}"><td class="leise">${i + 1}</td>${SO.map(s => `<td data-spalte="${esc(s)}"><input inputmode="numeric" data-sp="${i}" data-s="${esc(s)}" value="${z.werte[s] ?? ''}"></td>`).join('')}
+        <td class="spiel" data-spielwert="${i}" aria-label="Wert von Spiel ${i + 1}"></td>
+        <td><select data-solo="${i}"><option value="">–</option>${S.map(s => `<option value="${esc(s)}|p" ${z.solo === s && z.pflicht ? 'selected' : ''}>${esc(s)} S</option><option value="${esc(s)}|l" ${z.solo === s && !z.pflicht ? 'selected' : ''}>${esc(s)} Lust</option>`).join('')}</select></td>
+        <td><button type="button" class="zweit streich" data-streich="${i}" aria-pressed="false" title="Spiel streichen (zählt dann nicht)" aria-label="Spiel ${i + 1} streichen">✕</button></td></tr>`).join('')}
       </tbody></table></div></details>` : ''}
     <label>Notiz</label><input id="e-notiz" value="${esc(e.notiz || '')}" placeholder="optional">
     <div class="zeile" style="margin-top:14px"><button class="zweit" id="e-weg">Verwerfen</button><button class="dehnen" id="e-ok">Abend speichern</button></div>
@@ -315,7 +519,153 @@ function zeigeEntwurf(e) {
   $('#entwurf').querySelectorAll('[data-platz]').forEach(el => el.onchange = kasse);
   $('#e-datum').onchange = () => { const o = terminOrt($('#e-datum').value); if (o && !$('#e-ort').value) $('#e-ort').value = o; };
   kasse();
-  $('#e-weg').onclick = () => { if (confirm('Entwurf verwerfen?')) { $('#entwurf').innerHTML = ''; ENTWURF = null; } };
+  // Ersetzt 26.11.2026 (#67): „Ändert man ein Sitzfeld, ziehen die Spalten der Spielzeilen mit (#70)“ – die Punkte landeten dann beim falschen Spieler.
+  // Jetzt: die Spalten stehen, wie die KI sie von links nach rechts gelesen hat, und bleiben stehen (Handler unten, nach der Prüfung).
+  let spalteUmbenennen = null;   // setzt die Prüfung unten: Zustand der Werte auf die neuen Namen umhängen
+  // ---------- Prüfen wie ein Sudoku (#38) ----------
+  // Farben je Wert: blassgrün = KI liest sicher · gelb = mittel · orange = unsicher/unleserlich ·
+  // blau = von dir bestätigt oder eingetippt · grasgrün = folgt logisch aus Blauem/Grasgrünem.
+  // Die Logik ersetzt nie einen gelesenen Wert: Widerspricht sie ihm, wird er rot und der logische Wert nur vorgeschlagen.
+  LETZTE_PRUEFUNG = null;
+  e.gestrichen = new Set();   // gestrichene Spiele (#69): zählen nicht und werden nicht gespeichert
+  if (spiele.length) {
+    const KEY = (i, s) => i + '|' + s;
+    const zelle = (i, s) => document.querySelector(`[data-sp="${i}"][data-s="${s}"]`);
+    const endZelle = s => document.querySelector(`[data-end="${s}"]`);
+    // Zustand je Wert: gelesen (was die KI las), sicher (hoch|mittel|niedrig), blau (bestätigt/eingetippt)
+    const Z = {};
+    const unsicherHinweis = new Set();
+    (e.hinweise || []).forEach(h => { const m = /^Unsicher:\s*Spiel\s*(\d+)\s*,\s*(?:Spalte\s*)?(.+)$/.exec(h); if (!m) return;
+      const sp = S.find(s => s.toLowerCase() === m[2].trim().toLowerCase()); if (sp) unsicherHinweis.add(KEY(+m[1] - 1, sp)); });
+    spiele.forEach((q, i) => S.forEach(s => {
+      const v = q.werte[s];
+      let si = q.sicher?.[s] || 'mittel';
+      if (v === null || v === undefined || unsicherHinweis.has(KEY(i, s))) si = 'niedrig';
+      Z[KEY(i, s)] = { gelesen: v === null || v === undefined ? '' : String(v), sicher: si, alt: q.alternativ?.[s], blau: null };
+    }));
+    S.forEach(s => { const v = e.endstand?.[s]; Z['E|' + s] = { gelesen: v === null || v === undefined ? '' : String(v), sicher: e.endstand_sicher?.[s] || 'mittel', blau: null }; });
+    const solo = i => ((document.querySelector(`[data-solo="${i}"]`)?.value || '').split('|')[0]) || null;
+    const zahl = v => (v === '' || v === null || v === undefined || !Number.isFinite(+v)) ? null : +v;
+
+    const anzeigen = () => {
+      // Gestrichene Spiele (#69) zählen nicht: geprüft wird, als stünden sie nicht auf dem Zettel; Nummern bleiben die des Zettels.
+      const idx = spiele.map((_, i) => i).filter(i => !e.gestrichen.has(i));
+      const nr = t => String(t).replace(/(Spiel|Zeile) (\d+)/g, (m, w, k) => `${w} ${idx[+k - 1] + 1}`);
+      // 1. Was steht fest? Blau ist gesetzt; daraus folgt Grasgrün.
+      const r0 = aufloesen({ format: e.format === 'laufend' ? 'laufend' : 'einzeln', spieler: S,
+        zeilen: idx.map(i => spiele[i]).map((q, j, _a, i = idx[j]) => ({ werte: Object.fromEntries(S.map(s => [s, zahl(Z[KEY(i, s)].blau)])), solo: solo(i), notiz: q.notiz || '', wert: null })), // kein getippter Spielwert mehr (#66): der Wert folgt aus den Punkten der Zeile
+        endstand: Object.fromEntries(S.map(s => [s, zahl(Z['E|' + s].blau)])) });
+      const r = { folgt: Object.fromEntries(Object.entries(r0.folgt).map(([k, v]) => { const [j, s] = k.split('|'); return [j === 'E' ? k : idx[+j] + '|' + s, v]; })),
+        widerspruch: r0.widerspruch.map(nr) };
+      const konflikte = [];
+      const malen = (el, z, key, soll) => {
+        el.classList.remove('z-hoch', 'z-mittel', 'z-niedrig', 'z-blau', 'z-gruen', 'z-rot', 'z-leer');
+        el.removeAttribute('title');
+        if (z.blau !== null) { el.value = z.blau; el.classList.add('z-blau'); el.title = 'Von dir bestätigt'; return; }
+        if (soll !== undefined && (z.gelesen === '' || +z.gelesen === soll)) { el.value = soll; el.classList.add('z-gruen'); el.title = 'Folgt aus den bestätigten Werten'; return; }
+        el.value = z.gelesen;
+        if (soll !== undefined) { el.classList.add('z-rot'); el.title = `Gelesen ${z.gelesen}, aus den bestätigten Werten folgt ${soll}`; konflikte.push({ key, soll, gelesen: z.gelesen, alt: z.alt }); return; }
+        if (z.gelesen === '') { el.classList.add('z-leer'); el.title = 'Nicht lesbar – bitte eintippen'; return; }
+        el.classList.add(z.sicher === 'hoch' ? 'z-hoch' : z.sicher === 'niedrig' ? 'z-niedrig' : 'z-mittel');
+        el.title = z.sicher === 'hoch' ? 'Die KI liest das sicher' : z.sicher === 'nachgerechnet' ? 'Nicht vom Zettel, aus den Spielen nachgerechnet' : 'Die KI ist hier nicht sicher' + (z.alt !== undefined ? ` – vielleicht ${z.alt}` : '');
+      };
+      spiele.forEach((q, i) => S.forEach(s => { const el = zelle(i, s); if (!el) return;
+        if (e.gestrichen.has(i)) { el.classList.remove('z-hoch', 'z-mittel', 'z-niedrig', 'z-blau', 'z-gruen', 'z-rot', 'z-leer'); el.title = 'Gestrichen – zählt nicht'; return; }
+        malen(el, Z[KEY(i, s)], KEY(i, s), r.folgt[KEY(i, s)]); }));
+      if (!e.hand) S.forEach(s => { const el = endZelle(s); if (el) malen(el, Z['E|' + s], 'E|' + s, r.folgt['E|' + s]); });
+      // 2. Gesamtprüfung auf den angezeigten Werten (Zeilen 0, Spielmuster, Endstand)
+      const endIn = {}; S.forEach(s => { const el = endZelle(s); endIn[s] = el ? el.value : null; });
+      const g0 = regelwerk({ format: e.format === 'laufend' ? 'laufend' : 'einzeln', spieler: S,
+        spiele: idx.map(i => spiele[i]).map((q, j, _a, i = idx[j]) => ({ werte: Object.fromEntries(S.map(s => [s, zelle(i, s)?.value ?? ''])), solo: solo(i), notiz: q.notiz || '' })),
+        endstand: e.hand ? {} : endIn });
+      const g = { ...g0, fehler: g0.fehler.map(nr), hinweise: g0.hinweise.map(nr) };
+      LETZTE_PRUEFUNG = g;
+      // Zeilen, die nicht aufgehen (#70), nur markieren – Speichern bleibt möglich
+      const falsch = new Set(g.fehler.flatMap(f => [...f.matchAll(/(?:Spiel|Zeile) (\d+)/g)].map(m => +m[1] - 1)));
+      document.querySelectorAll('#entwurf tr[data-zeile]').forEach(tr => tr.classList.toggle('zeile-falsch', falsch.has(+tr.dataset.zeile)));
+      // Spalte „Spiel“ (#66): Unterschied zur Zeile darüber, rot, wenn er nicht aufgeht; gestrichene Spiele zählen nicht
+      const sw = spielwerte({ format: e.format === 'laufend' ? 'laufend' : 'einzeln', spieler: S,
+        zeilen: idx.map(i => ({ werte: Object.fromEntries(S.map(s => [s, zelle(i, s)?.value ?? ''])), solo: solo(i) })) });
+      document.querySelectorAll('#entwurf td[data-spielwert]').forEach(td => { td.textContent = ''; td.classList.remove('spiel-falsch'); td.removeAttribute('title'); });
+      idx.forEach((i, j) => { const td = document.querySelector(`#entwurf td[data-spielwert="${i}"]`); if (!td) return;
+        td.textContent = sw[j].text; td.classList.toggle('spiel-falsch', sw[j].falsch);
+        if (sw[j].falsch) td.title = 'Geht nicht auf: die Zeile ergibt nicht 0 oder passt nicht zum Spiel'; });
+      const zaehlt = k => !e.gestrichen.has(+k.split('|')[0]);
+      const offen = Object.entries(Z).filter(([k, z]) => z.blau === null && zaehlt(k)).length;
+      const name = key => { const [i, s] = key.split('|'); return i === 'E' ? `Endstand ${s}` : `Spiel ${+i + 1}, ${s}`; };
+      const liste = t => t.length ? `<ul>${t.slice(0, 8).map(x => `<li>${x}</li>`).join('')}${t.length > 8 ? '<li>…</li>' : ''}</ul>` : '';
+      let html = '';
+      if (e.gestrichen.size) html += `<div class="warn"><b>Gestrichen:</b> ${[...e.gestrichen].sort((a, b) => a - b).map(i => `Spiel ${i + 1}`).join(', ')} – zählt nicht und wird nicht gespeichert. Nochmal auf ✕ tippen holt es zurück.</div>`;
+      if (r.widerspruch.length) html += `<div class="bad"><b>Deine bestätigten Werte widersprechen sich:</b>${liste(r.widerspruch.map(esc))}</div>`;
+      if (konflikte.length) html += `<div class="bad"><b>Gelesen ≠ logisch:</b>${liste(konflikte.map(k => `${esc(name(k.key))}: gelesen ${esc(k.gelesen)}, logisch <b>${k.soll}</b>${k.alt === k.soll ? ' (hielt die KI auch für möglich)' : ''} <button type="button" class="klein" data-nimm="${esc(k.key)}" data-wert="${k.soll}">Übernehmen</button>`))}</div>`;
+      const fehler = g.fehler.filter(f => !konflikte.length || true);
+      if (!g.allesOK && fehler.length) html += `<div class="warn"><b>Geht noch nicht auf:</b>${liste(fehler.map(esc))}</div>`;
+      if (g.allesOK && !konflikte.length && !r.widerspruch.length)
+        html += `<div class="ok"><b>Tabelle stimmt ✓</b> – jede Zeile ergibt 0, jedes Spiel passt, der Endstand passt.${offen ? ` ${offen} Wert${offen > 1 ? 'e' : ''} noch nicht von dir bestätigt.` : ''}</div>`;
+      const hell = Object.values(Z).filter(z => z.blau === null && z.sicher === 'hoch' && z.gelesen !== '').length;
+      html += `<div class="legende"><span class="z-hoch">sicher</span><span class="z-mittel">unsicher</span><span class="z-niedrig">sehr unsicher</span><span class="z-blau">bestätigt</span><span class="z-gruen">folgt logisch</span><span class="z-rot">Widerspruch</span></div>
+        <p class="leise" style="margin:6px 0 0;font-size:.82rem">Antippen und tippen = korrigieren · lange drücken = so bestätigen.${hell ? ` <button type="button" class="zweit klein" id="e-hell-ok">Alle sicheren (${hell}) bestätigen</button>` : ''}</p>`;
+      $('#e-pruef').innerHTML = html;
+      $('#e-pruef').querySelectorAll('[data-nimm]').forEach(b => b.onclick = () => { Z[b.dataset.nimm].blau = b.dataset.wert; anzeigen(); });
+      const hb = $('#e-hell-ok'); if (hb) hb.onclick = () => { Object.values(Z).forEach(z => { if (z.blau === null && z.sicher === 'hoch' && z.gelesen !== '') z.blau = z.gelesen; }); anzeigen(); };
+      const det = $('#entwurf').querySelector('details');
+      if (det && (konflikte.length || r.widerspruch.length)) det.open = true;
+    };
+    // Eingaben: Tippen = blau (leer = wieder offen), langer Druck = so bestätigen
+    const keyVon = el => el.dataset.end ? 'E|' + el.dataset.end : KEY(el.dataset.sp, el.dataset.s);
+    document.querySelectorAll('[data-sp],[data-end]').forEach(el => {
+      el.oninput = () => { const z = Z[keyVon(el)]; const v = el.value.trim(); z.blau = v === '' ? null : v; if (v === '') z.gelesen = ''; };
+      el.onchange = anzeigen;
+    });
+    document.querySelectorAll('[data-solo]').forEach(el => el.onchange = anzeigen);
+    document.querySelectorAll('[data-streich]').forEach(b => b.onclick = () => {
+      const i = +b.dataset.streich, weg = !e.gestrichen.has(i);
+      if (weg) e.gestrichen.add(i); else e.gestrichen.delete(i);
+      const tr = b.closest('tr'); tr.classList.toggle('gestrichen', weg);
+      tr.querySelectorAll('input,select').forEach(el => el.disabled = weg);
+      b.setAttribute('aria-pressed', String(weg)); b.title = weg ? 'Spiel zurückholen' : 'Spiel streichen (zählt dann nicht)';
+      anzeigen();
+    });
+    let druck = null;
+    const box = $('#entwurf');
+    box.addEventListener('pointerdown', ev => { const el = ev.target.closest?.('[data-sp],[data-end]'); if (!el) return;
+      druck = setTimeout(() => { druck = null; const v = el.value.trim(); if (v === '') { toast('Erst einen Wert eintippen'); return; }
+        Z[keyVon(el)].blau = v; toast('Bestätigt'); anzeigen(); }, 550); });
+    ['pointerup', 'pointercancel', 'pointerleave'].forEach(ereignis => box.addEventListener(ereignis, () => { if (druck) { clearTimeout(druck); druck = null; } }));
+    box.addEventListener('contextmenu', ev => { if (ev.target.closest?.('[data-sp],[data-end]')) ev.preventDefault(); });
+    spalteUmbenennen = m => {   // m: alter Name → neuer Name; was ein Wert war (gelesen, sicher, bestätigt), bleibt in seiner Spalte
+      const alt = { ...Z };
+      Object.keys(Z).forEach(k => delete Z[k]);
+      Object.entries(alt).forEach(([k, z]) => { const [i, s] = k.split('|'); Z[i + '|' + (m[s] ?? s)] = z; });
+      anzeigen();
+    };
+    anzeigen();
+  }
+  // Ändert man oben den Namen einer Spalte, bleibt alles in der Spalte stehen (#67, ersetzt „ziehen mit“ aus #70): Zahlen, Endstand,
+  // Platz und Solo bleiben, wo die KI sie von links nach rechts gelesen hat; nur der Name darüber ändert sich – und damit, wem sie gehören.
+  // Steht der gewählte Name schon über einer anderen Spalte, tauschen die beiden Spalten ihre Namen (jeder Name genau einmal).
+  // Ersetzt 27.11.2026 (#67, Bürotest des Betreibers): getrennte Zeilen „Sitzordnung“, „Plätze“ und „Endstand“ mit eigener Reihenfolge;
+  // umgestellt wurde erst, wenn jeder Name genau einmal dastand, und die Plätze blieben beim Namen statt in der Spalte.
+  let sitzAlt = [...SO];
+  $('#entwurf').querySelectorAll('[data-sitz]').forEach(el => el.addEventListener('change', () => {
+    const i = +el.dataset.sitz, alt = sitzAlt[i], neu = el.value;
+    if (neu === alt) return;
+    const so = [...sitzAlt], j = so.indexOf(neu);
+    so[i] = neu; if (j >= 0) so[j] = alt;
+    const m = Object.fromEntries(sitzAlt.map((s, p) => [s, so[p]]));
+    sitzAlt = so;
+    const box = $('#entwurf');
+    box.querySelectorAll('[data-sitz]').forEach((x, p) => { x.value = so[p]; if (p === i || p === j) { x.classList.remove('z-niedrig'); x.title = 'Name dieser Spalte – ändern, wenn falsch gelesen'; } });
+    box.querySelectorAll('th[data-kopf]').forEach(th => { th.dataset.kopf = m[th.dataset.kopf]; th.textContent = th.dataset.kopf.slice(0, 3); });
+    box.querySelectorAll('td[data-spalte]').forEach(td => { td.dataset.spalte = m[td.dataset.spalte]; });
+    box.querySelectorAll('input[data-sp]').forEach(inp => { inp.dataset.s = m[inp.dataset.s]; });
+    box.querySelectorAll('[data-kopfzelle] [data-end]').forEach(x => { x.dataset.end = m[x.dataset.end]; });
+    box.querySelectorAll('[data-kopfzelle] [data-platz]').forEach(x => { x.dataset.platz = m[x.dataset.platz]; });
+    box.querySelectorAll('select[data-solo]').forEach(sel => { const [s, art] = sel.value.split('|'); if (s) sel.value = m[s] + '|' + art; });
+    kasse();
+    if (spalteUmbenennen) spalteUmbenennen(m);
+  }));
+  $('#e-weg').onclick = () => { if (confirm('Entwurf verwerfen?')) { $('#entwurf').innerHTML = ''; ENTWURF = null; LETZTE_PRUEFUNG = null; } };
   $('#e-ok').onclick = speichern;
   $('#entwurf').scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
@@ -332,8 +682,13 @@ async function speichern() {
     abend.spiele = (e.spiele || []).map((z, i) => {
       const w = {}; S.forEach(s => { const v = document.querySelector(`[data-sp="${i}"][data-s="${s}"]`).value.trim(); w[s] = v === '' ? null : +v; });
       const [solo, art] = (document.querySelector(`[data-solo="${i}"]`).value || '|').split('|');
-      return { werte: w, solo: solo || null, pflicht: art === 'p', notiz: z.notiz, wert: z.wert };
-    });
+      return { werte: w, solo: solo || null, pflicht: art === 'p', notiz: z.notiz };
+    }).filter((_, i) => !e.gestrichen?.has(i));   // gestrichene Spiele werden nicht gespeichert (#69)
+    // Spielwert (#66): wie in der Spalte „Spiel“ aus den Punkten gerechnet (Betrag je Gegenspieler); geht die Zeile nicht auf, ohne Wert
+    spielwerte({ spieler: S, format: e.format, zeilen: abend.spiele }).forEach((r, j) => { if (r.wert !== null) abend.spiele[j].wert = r.wert; });
+    // Plätze aus den Zeilen (#70): passen sie nicht zu den eingetragenen, nur nachfragen – Speichern bleibt möglich
+    const warnung = plaetzeAusZeilen({ spieler: S, format: e.format, spiele: abend.spiele, plaetze: abend.plaetze });
+    if (warnung && !confirm(warnung)) return;
   }
   if (aktiv().some(a => a.datum === abend.datum) && !confirm('Für den ' + datum(abend.datum) + ' gibt es schon einen Abend. Trotzdem einen weiteren speichern?')) return;
   const b = $('#e-ok'); b.disabled = true;

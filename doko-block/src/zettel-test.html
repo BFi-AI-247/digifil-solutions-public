@@ -1,0 +1,623 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#1f4d3a">
+<meta name="robots" content="noindex,nofollow">
+<title>Zettel-Test</title>
+<style>
+/*BASIS_CSS*/
+/* --- Zettel-Test: eigene Styles --- */
+.test-band{position:sticky;top:0;z-index:99;background:#f6d743;color:#2a2200;text-align:center;font:600 14px/1.35 system-ui,sans-serif;padding:6px 10px}
+.foto-wahl{border:2px dashed var(--linie);border-radius:var(--r);padding:22px 14px;text-align:center;cursor:pointer;display:block;margin:0}
+.foto-wahl input{display:none}
+.foto-wahl strong{display:block;font-size:1.05rem;color:var(--filz);margin-bottom:4px}
+.vorschau{max-width:100%;max-height:260px;border-radius:10px;display:block;margin:10px auto 0;cursor:zoom-in}
+.wahl{display:inline-flex;background:var(--papier);border:1px solid var(--linie);border-radius:11px;padding:3px}
+.wahl button{background:none;color:var(--leise);min-height:36px;padding:6px 12px;border-radius:8px}
+.wahl button[aria-pressed=true]{background:var(--karte);color:var(--filz);box-shadow:var(--schatten)}
+.zt-kopf{display:grid;grid-template-columns:26px repeat(4,1fr) 62px;gap:4px;margin:10px 0 2px}
+.zt-kopf b{font-size:.72rem;text-transform:uppercase;letter-spacing:.03em;text-align:center;overflow:hidden;text-overflow:ellipsis}
+.zt-kopf b:first-child{color:var(--leise);text-transform:none}
+.zt-zeile{display:grid;grid-template-columns:26px repeat(4,1fr) 62px;gap:4px;align-items:stretch;margin-bottom:4px;border-radius:10px}
+.zt-zeile.gestrichen{opacity:.55}
+.zt-zeile.letzt{outline:2px solid rgba(47,138,78,.55)}
+.zt-nr{font-size:.78rem;color:var(--leise);text-align:right;padding-top:11px;font-variant-numeric:tabular-nums}
+.zz{position:relative;border:1px solid var(--linie);background:var(--papier);border-radius:9px;min-height:42px;font-weight:700;font-size:.95rem;font-variant-numeric:tabular-nums;-webkit-user-select:none;user-select:none;touch-action:manipulation;padding:0 2px}
+.zz.gelesen{border-color:#d97706;color:#a05a02}
+.zz.erschlossen{border-style:dashed;border-color:#3b82f6;color:#1d4ed8;background:#f2f7ff}
+.zz.bestaetigt{border-color:#16a34a;color:#15803d;background:#effaf1}
+.zz.leer{border-style:dashed;color:var(--leise);font-weight:400}
+.zz .zeichen{position:absolute;top:1px;right:4px;font-size:.58rem;font-weight:700;line-height:1}
+.zt-notiz{border:1px solid var(--linie);background:var(--papier);border-radius:9px;min-height:42px;text-align:center;font-size:.8rem;padding:4px 2px;font-variant-numeric:tabular-nums}
+.zt-status{display:flex;flex-wrap:wrap;gap:6px;align-items:baseline;font-size:.74rem;margin:-2px 0 8px 30px}
+.zt-status .rot{color:#b3261e;font-weight:600}
+.zt-status .gelb{color:#8a6d00}
+.zt-status .grau{color:var(--leise)}
+.zt-status button{font-size:.74rem;font-weight:700;color:#1d4ed8;background:#e8f0fe;border:1px solid #c4d6f5;border-radius:99px;padding:3px 10px;min-height:0}
+.zt-status .werkzeug{color:var(--leise);text-decoration:underline dotted;font-size:.7rem;background:none;border:0;padding:0;min-height:0;font-weight:400}
+.legende{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:.74rem;color:var(--leise);margin-top:10px}
+.legende i{display:inline-block;width:11px;height:11px;border-radius:3px;margin-right:3px;vertical-align:-1px}
+.banner-ok{border:2px solid #2f8a4e;background:#eaf5ee;border-radius:var(--r);padding:10px 12px;margin:12px 0 0}
+.banner-offen{border:1px solid var(--linie);background:var(--papier);border-radius:var(--r);padding:10px 12px;margin:12px 0 0}
+</style>
+</head>
+<body>
+<div class="test-band">ZETTEL-TEST · ausprobieren, korrigieren, prüfen – gespeichert wird nichts</div>
+<header class="kopf">
+  <span class="pips" aria-hidden="true">♣♠</span>
+  <h1><span id="runde">Zettel-Test</span><small id="hallo">&nbsp;</small></h1>
+</header>
+<main>
+  <div class="karte">
+    <h2>Zettel testen</h2>
+    <p class="leise" style="margin-top:-6px">Foto vom Block hochladen, auslesen lassen und im Korrektur-Bildschirm prüfen. Die Regeln (Zeilensumme 0, Spiel ergibt 0, Solo ±3X) werden bei jeder Änderung sofort nachgerechnet, fehlende Werte werden erschlossen.</p>
+    <label class="foto-wahl" id="foto-wahl">
+      <input type="file" accept="image/*" id="foto">
+      <strong>📷 Foto vom Block</strong>
+      <span class="leise">Antippen zum Fotografieren oder ein Bild auswählen</span>
+    </label>
+    <img id="foto-vorschau" class="vorschau verdeckt" alt="Ausgewähltes Foto">
+    <div class="zeile verdeckt" id="foto-dreh" style="justify-content:center;margin-top:8px"><button type="button" class="zweit klein" id="drehen">↻ Foto drehen</button><span class="leise" style="font-size:.82rem">Schrift sollte waagerecht stehen</span></div>
+    <div class="zeile" style="margin-top:12px">
+      <span class="leise">Auslesen mit</span>
+      <div class="wahl" id="anbieter-wahl">
+        <button type="button" data-a="claude" aria-pressed="true">Claude</button>
+        <button type="button" data-a="mistral" aria-pressed="false">Mistral</button>
+      </div>
+    </div>
+    <div class="zeile" style="margin-top:12px">
+      <button id="auslesen" class="dehnen" disabled>Zettel auslesen</button>
+      <button id="beispiel" class="zweit">Beispiel laden</button>
+    </div>
+    <div id="auslese-status"></div>
+  </div>
+  <div id="ergebnis"></div>
+  <p class="leise" style="font-size:.78rem;margin:14px 2px 0">Test-Seite für die Zettel-Erfassung. Sie speichert nichts, verändert keine Daten und zeigt nur, was auf dem Zettel steht – plus Rechenhinweise. Die echte Erfassung bleibt unverändert.</p>
+</main>
+<dialog id="dlg"><div class="innen" id="dlg-inhalt"></div></dialog>
+<script>
+/*BASIS_JS*/
+(() => {
+const { api, esc, euro, toast } = DK;
+const $ = s => document.querySelector(s);
+let D = null;            // Daten vom Server (Namen, Farben, Kasse)
+let FOTO = null;         // verkleinertes Foto
+let ZET = null;          // der Zettel im Test
+let HINWEISE = [];       // Hinweise vom Auslesen
+let ERG = null;          // Rechenergebnis
+let DATUM = null, MODELL = null;
+
+const KEY = 'zettel-test';
+function sichern() { try { localStorage.setItem(KEY, JSON.stringify({ ZET, HINWEISE, DATUM, MODELL })); } catch (e) {} }
+function lokalLaden() {
+  try {
+    const j = JSON.parse(localStorage.getItem(KEY) || 'null');
+    if (j && j.ZET && Array.isArray(j.ZET.zeilen) && j.ZET.zeilen.length) { ZET = j.ZET; HINWEISE = j.HINWEISE || []; DATUM = j.DATUM || null; MODELL = j.MODELL || null; return true; }
+  } catch (e) {}
+  return false;
+}
+
+// ---------- Regeln ----------
+function parseNotiz(roh) {
+  const s = (roh || '').trim().replace(/−/g, '-').replace(/\s+/g, '');
+  if (!s) return null;
+  const pf = /S$/i.test(s);
+  const t = pf ? s.replace(/S$/i, '') : s;
+  if (!t) return { unklar: true };
+  const m = t.match(/^([+-]?\d+)\/([+-]?\d+)$/);
+  if (m) {
+    const a = parseInt(m[1], 10);
+    let b = parseInt(m[2], 10);
+    if (!/^[+-]/.test(m[2])) b = (a >= 0 ? -1 : 1) * Math.abs(b);
+    return { art: 'solo', a, b, pflicht: pf };
+  }
+  const n = t.match(/^(\d+)$/);
+  if (n) return { art: 'normal', x: parseInt(n[1], 10), pflicht: pf };
+  return { unklar: true };
+}
+const PLUS = [[0, 1], [0, 2], [0, 3], [1, 2], [1, 3], [2, 3]];
+
+function rechne(zeilen, format) {
+  const SP = [0, 1, 2, 3];
+  const kette = [];
+  zeilen.forEach((z, i) => { if (!z.gestrichen) kette.push(i); });
+  const abl = [], gru = [];
+  zeilen.forEach(() => { abl.push(null); gru.push(null); });
+  kette.forEach(i => { abl[i] = [null, null, null, null]; gru[i] = [null, null, null, null]; });
+  const kennt = (i, p) => {
+    const z = zeilen[i].zellen[p];
+    if (z.v !== null) return z.v;
+    return abl[i] ? abl[i][p] : null;
+  };
+  const setz = (i, p, w, grund) => {
+    if (zeilen[i].zellen[p].v !== null || abl[i][p] !== null) return false;
+    abl[i][p] = w; gru[i][p] = grund;
+    return true;
+  };
+  let veraendert = true, runde = 0;
+  while (veraendert && runde++ < 30) {
+    veraendert = false;
+    // A: Jede Zeile (laufende Summe) ergibt 0 → bei 3 Werten ergibt sich der 4.
+    for (const i of kette) {
+      const vals = SP.map(p => kennt(i, p));
+      const fehlt = SP.filter(p => vals[p] === null);
+      if (fehlt.length === 1) {
+        const p = fehlt[0];
+        const soll = -SP.reduce((a, q) => a + (vals[q] ?? 0), 0);
+        if (setz(i, p, soll, 'aus der Zeilensumme (muss 0 ergeben)')) veraendert = true;
+      }
+    }
+    // B+C: je Spiel die Veränderung zur Vorzeile prüfen
+    kette.forEach((i, k) => {
+      const j = format === 'laufend' && k > 0 ? kette[k - 1] : null;
+      const delta = p => {
+        const c = kennt(i, p), pv = j === null ? 0 : kennt(j, p);
+        return c === null || pv === null ? null : c - pv;
+      };
+      const ds = SP.map(delta);
+      const fehltD = SP.filter(p => ds[p] === null);
+      if (fehltD.length === 1) {
+        const p = fehltD[0];
+        const dSoll = -SP.reduce((a, q) => a + (ds[q] ?? 0), 0);
+        const cur = kennt(i, p), pv = j === null ? 0 : kennt(j, p);
+        if (cur === null && pv !== null) { if (setz(i, p, pv + dSoll, 'Spiel muss 0 ergeben')) veraendert = true; }
+        else if (cur !== null && j !== null && kennt(j, p) === null) { if (setz(j, p, cur - dSoll, 'Spiel muss 0 ergeben')) veraendert = true; }
+      }
+      const notiz = parseNotiz(zeilen[i].notiz);
+      if (notiz && notiz.art) {
+        let kandidaten = [];
+        if (notiz.art === 'normal') {
+          const x = notiz.x;
+          kandidaten = PLUS.map(ps => SP.map(p => (ps.includes(p) ? x : -x)));
+        } else if (notiz.a + 3 * notiz.b === 0) {
+          const a = notiz.a, b = notiz.b;
+          kandidaten = SP.map(s => SP.map(p => (p === s ? a : b)));
+        }
+        const passt = kandidaten.filter(kd => SP.every(p => ds[p] === null || ds[p] === kd[p]));
+        if (passt.length >= 1) {
+          for (const p of SP) {
+            if (ds[p] !== null) continue;
+            const werte = Array.from(new Set(passt.map(kd => kd[p])));
+            if (werte.length === 1) {
+              const d = werte[0];
+              const cur = kennt(i, p), pv = j === null ? 0 : kennt(j, p);
+              const g = notiz.art === 'solo' ? 'aus der Solo-Notiz' : 'aus dem Spielwert';
+              if (cur === null && pv !== null) { if (setz(i, p, pv + d, g)) veraendert = true; }
+              else if (cur !== null && j !== null && pv === null) { if (setz(j, p, cur - d, g)) veraendert = true; }
+            }
+          }
+        }
+      }
+    });
+  }
+  // ---------- Berichte ----------
+  const berichte = zeilen.map((z, i) => {
+    const leer = { fehler: [], warn: [], vorschlag: null, spielText: 'zählt nicht', spielKlasse: 'ok', voll: false, summe: null };
+    if (z.gestrichen) return leer;
+    const vals = SP.map(p => kennt(i, p));
+    const voll = vals.every(v => v !== null);
+    const summe = voll ? SP.reduce((a, p) => a + vals[p], 0) : null;
+    const fehler = [], warn = [];
+    let vorschlag = null;
+    if (voll && summe !== 0) {
+      fehler.push('Zeilensumme ' + summe + ' statt 0');
+      const offene = SP.filter(p => z.zellen[p].st !== 'bestaetigt');
+      if (offene.length === 1) vorschlag = { p: offene[0], wert: vals[offene[0]] - summe };
+    }
+    const k = kette.indexOf(i);
+    const j = format === 'laufend' && k > 0 ? kette[k - 1] : null;
+    const deltas = SP.map(p => {
+      const c = kennt(i, p), pv = j === null ? 0 : kennt(j, p);
+      return c === null || pv === null ? null : c - pv;
+    });
+    let spielText = '', spielKlasse = 'offen';
+    const notiz = parseNotiz(z.notiz);
+    if (notiz && notiz.unklar) warn.push('Notiz \u201E' + z.notiz + '\u201C unklar');
+    if (notiz && notiz.art === 'solo' && notiz.a + 3 * notiz.b !== 0) warn.push('Solo-Notiz ergibt rechnerisch keine 0');
+    if (deltas.every(d => d !== null)) {
+      const dd = deltas;
+      const dsum = dd.reduce((a, x) => a + x, 0);
+      if (dsum !== 0) {
+        spielText = 'Spiel ergibt ' + dsum + ' statt 0';
+        spielKlasse = 'fehler';
+        fehler.push('Spiel ergibt ' + dsum + ' statt 0');
+      } else {
+        let soloist = null, soloW = 0;
+        for (const s of SP) {
+          const a = dd[s], rest = SP.filter(p => p !== s).map(p => dd[p]);
+          if (a !== 0 && rest.every(r => r === rest[0]) && a === -3 * rest[0]) { soloist = s; soloW = rest[0]; break; }
+        }
+        const pos = dd.filter(x => x > 0), neg = dd.filter(x => x < 0);
+        const normalW = pos.length === 2 && neg.length === 2 && pos[0] === pos[1] && neg[0] === neg[1] ? pos[0] : null;
+        const namen = SP.filter(p => dd[p] > 0).map(p => ZET.ordnung[p]);
+        if (soloist !== null) {
+          const art = notiz && notiz.art === 'solo' ? (notiz.pflicht ? 'Pflichtsolo' : 'Lustsolo') : 'Solo';
+          spielText = art + ' ' + ZET.ordnung[soloist] + ' ' + dd[soloist] + ' (Wert ' + Math.abs(soloW) + ')';
+          spielKlasse = 'ok';
+          if (!notiz) warn.push('Solo ohne Notiz – Spielwert nachtragen?');
+          if (notiz && notiz.art === 'normal') { spielKlasse = 'warn'; warn.push('Sieht aus wie ein Solo, Notiz sagt Normalspiel'); }
+          if (notiz && notiz.art === 'solo' && (dd[soloist] !== notiz.a || SP.filter(p => p !== soloist).some(p => dd[p] !== notiz.b))) { spielKlasse = 'warn'; warn.push('Solo-Notiz passt nicht zum Muster'); }
+        } else if (normalW !== null) {
+          spielText = 'Wert ' + normalW + ' · ' + namen.join(' + ') + ' gewinnen';
+          spielKlasse = 'ok';
+          if (notiz && notiz.art === 'normal' && notiz.x !== normalW) { spielKlasse = 'warn'; warn.push('Spielwert ' + notiz.x + ' in der Notiz, Punkte sagen ' + normalW); }
+          if (notiz && notiz.art === 'solo') { spielKlasse = 'warn'; warn.push('Notiz sagt Solo, Punkte sagen Normalspiel'); }
+        } else {
+          spielText = 'ergibt 0, aber kein Standard-Muster';
+          spielKlasse = 'warn';
+          warn.push('kein Standard-Muster (Sonderpunkte?) – bitte prüfen');
+        }
+      }
+    } else if (voll) {
+      spielText = 'warte auf die Zeile davor';
+    } else {
+      const n = vals.filter(v => v === null).length;
+      spielText = n + ' Wert(e) in dieser Zeile fehlen noch';
+    }
+    return { fehler, warn, vorschlag, spielText, spielKlasse, voll, summe };
+  });
+  let fehlerzahl = 0, warnzahl = 0, fehlend = 0, unbestaetigt = 0;
+  kette.forEach(i => {
+    fehlerzahl += berichte[i].fehler.length;
+    warnzahl += berichte[i].warn.length;
+    SP.forEach(p => {
+      const v = kennt(i, p);
+      if (v === null) fehlend++;
+      else if (zeilen[i].zellen[p].st !== 'bestaetigt') unbestaetigt++;
+    });
+  });
+  const aufgeht = kette.length > 0 && fehlerzahl === 0 && fehlend === 0;
+  // Endstand: laufend = letzte Zeile, einzeln = Summe je Spalte
+  let endstand = null, endVoll = false;
+  if (format === 'laufend') {
+    const li = kette.length ? kette[kette.length - 1] : null;
+    if (li !== null) { endstand = SP.map(p => kennt(li, p)); endVoll = endstand.every(v => v !== null); }
+  } else {
+    endstand = SP.map(p => kette.reduce((a, i) => { const v = kennt(i, p); return a + (v ?? 0); }, 0));
+    endVoll = kette.length > 0 && kette.every(i => SP.every(p => kennt(i, p) !== null));
+  }
+  const pflichtsoli = kette.filter(i => { const n = parseNotiz(zeilen[i].notiz); return n && n.art === 'solo' && n.pflicht; }).length;
+  return { berichte, abl, gru, aufgeht, fehlerzahl, warnzahl, fehlend, unbestaetigt, kette: kette.length, endstand, endVoll, pflichtsoli };
+}
+
+// ---------- Auslesen ----------
+async function verkleinern(datei) {
+  let bild;
+  try { bild = await createImageBitmap(datei, { imageOrientation: 'from-image' }); }
+  catch (e) { bild = await new Promise((ok, nein) => { const i = new Image(); i.onload = () => ok(i); i.onerror = () => nein(new Error('Das Bild lässt sich nicht öffnen. Bitte als JPEG fotografieren.')); i.src = URL.createObjectURL(datei); }); }
+  const max = 2200, f = Math.min(1, max / Math.max(bild.width, bild.height));
+  const c = document.createElement('canvas'); c.width = Math.round(bild.width * f); c.height = Math.round(bild.height * f);
+  c.getContext('2d').drawImage(bild, 0, 0, c.width, c.height);
+  return await new Promise(ok => c.toBlob(ok, 'image/jpeg', 0.86));
+}
+$('#foto').onchange = async e => {
+  const f = e.target.files[0]; if (!f) return;
+  $('#auslese-status').innerHTML = '';
+  try {
+    FOTO = await verkleinern(f);
+    const v = $('#foto-vorschau'); v.src = URL.createObjectURL(FOTO); v.classList.remove('verdeckt');
+    v.onclick = () => dialog('<img class="vorschau" style="max-height:70vh;cursor:default" src="' + v.src + '" alt="Foto"><div class="zeile" style="margin-top:10px"><button class="dehnen zweit" data-zu>Schließen</button></div>');
+    $('#foto-dreh').classList.remove('verdeckt');
+    $('#auslesen').disabled = false;
+    $('#foto-wahl strong').textContent = '📷 Anderes Foto wählen';
+  } catch (err) { $('#auslese-status').innerHTML = '<div class="fehler">' + esc(err.message) + '</div>'; }
+};
+$('#drehen').onclick = async () => {
+  if (!FOTO) return;
+  const bild = await createImageBitmap(FOTO);
+  const c = document.createElement('canvas'); c.width = bild.height; c.height = bild.width;
+  const g = c.getContext('2d'); g.translate(c.width, 0); g.rotate(Math.PI / 2); g.drawImage(bild, 0, 0);
+  FOTO = await new Promise(ok => c.toBlob(ok, 'image/jpeg', 0.88));
+  $('#foto-vorschau').src = URL.createObjectURL(FOTO);
+};
+const anbieter = (() => {
+  const el = $('#anbieter-wahl');
+  el.querySelectorAll('button').forEach(b => b.onclick = () => el.querySelectorAll('button').forEach(x => x.setAttribute('aria-pressed', x === b)));
+  return () => el.querySelector('[aria-pressed=true]').dataset.a;
+})();
+$('#auslesen').onclick = async () => {
+  if (!FOTO) return;
+  const b = $('#auslesen'); b.disabled = true;
+  const wer = anbieter() === 'mistral' ? 'Mistral' : 'Claude';
+  b.innerHTML = '<span class="drehen"></span> ' + wer + ' liest den Zettel …';
+  $('#auslese-status').innerHTML = '<p class="leise">Das dauert meist 15–60 Sekunden.</p>';
+  const fd = new FormData(); fd.append('foto', FOTO, 'zettel.jpg'); fd.append('anbieter', anbieter());
+  try {
+    const r = await api('auslesen', fd);
+    const ent = r.entwurf || {};
+    HINWEISE = ent.hinweise || [];
+    DATUM = ent.datum || null;
+    MODELL = ent.modell || null;
+    ZET = ausEntwurf(ent);
+    sichern(); zeichne();
+    $('#ergebnis').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  } catch (e) {
+    $('#auslese-status').innerHTML = '<div class="fehler">' + esc(e.message) + '</div>';
+  } finally { b.disabled = false; b.textContent = 'Zettel auslesen'; }
+};
+function ausEntwurf(e) {
+  const S = D.spieler;
+  let ordnung = Array.isArray(e.sitzordnung) ? e.sitzordnung.filter(n => S.includes(n)) : [];
+  if (ordnung.length !== S.length || new Set(ordnung).size !== S.length) ordnung = S.slice();
+  const zeilen = (e.spiele || []).map(sp => ({
+    zellen: ordnung.map(n => {
+      const w = (sp.werte || {})[n];
+      const v = (w === null || w === undefined || w === '' || isNaN(+w)) ? null : +w;
+      return { v, st: v === null ? 'leer' : 'gelesen' };
+    }),
+    notiz: sp.notiz || '', gestrichen: false
+  }));
+  return { format: e.format === 'laufend' ? 'laufend' : 'einzeln', ordnung, zeilen };
+}
+
+// ---------- Zustand ändern ----------
+const name = p => ZET.ordnung[p] || '?';
+function setzeZelle(zi, p, v, st) {
+  ZET.zeilen[zi].zellen[p] = { v, st };
+  sichern(); zeichne();
+}
+function bestaetige(zi, p) {
+  const z = ZET.zeilen[zi].zellen[p];
+  const wert = z.v !== null ? z.v : (ERG.abl[zi] ? ERG.abl[zi][p] : null);
+  if (wert === null) { toast('Kein Wert zum Bestätigen – erst eintragen'); return; }
+  setzeZelle(zi, p, wert, 'bestaetigt');
+  toast('Bestätigt: ' + name(p) + ' ' + wert);
+  try { navigator.vibrate && navigator.vibrate(25); } catch (e) {}
+}
+function vorschlagUebernehmen(zi, p, wert) {
+  setzeZelle(zi, p, wert, 'bestaetigt');
+  toast('Korrektur übernommen: ' + name(p) + ' ' + wert);
+}
+
+// ---------- Dialog ----------
+function dialog(html) { $('#dlg-inhalt').innerHTML = html; $('#dlg-inhalt').querySelectorAll('[data-zu]').forEach(b => b.onclick = schliessen); $('#dlg').showModal(); }
+function schliessen() { $('#dlg').close(); }
+$('#dlg').addEventListener('click', e => { if (e.target.id === 'dlg') schliessen(); });
+const zuZahl = t => {
+  const s = (t || '').trim().replace(/−/g, '-');
+  if (s === '' || s === '?' || s === '·') return null;
+  return /^[+-]?\d+$/.test(s) ? parseInt(s, 10) : null;
+};
+function editor(zi, p) {
+  const z = ZET.zeilen[zi].zellen[p];
+  const ab = ERG.abl[zi] ? ERG.abl[zi][p] : null;
+  const grund = ERG.gru[zi] ? ERG.gru[zi][p] : null;
+  dialog('<h2>Zeile ' + (zi + 1) + ' · ' + esc(name(p)) + '</h2>'
+    + (grund ? '<p class="leise" style="margin:2px 0 8px">Erschlossen ' + esc(grund) + '</p>' : '')
+    + '<input id="z-eingabe" inputmode="text" value="' + (z.v !== null ? z.v : (ab !== null ? ab : '')) + '" placeholder="Zahl, ? oder leer">'
+    + '<div class="zeile" style="margin-top:14px">'
+    + '<button class="zweit" data-zu>Abbrechen</button>'
+    + '<button class="dehnen" id="z-ok">Übernehmen</button>'
+    + '<button class="dehnen" id="z-fest">✓ Bestätigt</button></div>'
+    + '<div class="zeile" style="margin-top:8px"><button class="zweit klein dehnen" id="z-leer">Feld leeren</button></div>');
+  $('#z-eingabe').focus();
+  const apply = st => {
+    const t = $('#z-eingabe').value;
+    const v = zuZahl(t);
+    if (t.trim() !== '' && v === null) { toast('Bitte Zahl, ? oder leer'); return; }
+    schliessen();
+    setzeZelle(zi, p, v, st === 'bestaetigt' ? 'bestaetigt' : (v === null ? 'leer' : 'gelesen'));
+  };
+  $('#z-ok').onclick = () => apply('gelesen');
+  $('#z-fest').onclick = () => apply('bestaetigt');
+  $('#z-leer').onclick = () => { schliessen(); setzeZelle(zi, p, null, 'leer'); };
+  $('#z-eingabe').onkeydown = e => { if (e.key === 'Enter') apply('bestaetigt'); };
+}
+
+// ---------- Zeichnen ----------
+function zeichne() {
+  ERG = ZET ? rechne(ZET.zeilen, ZET.format) : null;
+  const ziel = $('#ergebnis');
+  if (!ZET || !ERG) { ziel.innerHTML = ''; return; }
+  const SP = [0, 1, 2, 3];
+  const letzteIdx = ERG.kette ? ZET.zeilen.map((z, i) => z.gestrichen ? -1 : i).filter(i => i >= 0).slice(-1)[0] : -1;
+  // Banner
+  let banner;
+  if (ERG.aufgeht) {
+    const pl = ERG.endVoll ? SP.map(p => ({ p, wert: ERG.endstand[p] })).sort((a, b) => b.wert - a.wert).map((e, i) => ({ ...e, platz: i + 1 })) : null;
+    banner = '<div class="banner-ok"><b style="color:#20603a">✓ Zettel aufgeht</b> – ' + ERG.kette + ' Spiele, alle Zeilen und Spiele ergeben 0.'
+      + (pl ? '<div style="margin-top:4px">' + pl.map(e => '<span class="chip" data-p="' + esc(name(e.p)) + '">' + e.platz + '. ' + esc(name(e.p)) + ' ' + (e.wert > 0 ? '+' : '') + e.wert + ' · ' + euro(e.platz * D.euro_pro_platz) + '</span>').join(' ') + '</div>' : '')
+      + (ERG.pflichtsoli !== SP.length ? '<div style="margin-top:4px;font-size:.8rem;color:#8a6d00">Nur ' + ERG.pflichtsoli + ' Pflichtsoli notiert (üblich: ' + SP.length + ')</div>' : '')
+      + '</div>';
+  } else {
+    banner = '<div class="banner-offen"><b>Noch nicht aufgegangen</b>'
+      + '<div class="leise" style="margin-top:2px">'
+      + (ERG.fehlend ? ERG.fehlend + ' Wert(e) fehlen · ' : '')
+      + (ERG.unbestaetigt ? ERG.unbestaetigt + ' unbestätigt · ' : '')
+      + (ERG.fehlerzahl ? '<span style="color:#b3261e;font-weight:600">' + ERG.fehlerzahl + ' Widerspruch/Widersprüche</span>' : '')
+      + (ERG.warnzahl ? ' · ' + ERG.warnzahl + ' zum Prüfen' : '')
+      + '</div>'
+      + (ERG.endstand && ERG.endVoll ? '<div class="leise" style="margin-top:2px">Bisheriges Ergebnis: ' + SP.map(p => name(p) + ' ' + ERG.endstand[p]).join(' · ') + '</div>' : '')
+      + '</div>';
+  }
+  // Kopf
+  const kopf = '<div class="zt-kopf"><b>Nr</b>' + SP.map(p => '<b data-p="' + esc(name(p)) + '">' + esc(name(p)) + '</b>').join('') + '<b>Spiel</b></div>';
+  // Zeilen
+  const zeilenHtml = ZET.zeilen.map((z, i) => {
+    const r = ERG.berichte[i];
+    const zellen = SP.map(p => {
+      const c = z.zellen[p];
+      const ab = ERG.abl[i] ? ERG.abl[i][p] : null;
+      const v = c.v !== null ? c.v : ab;
+      const st = c.v !== null ? c.st : (ab !== null ? 'erschlossen' : 'leer');
+      const zeichen = st === 'bestaetigt' ? '<span class="zeichen" style="color:#16a34a">✓</span>' : st === 'erschlossen' ? '<span class="zeichen" style="color:#3b82f6">E</span>' : '';
+      const fehlt = r.fehler.length && c.v !== null && r.summe !== null && r.summe !== 0 ? ' style="box-shadow:inset 0 0 0 2px rgba(217,76,61,.4)"' : '';
+      return '<button class="zz ' + st + '" data-z="' + i + '" data-p="' + p + '"' + fehlt + ' aria-label="Zeile ' + (i + 1) + ' ' + esc(name(p)) + '">'
+        + (v === null ? '·' : (v > 0 ? '+' : '') + v) + zeichen + '</button>';
+    }).join('');
+    const notiz = '<input class="zt-notiz" data-notiz="' + i + '" value="' + esc(z.notiz) + '" placeholder="Wert">';
+    const status = '<div class="zt-status">'
+      + (z.gestrichen ? '<span class="grau">gestrichen – zählt nicht</span>'
+        : r.fehler.map(f => '<span class="rot">⚠ ' + esc(f) + '</span>').join(' ')
+          + (r.fehler.length && r.warn.length ? ' ' : '')
+          + r.warn.map(w => '<span class="gelb">△ ' + esc(w) + '</span>').join(' ')
+          + (!r.fehler.length && !r.warn.length && r.spielKlasse !== 'offen' ? '<span class="grau">' + esc(r.spielText) + '</span>' : '')
+          + (r.fehler.length && r.spielKlasse !== 'fehler' && r.spielKlasse !== 'ok' ? '<span class="grau">' + esc(r.spielText) + '</span>' : ''))
+      + (r.spielKlasse === 'offen' && !z.gestrichen && !r.fehler.length ? '<span class="grau">' + esc(r.spielText) + '</span>' : '')
+      + (r.vorschlag ? '<button data-vorschlag="' + i + '" data-p="' + r.vorschlag.p + '" data-wert="' + r.vorschlag.wert + '">Vorschlag: ' + esc(name(r.vorschlag.p)) + ' ' + (r.vorschlag.wert > 0 ? '+' : '') + r.vorschlag.wert + ' → übernehmen</button>' : '')
+      + '<span class="werkzeug" data-streich="' + i + '">' + (z.gestrichen ? 'wieder gelten lassen' : 'durchstreichen') + '</span>'
+      + '<span class="werkzeug" data-weg="' + i + '">Zeile weg</span>'
+      + '</div>';
+    return '<div class="zt-zeile' + (z.gestrichen ? ' gestrichen' : '') + (i === letzteIdx && !z.gestrichen ? ' letzt' : '') + '">'
+      + '<span class="zt-nr">' + (i === letzteIdx && !z.gestrichen ? '<b>✓</b> ' : '') + (i + 1) + '</span>'
+      + zellen + notiz + '</div>' + status;
+  }).join('');
+  // Werkzeuge
+  const werkzeuge = '<div class="zeile" style="margin-top:10px">'
+    + '<button class="zweit klein" id="plus-zeile">+ Zeile</button>'
+    + '<button class="zweit klein" id="plus-gestrichen">+ gestrichene Zeile</button>'
+    + '<button class="zweit klein" id="kopieren">Als Text kopieren</button>'
+    + '<button class="zweit klein" id="einfuegen">Einfügen</button>'
+    + '<button class="zweit klein" id="neu-btn">Neu</button>'
+    + '</div>'
+    + '<div class="legende">'
+    + '<span><i style="background:#fde8c8;border:1px solid #d97706"></i>gelesen (unbestätigt)</span>'
+    + '<span><i style="background:#f2f7ff;border:1px dashed #3b82f6"></i><b>E</b>rschlossen</span>'
+    + '<span><i style="background:#effaf1;border:1px solid #16a34a"></i>✓ bestätigt</span>'
+    + '<span><i style="border:1px dashed #999"></i>unbekannt</span>'
+    + '</div>'
+    + '<p class="leise" style="font-size:.76rem;margin:8px 0 0">Antippen = Wert eingeben oder korrigieren · langer Druck = bestätigt. Erschlossene Werte (E) ergeben sich aus den Regeln: Jede Zeile ergibt 0, jedes Spiel (Veränderung zur Vorzeile) ergibt 0, Normalspiel 2× +X und 2× −X, Solo ±3X gegen ∓X. Notiz „3/-1 S“ = Pflichtsolo.</p>';
+  const kopfInfo = (DATUM ? '<div class="leise" style="margin-top:-6px">' + esc((MODELL ? 'Ausgelesen mit ' + MODELL + ' · ' : '') + 'Datum laut Zettel: ' + DATUM) + '</div>' : '');
+  const hinw = HINWEISE.length ? HINWEISE.map(h => '<div class="hinweis">' + esc(h) + '</div>').join('') : '';
+  ziel.innerHTML = '<div class="karte">'
+    + '<h2>' + (ZET.format === 'laufend' ? 'Zettel prüfen (laufende Summe)' : 'Zettel prüfen (Punkte je Spiel)') + '</h2>'
+    + kopfInfo + hinw + banner + kopf
+    + '<div class="zt-tabelle">' + zeilenHtml + '</div>'
+    + werkzeuge + '</div>';
+  // Ereignisse
+  ziel.querySelectorAll('.zz').forEach(el => {
+    const zi = +el.dataset.z, p = +el.dataset.p;
+    let timer = null, xy = null, gefeuert = false;
+    const weg = () => { if (timer) { clearTimeout(timer); timer = null; } };
+    el.onpointerdown = e => { gefeuert = false; xy = [e.clientX, e.clientY]; weg(); timer = setTimeout(() => { gefeuert = true; bestaetige(zi, p); }, 450); };
+    el.onpointermove = e => { if (xy && (Math.abs(e.clientX - xy[0]) > 12 || Math.abs(e.clientY - xy[1]) > 12)) weg(); };
+    el.onpointerup = () => { const war = timer !== null; weg(); if (!gefeuert && war) editor(zi, p); };
+    el.onpointercancel = weg; el.onpointerleave = weg;
+    el.oncontextmenu = e => { e.preventDefault(); bestaetige(zi, p); };
+  });
+  ziel.querySelectorAll('[data-notiz]').forEach(el => el.onchange = () => { ZET.zeilen[+el.dataset.notiz].notiz = el.value; sichern(); zeichne(); });
+  ziel.querySelectorAll('[data-vorschlag]').forEach(el => el.onclick = () => vorschlagUebernehmen(+el.dataset.vorschlag, +el.dataset.p, +el.dataset.wert));
+  ziel.querySelectorAll('[data-streich]').forEach(el => el.onclick = () => { ZET.zeilen[+el.dataset.streich].gestrichen = !ZET.zeilen[+el.dataset.streich].gestrichen; sichern(); zeichne(); });
+  ziel.querySelectorAll('[data-weg]').forEach(el => el.onclick = () => { ZET.zeilen.splice(+el.dataset.weg, 1); sichern(); zeichne(); });
+  $('#plus-zeile').onclick = () => { ZET.zeilen.push({ zellen: SP.map(() => ({ v: null, st: 'leer' })), notiz: '', gestrichen: false }); sichern(); zeichne(); };
+  $('#plus-gestrichen').onclick = () => { ZET.zeilen.push({ zellen: SP.map(() => ({ v: null, st: 'leer' })), notiz: '', gestrichen: true }); sichern(); zeichne(); };
+  $('#neu-btn').onclick = neu;
+  $('#kopieren').onclick = kopieren;
+  $('#einfuegen').onclick = einfuegen;
+}
+
+// ---------- Kopieren / Einfügen ----------
+function alsText() {
+  const SP = [0, 1, 2, 3];
+  const zeilen = ZET.zeilen.map((z, i) => {
+    const r = ERG.berichte[i];
+    const werte = SP.map(p => {
+      const c = z.zellen[p], ab = ERG.abl[i] ? ERG.abl[i][p] : null;
+      const v = c.v !== null ? c.v : ab;
+      const st = c.v === null ? (v !== null ? '~' : '?') : c.st === 'bestaetigt' ? '✓' : '.';
+      return (v === null ? '?' : String(v)) + st;
+    }).join(' ');
+    const status = z.gestrichen ? '  (gestrichen)'
+      : r.fehler.length ? '  ⚠ ' + r.fehler.join('; ')
+      : r.spielKlasse === 'ok' ? '  (' + r.spielText + ')'
+      : r.warn.length ? '  (prüfen: ' + r.warn[0] + ')' : '';
+    return (i + 1) + ': ' + (z.gestrichen ? 'x ' : '') + werte + (z.notiz ? ' | ' + z.notiz : '') + status;
+  }).join('\n');
+  const end = ERG.endstand && ERG.endVoll ? '\nErgebnis: ' + SP.map(p => name(p) + ' ' + ERG.endstand[p]).join(' · ') : '';
+  const status = ERG.aufgeht ? 'Status: Zettel aufgeht ✓ (' + ERG.kette + ' Spiele)' : 'Status: ' + ERG.fehlend + ' fehlen · ' + ERG.fehlerzahl + ' Fehler · ' + ERG.warnzahl + ' Hinweise';
+  return 'Zettel-Test · Spieler: ' + ZET.ordnung.join(', ') + '\n' + zeilen + end + '\n' + status;
+}
+function kopieren() {
+  const t = alsText();
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(t).then(() => toast('In die Zwischenablage kopiert'), () => textDialog(t));
+  } else textDialog(t);
+}
+function textDialog(t) {
+  dialog('<h2>Zum Kopieren</h2><textarea readonly style="min-height:200px">' + esc(t) + '</textarea><div class="zeile" style="margin-top:10px"><button class="dehnen zweit" data-zu>Schließen</button></div>');
+  const ta = $('#dlg textarea'); ta.onfocus = () => ta.select();
+}
+function parseImport(text) {
+  const out = [];
+  for (let roh of text.split(/\r?\n/)) {
+    let l = roh.trim();
+    if (!l) continue;
+    let gestrichen = false;
+    if (/^(x|✕|✗|gestr\w*)\s+/i.test(l)) { gestrichen = true; l = l.replace(/^(x|✕|✗|gestr\w*)\s+/i, ''); }
+    l = l.replace(/^[A-Za-zÄÖÜäöüß]+\s+\d*\s*[:.)]?\s*/, '').replace(/^\d+\s*[:.)]\s*/, '');
+    let note = '', links = l;
+    const pipe = l.indexOf('|');
+    if (pipe >= 0) { links = l.slice(0, pipe); note = l.slice(pipe + 1).trim(); }
+    const toks = links.split(/[\s,;]+/).filter(Boolean);
+    const vals = [];
+    for (const t of toks) {
+      if (vals.length < 4) vals.push(zuZahl(t));
+      else if (!note) note = t;
+    }
+    while (vals.length < 4) vals.push(null);
+    if (!toks.length) continue;
+    out.push({ zellen: vals.map(v => ({ v, st: v === null ? 'leer' : 'gelesen' })), notiz: note, gestrichen });
+  }
+  return out;
+}
+function einfuegen() {
+  dialog('<h2>Zeilen einfügen</h2><p class="leise" style="margin:2px 0 8px">Eine Zeile je Spiel: 4 Zahlen (oder „?“ für unleserlich), danach „|“ und die Spalte Spiel. „x“ davor = gestrichen. Beispiel: <code>20: -13 +23 -1 -9 | 2</code></p>'
+    + '<textarea id="ein-text" style="min-height:120px" placeholder="-13 +23 -1 -9 | 2\n-11 +25 -3 -11 | 6\n? ? ? ? | 3/-1"></textarea>'
+    + '<div class="zeile" style="margin-top:12px"><button class="zweit" data-zu>Abbrechen</button><button class="dehnen" id="ein-ok">Ersetzt den Zettel</button></div>');
+  $('#ein-ok').onclick = () => {
+    const zs = parseImport($('#ein-text').value);
+    if (!zs.length) { toast('Nichts erkennbar'); return; }
+    schliessen();
+    ZET = { format: ZET ? ZET.format : 'laufend', ordnung: ZET ? ZET.ordnung : D.spieler.slice(), zeilen: zs };
+    sichern(); zeichne();
+  };
+}
+function neu() {
+  if (neu.warn) {
+    ZET = null; HINWEISE = []; DATUM = null; MODELL = null;
+    try { localStorage.removeItem(KEY); } catch (e) {}
+    neu.warn = false; zeichne(); toast('Zurückgesetzt');
+  } else {
+    neu.warn = true; toast('Nochmal tippen, um wirklich zu leeren');
+    setTimeout(() => { neu.warn = false; }, 3000);
+  }
+}
+
+// ---------- Beispiel ----------
+$('#beispiel').onclick = () => {
+  if (!D) { toast('Einen Moment bitte …'); return; }
+  const B = (w, n) => ({ zellen: w.map(x => ({ v: x, st: 'bestaetigt' })), notiz: n, gestrichen: false });
+  const G = (w, n) => ({ zellen: w.map(x => ({ v: x, st: 'gelesen' })), notiz: n, gestrichen: false });
+  const L = (w, n) => ({ zellen: w.map(x => ({ v: x, st: x === null ? 'leer' : 'bestaetigt' })), notiz: n, gestrichen: false });
+  const Z10 = { zellen: [{ v: -9, st: 'bestaetigt' }, { v: 1, st: 'gelesen' }, { v: -1, st: 'bestaetigt' }, { v: 11, st: 'bestaetigt' }], notiz: '1', gestrichen: false };
+  ZET = {
+    format: 'laufend', ordnung: D.spieler.slice(), zeilen: [
+      B([2, -2, 2, -2], '2'), B([-2, 2, -2, 2], '4'), B([-3, 1, -3, 5], '3/-1 S'), B([0, 4, -6, 2], '3'),
+      B([-5, 9, -11, 7], '5'), B([-3, 3, -9, 9], '-6/2'), B([1, -1, -5, 5], '4'), B([-1, -3, -3, 7], '2'),
+      B([-10, 0, 0, 10], '9/-3 S'), Z10, B([-12, 2, 2, 8], '3'), L([-6, null, -4, 14], '6'),
+      B([-2, 0, -16, 18], '-12/4 S'), L([-4, 2, null, 20], ''), B([1, 7, -23, 15], '5'), B([0, 8, -24, 16], '1'),
+      B([7, 1, -17, 9], '7'), G([null, null, null, null], '-9/3 S'), B([6, -4, -18, 16], '4'), B([8, -2, -20, 14], '2')
+    ]
+  };
+  HINWEISE = ['Beispiel-Zettel: Zeile 10 enthält absichtlich einen Fehler, in Zeile 12 und 14 fehlt je ein Wert (erschließt sich), Zeile 18 ist unleserlich.'];
+  DATUM = null; MODELL = null;
+  sichern(); zeichne();
+  $('#ergebnis').scrollIntoView({ behavior: 'smooth', block: 'start' });
+};
+
+// ---------- Start ----------
+if (!DK.hatSchluessel()) { DK.sperre('Bitte zuerst deinen persönlichen Link öffnen – dann funktioniert auch diese Test-Seite. Sie speichert nichts.'); return; }
+(async () => {
+  try { D = await api('daten'); } catch (e) { toast(e.message); return; }
+  DK.farben(D.farben);
+  if (D.runde) { $('#runde').textContent = D.runde + ' · Zettel-Test'; document.title = D.runde + ' · Zettel-Test'; }
+  $('#hallo').textContent = 'Hallo ' + D.ich;
+  lokalLaden();
+  zeichne();
+})();
+})();
+</script>
+</body>
+</html>

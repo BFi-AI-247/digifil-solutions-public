@@ -1,76 +1,71 @@
-# Zwei-Kanal-Format 1.3
+# Two-Channel Format 1.4
 
-*AI-to-AI-and-Human-Messages: ein Text, zwei Leser – Block A für die KI, die handelt, Block B für den Menschen.*
+*AI-to-AI-and-Human-Messages: one text, two readers – BLOCK A for the AI that acts, BLOCK B for the human.*
 
-## BLOCK A – Auftrag an die schreibende KI
+**Status of this folder (2026-11-26).** This is version 1.4 of the format; it replaces version 1.3, which was German. The files have English names since this version.
+
+## BLOCK A – order to the AI that writes
 
 ```text
-ZWECK:        Du schreibst einen Text im Zwei-Kanal-Format. Block A enthält alles, was der Empfänger zum Handeln braucht.
-              Block B erklärt Menschen in Klartext, wozu der Text gut ist. Das Ziel ist erreicht, wenn der Empfänger
-              allein mit Block A richtig handeln kann.
-GILT FÜR:     Aufträge von einer KI an eine andere, die etwas bewirken · Anleitungen, nach denen eine KI etwas
-              einrichtet oder benutzt · Testprotokolle, die mehrere KIs in derselben Form schreiben, damit sich ihre
-              Ergebnisse nebeneinander lesen lassen.
-GILT NICHT:   Quittungen und kurze Rückfragen bleiben kurzer Klartext. Ob ein Text im Format stehen muss, legt das
-              Regelwerk fest, nach dem du arbeitest. Dieses Format legt nur fest, wie der Text dann aussieht.
-VORAUSSETZUNG: Zum Schreiben genügen die acht Dateien dieses Ordners. Für Schritt 5 brauchst du eine frische KI oder
-              eine neue Sitzung ohne Verlauf.
-DATEIEN:      README.md (diese Anleitung) · konzept.md (Grundsatz und Herkunft: warum das Format so ist) ·
-              auftrag-vorlage.md (Form eines Auftrags und seiner Quittung) · readme-vorlage.md (Form einer Anleitung) ·
-              testprotokoll-vorlage.md (Form eines Testprotokolls) · beispiel-auftrag.md (ein fertiger, erfundener
-              Auftrag) · beispiel-readme.md (eine fertige, erfundene Anleitung) · beispiel-testprotokoll.md (ein
-              fertiges, erfundenes Testprotokoll).
-BEGRIFFE:     Empfänger = die KI, die nach dem Text handelt.
-              Ausführungsrelevant = alles, ohne das der Empfänger anders oder falsch handeln würde: Fristen, Pfade,
-              Werte, Schwellen, Freigaben, Beteiligte, Verweise.
-              Grenze = etwas, das der Empfänger lässt. Aufträge nennen Grenzen im Feld LEITPLANKEN, Anleitungen im
-              Feld NICHT TUN.
-              Frische KI = eine KI, die weder den Text noch das Projekt kennt.
-              Ratestelle = eine Stelle, an der die frische KI raten musste.
+PURPOSE:      You write a text in the Two-Channel Format. BLOCK A holds everything the receiver needs to act. BLOCK B
+              explains to humans in plain language what the text is for. The aim is reached when the receiver can act
+              correctly with BLOCK A alone.
+APPLIES TO:   Orders from one AI to another that make something happen · guides by which an AI sets up or uses something ·
+              test reports that several AIs write in the same form so that their results can be read side by side.
+DOES NOT APPLY TO: Receipts and short questions stay short plain text. Whether a text must be in the format is laid down by
+              the rules you work under. This format only lays down what the text then looks like.
+PREREQUISITES: The eight files of this folder are enough for writing. For step 5 you need a fresh AI or a new session without history.
+FILES:        README.md (this guide) · concept.md (principle and origin: why the format is as it is) ·
+              template-order.md (form of an order and its receipt) · template-guide.md (form of a guide) ·
+              template-test-report.md (form of a test report) · example-order.md (a finished, invented order) ·
+              example-guide.md (a finished, invented guide) · example-test-report.md (a finished, invented test report).
+TERMS:        Receiver = the AI that acts after the text.
+              Relevant for execution = everything without which the receiver would act differently or wrongly: deadlines,
+              paths, values, thresholds, approvals, parties, references.
+              Limit = something the receiver leaves. Orders name limits in the field GUARDRAILS, guides in the field DO NOT.
+              Fresh AI = an AI that knows neither the text nor the project.
+              Guess place = a place where the fresh AI had to guess.
+              Language = BLOCK A is English, BLOCK B is German (operator 25.11.2026 21:40); the operator's words and quotes
+              stay in the language they were said in.
 ```
 
-### SCHRITTE (in dieser Reihenfolge; jeder Schritt hat ein prüfbares Ergebnis)
+### STEPS (in this order; every step has a checkable result)
 
-1. **Vorlage wählen.** Wenn der Text eine Nachricht an eine andere KI ist, die etwas bewirkt, dann kopiere
-   `auftrag-vorlage.md`. Wenn der Text eine Anleitung ist, die dauerhaft im Repo liegt, dann kopiere `readme-vorlage.md`.
-   Wenn der Text über einen Test berichtet, dann kopiere `testprotokoll-vorlage.md`.
-   Namen und Reihenfolge der Felder lässt du, wie sie sind.
-   *Ergebnis:* Die Kopie enthält die Felder der Vorlage in derselben Reihenfolge.
-2. **Block A füllen.** Ersetze jeden Platzhalter; der Platzhalter sagt, was in das Feld gehört. Schreib so:
-   - Schreib ganze Sätze mit Verb.
-   - Nenne die Bedingung vor der Handlung: „Wenn X, dann tu Y.“
-   - Nenne bei jeder Grenze zuerst, was richtig ist, und dann, was der Empfänger lässt: „Schreib nur auf Branch X.
-     Main fasst du nicht an.“
-   - Nenne in jedem Schritt einer Anleitung die Datei, die Stelle und den Wert.
-   - Nenne auch, was sonst nur im Code steht: Dateinamen, Ablageorte und das Wort, mit dem der Code eine Rolle
-     bezeichnet.
-   - Bezeichne dieselbe Sache überall mit demselben Wort.
-   - Trenne die Punkte eines Listenfelds mit „·“ oder je Zeile. Jeder Punkt ist eine vollständige Aussage.
+1. **Choose the template.** If the text is a message to another AI that makes something happen, then copy
+   `template-order.md`. If the text is a guide that stays in a repo for good, then copy `template-guide.md`. If the text
+   reports on a test, then copy `template-test-report.md`. Leave the names and the order of the fields as they are.
+   *Result:* The copy holds the fields of the template in the same order.
+2. **Fill BLOCK A.** Replace every placeholder; the placeholder says what belongs into the field. Write like this:
+   - Write whole sentences with a verb.
+   - Name the condition before the action: "If X, then do Y."
+   - For every limit name first what is right, then what the receiver leaves: "Write only on branch X. You do not touch main."
+   - In every step of a guide name the file, the place and the value.
+   - Name also what otherwise stands only in the code: file names, storage places and the word with which the code names a role.
+   - Name the same thing with the same word everywhere.
+   - Separate the items of a list field with "·" or one per line. Every item is a complete statement.
 
-   *Ergebnis:* `grep -n '<' <datei>` zeigt nur noch absichtliche Zeichen und keinen Platzhalter.
-3. **Die zwei Prüffragen.** Frag jeden Satz in Block B: „Ist das eigentlich eine Anweisung?“ Wenn ja, dann verschiebe
-   ihn nach Block A. Frag danach: „Könnte der Empfänger ohne Block B richtig handeln?“ Wenn nein, dann ergänze in
-   Block A, was fehlt.
-   *Ergebnis:* Alles Ausführungsrelevante steht in Block A.
-4. **Block B schreiben.** Schreib für einen Menschen ohne Fachwissen: ganze Sätze, keine Funktions-, Datei- oder
-   Feldnamen, jede Abkürzung erklärt. Folge dem Aufbau, den die Vorlage für Block B zeigt.
-   *Ergebnis:* Block B enthält keine Zeichen in Backticks und kein Kürzel ohne erklärenden Satz.
-5. **Blindtest (nur bei Anleitungen).** Gib einer frischen KI nur Block A und eine kleine, erfundene Probeaufgabe, die
-   zu GILT FÜR passt. Lass sie die Schritte ausführen und jede Ratestelle nennen. Behebe jede Ratestelle in Block A
-   oder im Code. Wiederhole den Test mit einer anderen Probeaufgabe, bis er nur noch Kleinigkeiten findet. Wenn du
-   keine frische KI hast, dann nimm dieselbe KI in einer neuen Sitzung ohne Verlauf und nenne das in der Lieferung.
-   Wenn auch das nicht geht, dann kennzeichne die Anleitung in der Lieferung als „ungeprüft (Blindtest offen)“.
-   *Ergebnis:* Der letzte Blindtest fand keine echte Lücke. Probeaufgabe, Ratestellen und Behebung liegen dort, wo das
-   Projekt seine Prüfungen aufbewahrt, und die Lieferung nennt den Ort.
+   *Result:* `grep -n '<' <file>` shows only intended characters and no placeholder.
+3. **The two test questions.** Ask of every sentence in BLOCK B: "Is this actually an instruction?" If yes, then move it
+   to BLOCK A. Then ask: "Could the receiver act correctly without BLOCK B?" If no, then add to BLOCK A what is missing.
+   *Result:* Everything relevant for execution stands in BLOCK A.
+4. **Write BLOCK B.** Write in German for a person without special knowledge: whole sentences, no function, file or
+   field names, every abbreviation explained. Follow the build that the template shows for BLOCK B.
+   *Result:* BLOCK B holds no characters in backticks and no abbreviation without an explaining sentence.
+5. **Blind test (guides only).** Give a fresh AI only BLOCK A and a small, invented sample task that fits APPLIES TO. Let
+   it carry out the steps and name every guess place. Fix every guess place in BLOCK A or in the code. Repeat the test
+   with another sample task until it finds only trifles. If you have no fresh AI, then take the same AI in a new session
+   without history and say so in the delivery. If that is not possible either, then mark the guide in the delivery as
+   "ungeprüft (Blindtest offen)".
+   *Result:* The last blind test found no real gap. Sample task, guess places and fix lie where the project keeps its
+   tests, and the delivery names the place.
 
 ```text
-PRÜFUNG:      Die Ergebnisse der Schritte 2, 3 und 4 gelten zusammen. Bei einer Anleitung gilt zusätzlich das Ergebnis
-              von Schritt 5.
-FAIL-MODE:    Wenn etwas Ausführungsrelevantes in kein Feld passt, dann nimm es als eigenen Punkt in PARAMETER oder als
-              eigenen Schritt in Block A auf. Wenn dir eine Angabe fehlt, die du nicht beschaffen kannst, dann schreib
-              sie in Block A als „offen: …“ mit dem, was der Empfänger damit tut, und nenne sie in der Lieferung.
-LIEFERUNG:    der Text · das Ergebnis der zwei Prüffragen · bei Anleitungen jeder Blindtest mit Befund · offene
-              Angaben · jede Stelle, an der diese Anleitung nicht reichte, mit Zitat.
+CHECK:        The results of steps 2, 3 and 4 apply together. For a guide the result of step 5 applies in addition.
+FAIL-MODE:    If something relevant for execution fits no field, then take it up as an item of its own in PARAMETERS or as a
+              step of its own in BLOCK A. If you lack a detail that you cannot get, then write it in BLOCK A as "open: …"
+              with what the receiver does with it, and name it in the delivery.
+DELIVERY:     the text · the result of the two test questions · for guides every blind test with its finding · open
+              details · every place where this guide was not enough, with quote.
 ```
 
 ---
@@ -92,11 +87,15 @@ in den Regeln, nach denen sie arbeitet, nicht hier.
 
 Ursprünglich galt das nur für Aufträge zwischen KI-Agenten. Seit Oktober 2026 gilt es auch für Anleitungen, denn auch die
 lesen heute meist KIs. Seit November 2026 gilt es außerdem für Testprotokolle, damit mehrere KIs ihre Berichte in
-derselben Form schreiben. Ob eine Anleitung taugt, zeigt ein Blindtest: Eine KI, die nichts davon kennt, richtet damit etwas
-ein und schreibt auf, wo sie raten musste. Bei der ersten Anleitung waren es beim ersten Versuch 22 Stellen, beim dritten
-noch 11, darunter eine echte Lücke, die dann behoben wurde; der vierte Versuch fand nur noch Kleinigkeiten.
+derselben Form schreiben; seit Fassung 1.4 ist das Testprotokoll eine feste Vorlage wie die beiden anderen. Ob eine
+Anleitung taugt, zeigt ein Blindtest: Eine KI, die nichts davon kennt, richtet damit etwas ein und schreibt auf, wo sie
+raten musste. Bei der ersten Anleitung waren es beim ersten Versuch 22 Stellen, beim dritten noch 11, darunter eine echte
+Lücke, die dann behoben wurde; der vierte Versuch fand nur noch Kleinigkeiten.
+
+Seit Fassung 1.4 ist Block A englisch; Block B bleibt deutsch.
 
 ## Was du im Alltag tust
 
 Lies nur den zweiten Teil. Verstehst du danach nicht, wozu das Ganze gut ist und was du selbst tun musst, ist der Text nicht
 fertig – sag es einfach. Den ersten Teil prüft der Blindtest, nicht du.
+Stand: 2026-11-26
